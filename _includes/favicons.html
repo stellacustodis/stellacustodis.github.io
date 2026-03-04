@@ -1,0 +1,18 @@
+<!--
+  Overridden to provide a transparent favicon instead of the default images.
+  A 1×1 transparent PNG is embedded via data URI so that browser tabs remain
+  blank while still satisfying any requests from the theme.  The PWA manifest
+  link is preserved below so that progressive‑web‑app functionality continues
+  to work if enabled.
+-->
+{% capture favicon_path %}{{ '/assets/img/favicons' | relative_url }}{% endcapture %}
+
+{% capture transparent %}data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAgMBAf8P4egAAAAASUVORK5CYII={% endcapture %}
+
+<link rel="icon" type="image/png" href="{{ transparent }}" sizes="96x96">
+<link rel="icon" type="image/svg+xml" href="{{ transparent }}">
+<link rel="shortcut icon" href="{{ transparent }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ transparent }}">
+{% if site.pwa.enabled %}
+  <link rel="manifest" href="{{ favicon_path }}/site.webmanifest">
+{% endif %}

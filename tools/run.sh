@@ -17,7 +17,7 @@ help() {
   echo "     -h, --help           Print this help information."
 }
 
-while (($#)); do
+while [ $# -gt 0 ]; do
   opt="$1"
   case $opt in
   -H | --host)
@@ -33,7 +33,7 @@ while (($#)); do
     exit 0
     ;;
   *)
-    echo -e "> Unknown option: '$opt'\n"
+    printf "> Unknown option: '%s'\n\n" "$opt"
     help
     exit 1
     ;;
@@ -50,5 +50,5 @@ if [ -e /proc/1/cgroup ] && grep -q docker /proc/1/cgroup; then
   command="$command --force_polling"
 fi
 
-echo -e "\n> $command\n"
+printf "\n> %s\n\n" "$command"
 eval "$command"
