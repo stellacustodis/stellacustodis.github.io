@@ -1,0 +1,12 @@
+{% raw %}{% assign items = include.items %}
+{% raw %}{% for item in items %}
+  <li>
+    <a href="{{ site.baseurl }}/categories/{{ item.slug | uri_escape }}/">{{ item.name }}</a>
+    {% raw %}{% if item.children %}
+      <ul>
+        {% raw %}{% include category-tree.html items=item.children %}{% endraw %}
+      </ul>
+    {% raw %}{% endif %}
+  </li>
+{% raw %}{% endfor %}
+{% endraw %}

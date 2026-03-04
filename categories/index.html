@@ -1,0 +1,18 @@
+---
+layout: page
+title: Categories
+permalink: /categories/
+---
+
+<h1>Categories</h1>
+
+<ul class="category-tree">
+  {% raw %}{% include category-tree.html items=site.data.categories.categories %}{% endraw %}
+</ul>
+
+<style>
+/* simple styling for nested category list */
+.category-tree { list-style: none; padding-left: 0 }
+.category-tree ul { list-style: none; margin-left: 1.2rem }
+.category-tree a { text-decoration: none }
+</style>
