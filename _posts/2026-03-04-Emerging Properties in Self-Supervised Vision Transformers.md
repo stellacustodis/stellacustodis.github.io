@@ -6,7 +6,7 @@ permalink: /posts/Emerging Properties in Self-Supervised Vision Transformers/
 categories:
   - deeplearning/paper-reading
 
-tags: [paper review, self-supervised learning]
+tags: [paper review, Self-supervised learning]
 paper:
   authors: "Facebook AI Research"
   venue: "ICCV, 2021"
