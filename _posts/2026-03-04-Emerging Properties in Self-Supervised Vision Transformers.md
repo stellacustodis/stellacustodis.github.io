@@ -1,6 +1,6 @@
 ---
 title: "[논문 리뷰] Emerging Properties in Self-Supervised Vision Transformers"
-date: 2026-03-24 21:00:00 +0900
+date: 2026-03-30 21:00:00 +0900
 layout: post
 permalink: /posts/Emerging Properties in Self-Supervised Vision Transformers/
 categories:
