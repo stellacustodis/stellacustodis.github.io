@@ -4,5 +4,92 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-> Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
-{: .prompt-tip }
+## 안녕하세요 👋
+
+비전 생성 모델을 연구하는 취업 준비생입니다.
+
+17살에 처음 Python을 접했고, 전공은 아니었지만 대학교에서 머신러닝을 공부하기 시작했습니다.  
+"완벽하지 않다면 앞으로 나아가지 않는다"는 성격 탓에 늘 시행착오가 많았지만,  
+그 과정에서 배운 것들을 이 블로그에 하나씩 정리하고 있습니다.
+
+---
+
+## 관심 분야
+
+- **생성 모델** — Diffusion, Flow Matching, Auto-regressive
+- **컴퓨터 비전** — Image / Video Generation, 3D Vision
+- **로보틱스** — Vision-Language Models (VLM), Vision-Language-Action (VLA)
+- **딥러닝 이론** — Transformer, Self-supervised Learning
+
+---
+
+## 수상
+
+| 연도 | 대회 | 결과 |
+|------|------|------|
+| 2023 | ICCAS · 제1회 고영 AI 경진대회 | 🥇 우승 |
+| 2024 | ETRI · Fashion-How Season 5 | 🏆 장관상(우승) |
+| 2025 | ETRI · 자율주행 챌린지 (Segmentation) | 4위 |
+
+---
+
+## 학력
+
+**서울과학기술대학교** 전기정보공학과  
+학사 졸업 (2019 수석 입학) → 석사 과정 입학 (2025) → 석사 과정 중퇴 (2026)
+
+---
+
+## 수료/학회 내역
+
+**IDEC**
+
+| 과정명 | 연도 |
+|---|---|
+| Deep Learning with TensorFlow | 2020 |
+| 신호 및 시계열 데이터를 위한 AI 개발 워크플로우 | 2020 |
+| 비휘발성 메모리 Overview | 2020 |
+| OrCAD를 이용한 회로도 작성 및 PCB 설계 방법 | 2022 |
+| AI 머신러닝 워크샵 | 2022 |
+| 소프트웨어 보안설계 | 2023 |
+
+
+**NVIDIA Deep Learning Institute**
+
+| 과정명 | 연도 |
+|---|---|
+| 딥러닝의 기초 | 2022 |
+| 트랜스포머 기반 자연어 처리 애플리케이션 구축 | 2023 |
+
+**Conference**
+
+| 과정명 | 주관 | 연도 |
+|---|---|---|
+| Extended Abstract Paper Poster Session| RoboSoft | 2026 |
+
+---
+
+## 타임라인
+
+- **1999** 강릉 출생
+- **2015** 나로우주센터 과학 동아리에서 Python 첫 만남 — RR Lyrae 변광성에 빠져들다
+- **2016** 아마추어 천문 동아리 *별하늘지기* 연간 전시회 대표사진 게재
+- **2017** 수능 공부 시작. 3월 평균 5등급 → 10월 거의 올1 달성 — 한 달간 PC방 거주
+- **2018** 수능을 말아먹고 강원대 입학 → 한 달 만에 자퇴, 독학 재수 시작
+- **2019** 과탐2과목에서 크게 미끄러지며 서울대 실패 — 서울과기대 전기정보공학과 수석 입학 / 교내 아두이노 대회 수상 / 진로 방황 중
+- **2020–2022** 육군 제2기갑여단 전차병 복무 (파주) — 복무 중 IDEC 딥러닝(TensorFlow) 수강
+- **2022** NVIDIA DLI 딥러닝 기초 수강
+- **2023** 학부 연구 인턴 시작 / NVIDIA DLI Transformer NLP 수강  
+  🥇 ICCAS · 제1회 고영 AI 경진대회 우승
+- **2024** 캡스톤 디자인 — 악천후 환경 보행자 ReID 모델 & Windows 프로그램 개발  
+  🏆 ETRI Fashion-How S5 장관상
+- **2025** 석사 과정 입학 / PyCon KR 참가 / ETRI 자율주행 챌린지 Segmentation 4위
+- **2026** Robosoft Extended Abstract 참여 / 석사 자퇴
+
+---
+
+## 링크
+
+- GitHub: [github.com/stellacustodis](https://github.com/stellacustodis)
+- Email: stellacustodis@gmail.com
+
