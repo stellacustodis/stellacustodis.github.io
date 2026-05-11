@@ -1,61 +1,72 @@
-#!/bin/bash
+<#
+.SYNOPSIS
+    Jekyll 블로그 새 포스트 생성 스크립트
 
-# Jekyll 블로그 새 포스트 생성 스크립트
+.PARAMETER Title
+    포스트 제목 (필수)
 
-# 함수: 도움말 출력
-show_help() {
-    echo "❌ 제목을 입력해주세요."
-    echo "사용법: ./tools/new-post.sh '논문 제목' [YYYY-MM-DD]"
-    echo "예시: ./tools/new-post.sh 'Self-Supervised Flow Matching' '2026-03-21'"
+.PARAMETER Type
+    포스트 유형: paper (논문 리뷰), dev (개발 공부), note (기타)
+    기본값: paper
+
+.PARAMETER Date
+    게시 날짜 (YYYY-MM-DD). 기본값: 오늘
+
+.EXAMPLE
+    .\tools\new-post.ps1 -Title "PixelDiT: Pixel Diffusion Transformers"
+    .\tools\new-post.ps1 -Title "Python 환경 설정 완전 가이드" -Type dev
+    .\tools\new-post.ps1 -Title "Self-Flow" -Type paper -Date 2026-03-21
+#>
+param(
+    [Parameter(Mandatory = $true, HelpMessage = "포스트 제목을 입력하세요")]
+    [string]$Title,
+
+    [ValidateSet("paper", "dev", "note")]
+    [string]$Type = "paper",
+
+    [string]$Date = (Get-Date -Format "yyyy-MM-dd")
+)
+
+$repoRoot = Split-Path $PSScriptRoot -Parent
+
+# URL-safe 슬러그 (소문자 + 영문/숫자/한글만, 나머지는 하이픈)
+$slug = $Title.ToLower() `
+    -replace '[^a-z0-9가-힣]+', '-' `
+    -replace '^-|-$', ''
+
+$postFile  = "_posts\$Date-$slug.md"
+$imgFolder = "assets\img\posts\$slug"
+$postPath  = Join-Path $repoRoot $postFile
+$imgPath   = Join-Path $repoRoot $imgFolder
+$mathPath  = Join-Path $repoRoot "_includes\_math"
+
+if (Test-Path $postPath) {
+    Write-Error "이미 존재하는 파일입니다: $postFile"
+    exit 1
 }
 
-# 인자 확인
-if [ -z "$1" ]; then
-    show_help
-    exit 1
-fi
+New-Item -ItemType Directory -Force -Path $imgPath  | Out-Null
+New-Item -ItemType Directory -Force -Path $mathPath | Out-Null
 
-TITLE="$1"
-DATE="${2:-$(date +%Y-%m-%d)}"
+# ── 템플릿 선택 ──────────────────────────────────────────────
+if ($Type -eq "paper") {
 
-# URL 친화적 제목 생성 (소문자 + 스페이스를 하이픈으로)
-URL_TITLE=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9가-힣-]/-/g' | sed 's/-\+/-/g' | sed 's/^-\|-$//'  )
-
-POST_FILENAME="${DATE}-${URL_TITLE}.md"
-SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
-REPO_ROOT="$(cd "$SCRIPT_DIR" && pwd)"
-
-POST_PATH="$REPO_ROOT/../_posts/$POST_FILENAME"
-IMG_FOLDER_PATH="$REPO_ROOT/../assets/img/posts/$URL_TITLE"
-MATH_FOLDER_PATH="$REPO_ROOT/../_includes/_math"
-
-# 파일 중복 확인
-if [ -f "$POST_PATH" ]; then
-    echo "❌ 이미 존재하는 파일입니다: $POST_FILENAME"
-    exit 1
-fi
-
-# 필요한 폴더 생성
-mkdir -p "$IMG_FOLDER_PATH" 2>/dev/null && echo "📁 폴더 생성: assets/img/posts/$URL_TITLE"
-mkdir -p "$MATH_FOLDER_PATH" 2>/dev/null && echo "📁 폴더 생성: _includes/_math"
-
-# 마크다운 템플릿 생성
-cat > "$POST_PATH" << EOF
+$content = @"
 ---
-title: "[논문 리뷰] $TITLE"
-date: $DATE 21:00:00 +0900
-layout: post
-permalink: /posts/$URL_TITLE/
+title: "[논문 리뷰] $Title"
+date: $Date 21:00:00 +0900
 categories:
-  - deeplearning/paper-reading
-
+  - ai/paper-review
 tags: [paper review, TODO]
 paper:
   authors: "TODO"
-  venue: "TODO"
-  arxiv: "TODO"
-  code: "TODO"
+  venue:   "TODO"
+  arxiv:   "TODO"
+  code:    "TODO"
 ---
+
+<!-- 이미지 경로: /assets/img/posts/$slug/<파일명> -->
+<!-- 예시: ![fig1](/assets/img/posts/$slug/fig1.png) -->
 
 ### My Insight
 
@@ -75,19 +86,65 @@ paper:
 ### 5. Results
 
 
-### [Reviewer's Note / Discussion]
+### Discussion
 
-EOF
+"@
 
-if [ $? -eq 0 ]; then
-    echo "✅ 포스트 생성: _posts/$POST_FILENAME"
-    echo ""
-    echo "다음 구조가 생성되었습니다:"
-    echo "  📄 _posts/$POST_FILENAME"
-    echo "  📁 assets/img/posts/$URL_TITLE"
-    echo "  📝 이미지는 위 폴더에 저장하세요"
-    echo "  📐 복잡한 수식은 _includes/_math 에 저장하세요"
-else
-    echo "❌ 포스트 생성 실패"
-    exit 1
-fi
+} elseif ($Type -eq "dev") {
+
+$content = @"
+---
+title: "$Title"
+date: $Date 21:00:00 +0900
+categories:
+  - dev
+tags: [TODO]
+---
+
+<!-- 이미지 경로: /assets/img/posts/$slug/<파일명> -->
+<!-- 예시: ![fig1](/assets/img/posts/$slug/fig1.png) -->
+
+## 개요
+
+
+## 본문
+
+
+## 마무리
+
+"@
+
+} else {
+
+$content = @"
+---
+title: "$Title"
+date: $Date 21:00:00 +0900
+categories:
+  - misc
+tags: [TODO]
+---
+
+<!-- 이미지 경로: /assets/img/posts/$slug/<파일명> -->
+
+
+"@
+
+}
+
+Set-Content -Path $postPath -Value $content -Encoding UTF8
+
+Write-Host ""
+Write-Host "✅ 포스트 생성 완료"
+Write-Host ""
+Write-Host "  📄 $postFile"
+Write-Host "  📁 $imgFolder\"
+Write-Host ""
+Write-Host "이미지 삽입 방법:"
+Write-Host "  1. 이미지를 $imgFolder\ 에 복사"
+Write-Host "  2. 마크다운에 삽입: ![설명](/assets/img/posts/$slug/파일명.png)"
+Write-Host ""
+Write-Host "수식 (MathJax):"
+Write-Host "  인라인:  `$수식`$"
+Write-Host "  블록:    `$`$수식`$`$"
+Write-Host ""

@@ -4,7 +4,7 @@ date: 2026-03-30 21:00:00 +0900
 layout: post
 permalink: /posts/Emerging Properties in Self-Supervised Vision Transformers/
 categories:
-  - deeplearning/paper-reading
+  - ai/paper-review
 
 tags: [paper review, Self-supervised learning]
 paper:

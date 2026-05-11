@@ -1,50 +1,19 @@
 categories:
-  - name: Basic knowledge for graduate school
-    slug: basic-knowledge-for-graduate-school
-  - name: Linux
-    slug: linux
-    children:
-      - name: GPU
-        slug: linux/gpu
-  - name: Programming
-    slug: programming
-    children:
-      - name: Python
-        slug: programming/python
-      - name: Torch
-        slug: programming/torch
-      - name: Algorithm
-        slug: programming/algorithm
+  - name: AI 논문 리뷰
+    slug: ai/paper-review
 
-  - name: Deep Learning
-    slug: deeplearning
-    children:
-      - name: Paper Reading
-        slug: deeplearning/paper-reading
-      - name: Code Implementation
-        slug: deeplearning/code-implementation
-    children:
-      - name: Computer Vision
-        slug: deeplearning/computer-vision
-        children:
-          - name: generative AI
-            slug: deeplearning/computer-vision/generative-ai
-            children:
-            - name: diffusion
-              slug: deeplearning/computer-vision/generative-ai/diffusion
-            - name: Auto-regressive
-              slug: deeplearning/computer-vision/generative-ai/auto-regressive
-            - name: Variational Autoencoder
-              slug: deeplearning/computer-vision/generative-ai/variational-autoencoder
-            - name: Normalizing Flow
-              slug: deeplearning/computer-vision/generative-ai/normalizing-flow
-          - name: Image Classification
-            slug: deeplearning/computer-vision/image-classification
-          - name: Object Detection
-            slug: deeplearning/computer-vision/object-detection
-          - name: Semantic Segmentation
-            slug: deeplearning/computer-vision/semantic-segmentation
-        
+  - name: AI 구현
+    slug: ai/implementation
 
-      - name: Natural Language Processing
-        slug: deeplearning/natural-language-processing
+  - name: 개발 공부
+    slug: dev
+    children:
+      - name: Python / PyTorch
+        slug: dev/python
+      - name: 알고리즘
+        slug: dev/algorithm
+      - name: 도구 & 환경
+        slug: dev/tools
+
+  - name: 기타
+    slug: misc
