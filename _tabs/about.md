@@ -25,11 +25,11 @@ order: 4
 
 ## 수상
 
-| 연도 | 대회 | 결과 |
-|------|------|------|
-| 2023 | ICCAS · 제1회 고영 AI 경진대회 | 🥇 우승 |
-| 2024 | ETRI · Fashion-How Season 5 | 🏆 장관상(우승) |
-| 2025 | ETRI · 자율주행 챌린지 (Segmentation) | 4위 |
+| 연도 | 대회                                  | 결과           |
+| ---- | ------------------------------------- | -------------- |
+| 2023 | ICCAS · 제1회 고영 AI 경진대회        | 🥇 우승         |
+| 2024 | ETRI · Fashion-How Season 5           | 🏆 장관상(우승) |
+| 2025 | ETRI · 자율주행 챌린지 (Segmentation) | 4위            |
 
 ---
 
@@ -44,28 +44,28 @@ order: 4
 
 **IDEC**
 
-| 과정명 | 연도 |
-|---|---|
-| Deep Learning with TensorFlow | 2020 |
+| 과정명                                          | 연도 |
+| ----------------------------------------------- | ---- |
+| Deep Learning with TensorFlow                   | 2020 |
 | 신호 및 시계열 데이터를 위한 AI 개발 워크플로우 | 2020 |
-| 비휘발성 메모리 Overview | 2020 |
-| OrCAD를 이용한 회로도 작성 및 PCB 설계 방법 | 2022 |
-| AI 머신러닝 워크샵 | 2022 |
-| 소프트웨어 보안설계 | 2023 |
+| 비휘발성 메모리 Overview                        | 2020 |
+| OrCAD를 이용한 회로도 작성 및 PCB 설계 방법     | 2022 |
+| AI 머신러닝 워크샵                              | 2022 |
+| 소프트웨어 보안설계                             | 2023 |
 
 
 **NVIDIA Deep Learning Institute**
 
-| 과정명 | 연도 |
-|---|---|
-| 딥러닝의 기초 | 2022 |
+| 과정명                                        | 연도 |
+| --------------------------------------------- | ---- |
+| 딥러닝의 기초                                 | 2022 |
 | 트랜스포머 기반 자연어 처리 애플리케이션 구축 | 2023 |
 
 **Conference**
 
-| 과정명 | 주관 | 연도 |
-|---|---|---|
-| Extended Abstract Paper Poster Session| RoboSoft | 2026 |
+| 과정명                                 | 주관     | 연도 |
+| -------------------------------------- | -------- | ---- |
+| Extended Abstract Paper Poster Session | RoboSoft | 2026 |
 
 ---
 
@@ -93,3 +93,22 @@ order: 4
 - GitHub: [github.com/stellacustodis](https://github.com/stellacustodis)
 - Email: stellacustodis@gmail.com
 
+## 공부한/하고있는 책
+
+핸즈온 머신러닝(3판)
+내일은 파이썬
+밑바닥부터 시작하는 딥러닝 1 ~ 5
+면접을 위한 CS 전공지식 노트
+Clean Code
+Claen Architecture
+알고리즘 코딩테스트(파이썬 편)
+이것이 자료구조 + 알고리즘이다 with C언어
+파이토치 딥러닝 프로그래밍 1,2
+신비한 파이썬 프로젝트
+파이토치 딥러닝 마스터
+Deep Learning
+통계적 기계학습
+한걸음 앞선 개발자가 지금 꼭 알아야 할 클로드 코드
+컴퓨터 비전
+Pattern Recognition and Machine Learning
+An INtroduction to Staticstical Learning
