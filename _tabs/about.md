@@ -95,20 +95,20 @@ order: 4
 
 ## 공부한/하고있는 책
 
-핸즈온 머신러닝(3판)
-내일은 파이썬
-밑바닥부터 시작하는 딥러닝 1 ~ 5
-면접을 위한 CS 전공지식 노트
-Clean Code
-Claen Architecture
-알고리즘 코딩테스트(파이썬 편)
-이것이 자료구조 + 알고리즘이다 with C언어
-파이토치 딥러닝 프로그래밍 1,2
-신비한 파이썬 프로젝트
-파이토치 딥러닝 마스터
-Deep Learning
-통계적 기계학습
-한걸음 앞선 개발자가 지금 꼭 알아야 할 클로드 코드
-컴퓨터 비전
-Pattern Recognition and Machine Learning
-An INtroduction to Staticstical Learning
+- 핸즈온 머신러닝(3판)
+- 내일은 파이썬
+- 밑바닥부터 시작하는 딥러닝 1 ~ 5
+- 면접을 위한 CS 전공지식 노트
+- Clean Code
+- Claen Architecture
+- 알고리즘 코딩테스트(파이썬 편)
+- 이것이 자료구조 + 알고리즘이다 with C언어
+- 파이토치 딥러닝 프로그래밍 1,2
+- 신비한 파이썬 프로젝트
+- 파이토치 딥러닝 마스터
+- Deep Learning
+- 통계적 기계학습
+- 한걸음 앞선 개발자가 지금 꼭 알아야 할 클로드 코드
+- Computer Vision
+- Pattern Recognition and Machine Learning
+- An INtroduction to Staticstical Learning
