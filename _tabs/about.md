@@ -111,4 +111,5 @@ order: 4
 - 한걸음 앞선 개발자가 지금 꼭 알아야 할 클로드 코드
 - Computer Vision
 - Pattern Recognition and Machine Learning
-- An INtroduction to Staticstical Learning
+- An Introduction to Staticstical Learning
+- 이펙티브 파이썬 3판
