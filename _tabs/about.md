@@ -40,6 +40,27 @@ order: 4
 
 ---
 
+## Publications
+
+> 학부생·석사 과정에서 참여한 연구들입니다. (본인: **J. Lee**)
+
+- **[2026.04]** **J. Lee**, *"Automated System Identification for Sim-to-Real Calibration of Tactile Sensors"*  
+  9th IEEE-RAS International Conference on Soft Robotics (RoboSoft), Extended Abstract Poster Session — *1st Author*
+
+- **[2025.12]** **J. Lee** and Y. Lee, *"Riemannian Manifold-Constrained Latent Embeddings for Transformer-Based Point Cloud Reconstruction"*  
+  Winter Annual Conference of KIBME — *1st Author*
+
+- **[2025.06]** Y. Yoon, **J. Lee**, and Y. Lee, *"Complementary Detection of Camouflaged Soldiers Using a Diffusion Model"*  
+  Journal of Institute of Control, Robotics and Systems (ICROS) — *Co-1st Author*
+
+- **[2024.11]** M. Kim, **J. Lee**, Y. Bae, N. Vasconcelos, and Y. Lee, *"Class-Balanced Methods for Enhanced Driver Drowsiness Recognition"*  
+  Autumn Annual Conference of IEIE
+
+- **[2024.11]** J. Park, **J. Lee**, and Y. Lee, *"A Method for Improving Person Re-identification Using Image Restoration"*  
+  Autumn Annual Conference of IEIE
+
+---
+
 ## 수료/학회 내역
 
 **IDEC**
