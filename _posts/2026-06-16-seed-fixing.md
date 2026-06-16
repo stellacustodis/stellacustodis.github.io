@@ -1,5 +1,5 @@
 ---
-title: "딥러닝 시드 고정 정리 (1)"
+title: "딥러닝 시드 고정 정리"
 date: 2026-06-16 21:00:00 +0900
 layout: post
 permalink: /posts/seed-fixing-1/
@@ -9,6 +9,8 @@ tags: [reproducibility, pytorch, cuda, seed]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/seed-fixing-1/<파일명> -->
+
+아래의 내용은 연구실 노션에 정리해놨던 글을 복사해 온 것임.
 
 글의 순서는 다음과 같음.
 
