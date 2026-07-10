@@ -18,7 +18,11 @@
     ];
 
     function fetchCount(p) {
-      var url = GC + '/counter/' + encodeURIComponent(p.path) + '.json';
+      // GoatCounter는 브라우저가 보내는 퍼센트 인코딩된 pathname을 그대로 저장하므로
+      // 한글 경로는 encodeURI로 먼저 브라우저 형태로 만든 뒤 다시 인코딩해야 함.
+      // ?start=는 과거에 캐시된 404 응답(최대 4시간)을 우회하기 위한 고정 파라미터.
+      var pathKey = encodeURI(p.path);
+      var url = GC + '/counter/' + encodeURIComponent(pathKey) + '.json?start=2026-01-01';
       return fetch(url)
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
