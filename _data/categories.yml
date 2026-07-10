@@ -15,5 +15,15 @@ categories:
       - name: 도구 & 환경
         slug: dev/tools
 
+  - name: 취업 준비
+    slug: career
+    children:
+      - name: 취준 일지
+        slug: career/log
+      - name: 코딩테스트
+        slug: career/cote
+      - name: 면접 & 자소서
+        slug: career/interview
+
   - name: 기타
     slug: misc
