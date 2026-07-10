@@ -1,0 +1,48 @@
+<!-- 인기 글 위젯(오른쪽 패널): GoatCounter 공개 카운터 API로 조회수를 실시간 조회해 Top N을 표시 -->
+<section id="popular-posts" hidden>
+  <h2 class="panel-heading">인기 글</h2>
+  <ol id="popular-posts-list" class="content mt-3 mb-1" style="padding-left: 1.2rem;"></ol>
+</section>
+
+<script>
+  (function () {
+    var GC = 'https://stellacustodis.goatcounter.com';
+    var TOP_N = 10;
+
+    var posts = [
+      {%- for post in site.posts -%}
+        {%- unless post.hidden -%}
+          { path: {{ post.url | relative_url | jsonify }}, title: {{ post.title | jsonify }} },
+        {%- endunless -%}
+      {%- endfor -%}
+    ];
+
+    function fetchCount(p) {
+      var url = GC + '/counter/' + encodeURIComponent(p.path) + '.json';
+      return fetch(url)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          var n = d ? parseInt(String(d.count).replace(/[^0-9]/g, ''), 10) : 0;
+          return { path: p.path, title: p.title, count: n || 0 };
+        })
+        .catch(function () { return { path: p.path, title: p.title, count: 0 }; });
+    }
+
+    Promise.all(posts.map(fetchCount)).then(function (results) {
+      results.sort(function (a, b) { return b.count - a.count; });
+      var top = results.filter(function (r) { return r.count > 0; }).slice(0, TOP_N);
+      if (top.length === 0) return;
+
+      var esc = function (s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+
+      var ol = document.getElementById('popular-posts-list');
+      ol.innerHTML = top.map(function (r) {
+        return '<li class="mb-1"><a href="' + r.path + '">' + esc(r.title) + '</a> ' +
+               '<span class="text-muted small">(' + r.count.toLocaleString() + ')</span></li>';
+      }).join('');
+      document.getElementById('popular-posts').hidden = false;
+    });
+  })();
+</script>
