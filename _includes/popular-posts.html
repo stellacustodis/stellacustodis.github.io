@@ -1,13 +1,17 @@
 <!-- 인기 글 위젯(오른쪽 패널): GoatCounter 공개 카운터 API로 조회수를 실시간 조회해 Top N을 표시 -->
-<section id="popular-posts" hidden>
+<!-- 주의: Chirpy가 HTML을 한 줄로 압축하므로 아래 스크립트에 `//` 줄 주석을 쓰면 안 됨 -->
+<section class="popular-posts" hidden>
   <h2 class="panel-heading">인기 글</h2>
-  <ol id="popular-posts-list" class="content mt-3 mb-1" style="padding-left: 1.2rem;"></ol>
+  <ol class="popular-posts-list content mt-3 mb-1" style="padding-left: 1.2rem;"></ol>
 </section>
 
 <script>
   (function () {
     var GC = 'https://stellacustodis.goatcounter.com';
     var TOP_N = 10;
+
+    if (window.__popularPostsLoaded) { return; }
+    window.__popularPostsLoaded = true;
 
     var posts = [
       {%- for post in site.posts -%}
@@ -18,9 +22,9 @@
     ];
 
     function fetchCount(p) {
-      // GoatCounter는 브라우저가 보내는 퍼센트 인코딩된 pathname을 그대로 저장하므로
-      // 한글 경로는 encodeURI로 먼저 브라우저 형태로 만든 뒤 다시 인코딩해야 함.
-      // ?start=는 과거에 캐시된 404 응답(최대 4시간)을 우회하기 위한 고정 파라미터.
+      /* GoatCounter는 브라우저가 보내는 퍼센트 인코딩된 pathname을 그대로 저장하므로
+         한글 경로는 encodeURI로 먼저 브라우저 형태로 만든 뒤 다시 인코딩해야 함.
+         ?start=는 과거에 캐시된 404 응답(최대 4시간)을 우회하기 위한 고정 파라미터. */
       var pathKey = encodeURI(p.path);
       var url = GC + '/counter/' + encodeURIComponent(pathKey) + '.json?start=2026-01-01';
       return fetch(url)
@@ -41,12 +45,16 @@
         return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       };
 
-      var ol = document.getElementById('popular-posts-list');
-      ol.innerHTML = top.map(function (r) {
+      var html = top.map(function (r) {
         return '<li class="mb-1"><a href="' + r.path + '">' + esc(r.title) + '</a> ' +
                '<span class="text-muted small">(' + r.count.toLocaleString() + ')</span></li>';
       }).join('');
-      document.getElementById('popular-posts').hidden = false;
+
+      /* 위젯이 사이드 패널과 검색 힌트 패널 두 곳에 include되므로 모든 인스턴스를 채움 */
+      document.querySelectorAll('.popular-posts').forEach(function (sec) {
+        sec.querySelector('.popular-posts-list').innerHTML = html;
+        sec.hidden = false;
+      });
     });
   })();
 </script>
