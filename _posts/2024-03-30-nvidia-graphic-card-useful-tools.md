@@ -2,7 +2,7 @@
 title: "nvidia graphic card useful tools"
 date: 2024-03-30 21:00:00 +0900
 categories:
-  - dev/tools
+  - dev
 tags: [nvidia, gpu]
 ---
 
