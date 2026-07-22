@@ -6,7 +6,7 @@ permalink: /posts/python-mutable-immutable/
 categories:
   - Programming
   - Python
-tags: [python, mutability, object-model, shallow-copy, deep-copy]
+tags: [python, mutability, object-model, shallow-copy, deep-copy, 코딩테스트]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/python-mutable-immutable/<파일명> -->
