@@ -4,9 +4,10 @@ date: 2026-05-20 21:00:00 +0900
 layout: post
 permalink: /posts/Emerging Properties in Self-Supervised Vision Transformers/
 categories:
-  - ai/paper-review
+  - AI
+  - Paper Review
 
-tags: [paper review, Self-supervised learning]
+tags: [paper-review, self-supervised-learning, vision-transformer, dino, knowledge-distillation]
 paper:
   authors: "Facebook AI Research"
   venue: "ICCV, 2021"
@@ -37,4 +38,3 @@ paper:
 
 
 ### 6. Conclusion
-

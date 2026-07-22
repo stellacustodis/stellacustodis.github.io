@@ -4,8 +4,9 @@ date: 2026-06-16 23:00:00 +0900
 layout: post
 permalink: /posts/job-hunt-log-1/
 categories:
-  - career/log
-tags: [취준, 취업준비, 취준일지]
+  - Career
+  - Journal
+tags: [취업준비, 취준일지, ssafy, skala, 면접]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/job-hunt-log-1/<파일명> -->

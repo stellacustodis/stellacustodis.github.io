@@ -4,8 +4,9 @@ date: 2026-05-02 21:00:00 +0900
 layout: post
 permalink: /posts/python-mutable-immutable/
 categories:
-  - dev/python
-tags: [python]
+  - Programming
+  - Python
+tags: [python, mutability, object-model, shallow-copy, deep-copy]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/python-mutable-immutable/<파일명> -->

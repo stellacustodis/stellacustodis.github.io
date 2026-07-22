@@ -4,8 +4,9 @@ date: 2026-06-16 22:00:00 +0900
 layout: post
 permalink: /posts/dl-foundational-roadmap/
 categories:
-  - misc
-tags: [deep learning, roadmap, cnn, transformer, generative model, self-supervised]
+  - AI
+  - Learning
+tags: [deep-learning, computer-vision, learning-roadmap, generative-model, self-supervised-learning, transformer]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/dl-foundational-roadmap/<파일명> -->

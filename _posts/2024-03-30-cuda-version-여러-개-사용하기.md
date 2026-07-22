@@ -2,8 +2,9 @@
 title: "CUDA version 여러 개 사용하기"
 date: 2024-03-30 21:00:00 +0900
 categories:
-  - dev
-tags: [CUDA]
+  - AI
+  - Engineering
+tags: [cuda, gpu, nvidia, linux, deep-learning-environment]
 ---
 <!-- 이미지 경로: /assets/img/posts/cuda-version-여러-개-사용하기/<파일명> -->
 <!-- 예시: ![fig1](/assets/img/posts/cuda-version-여러-개-사용하기/fig1.png) -->

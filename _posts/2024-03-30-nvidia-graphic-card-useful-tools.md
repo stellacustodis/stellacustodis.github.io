@@ -2,8 +2,9 @@
 title: "nvidia graphic card useful tools"
 date: 2024-03-30 21:00:00 +0900
 categories:
-  - dev
-tags: [nvidia, gpu]
+  - AI
+  - Engineering
+tags: [nvidia, gpu, monitoring, linux, nvidia-smi, nvtop]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/nvidia-graphic-card-useful-tools/<파일명> -->

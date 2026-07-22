@@ -4,8 +4,9 @@ date: 2026-06-16 21:00:00 +0900
 layout: post
 permalink: /posts/seed-fixing-1/
 categories:
-  - ai/implementation
-tags: [reproducibility, pytorch, cuda, seed]
+  - AI
+  - Engineering
+tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
 ---
 
 <!-- 이미지 경로: /assets/img/posts/seed-fixing-1/<파일명> -->
