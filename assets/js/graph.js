@@ -39,6 +39,7 @@
   let transform = { x: 0, y: 0, scale: 1 };
   let panState = null;
   let draggedNode = null;
+  let nodeDragStart = null;
   let dragMoved = false;
 
   categories.forEach((category) => categorySelect.add(new Option(category, category)));
@@ -147,9 +148,6 @@
       title.textContent = node.title;
       group.append(circle, label, title);
       group.addEventListener('pointerdown', (event) => startNodeDrag(event, node));
-      group.addEventListener('click', () => {
-        if (!dragMoved) selectNode(node.id);
-      });
       group.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
@@ -333,6 +331,7 @@
   function startNodeDrag(event, node) {
     event.stopPropagation();
     draggedNode = node;
+    nodeDragStart = { x: event.clientX, y: event.clientY };
     dragMoved = false;
     node.fixed = true;
     svg.setPointerCapture(event.pointerId);
@@ -415,12 +414,17 @@
 
   svg.addEventListener('pointermove', (event) => {
     if (draggedNode) {
+      const distance = Math.hypot(
+        event.clientX - nodeDragStart.x,
+        event.clientY - nodeDragStart.y,
+      );
+      if (distance < 4 && !dragMoved) return;
+      dragMoved = true;
       const point = eventToGraphPoint(event);
       draggedNode.x = point.x;
       draggedNode.y = point.y;
       draggedNode.vx = 0;
       draggedNode.vy = 0;
-      dragMoved = true;
       updatePositions();
       return;
     }
@@ -432,11 +436,15 @@
   });
 
   svg.addEventListener('pointerup', () => {
+    const clickedNode = draggedNode;
+    const wasDragged = dragMoved;
     if (draggedNode) draggedNode.fixed = false;
     draggedNode = null;
+    nodeDragStart = null;
     panState = null;
     svg.classList.remove('is-panning');
-    setTimeout(() => { dragMoved = false; }, 0);
+    dragMoved = false;
+    if (clickedNode && !wasDragged) selectNode(clickedNode.id);
   });
 
   svg.addEventListener('dblclick', (event) => {
