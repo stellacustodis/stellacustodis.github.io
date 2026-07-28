@@ -75,3 +75,5 @@ DBeaver 자체가 데이터베이스인 것은 아니다. DBeaver에서 작성�
 첫 번째 글에서는 파일과 데이터베이스의 차이에서 출발해 관계형 모델, PK/FK, ERD, 스키마, DDL과 DML을 하나의 작은 주문 시스템으로 연결한다.
 
 다음 글: [1일차 — 관계형 데이터베이스와 모델링](/posts/skala-smart-data-day1/)
+
+이어 읽기: [2일차 — JOIN부터 Window Function까지](/posts/skala-smart-data-day2/)
