@@ -1,0 +1,52 @@
+<!-- 방문자 수 위젯(오른쪽 패널): GoatCounter 공개 카운터 API로 오늘/누적 방문자 수를 표시 -->
+<!-- 주의: Chirpy가 HTML을 한 줄로 압축하므로 아래 스크립트에 `//` 줄 주석을 쓰면 안 됨 -->
+<section class="visitor-count" hidden>
+  <h2 class="panel-heading">방문자 수</h2>
+  <div class="content mt-3 mb-1">
+    <span>오늘 <b class="vc-today">-</b></span>
+    <span class="mx-1">·</span>
+    <span>전체 <b class="vc-total">-</b></span>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var GC = 'https://stellacustodis.goatcounter.com';
+
+    if (window.__visitorCountLoaded) { return; }
+    window.__visitorCountLoaded = true;
+
+    function fetchCount(url) {
+      return fetch(url)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          var raw = d ? (d.count_unique || d.count) : null;
+          var n = raw ? parseInt(String(raw).replace(/[^0-9]/g, ''), 10) : NaN;
+          return isNaN(n) ? null : n;
+        })
+        .catch(function () { return null; });
+    }
+
+    /* 오늘 날짜는 방문자 브라우저의 로컬 시간 기준(YYYY-MM-DD) */
+    var now = new Date();
+    var today = now.getFullYear() + '-' +
+      ('0' + (now.getMonth() + 1)).slice(-2) + '-' +
+      ('0' + now.getDate()).slice(-2);
+
+    Promise.all([
+      fetchCount(GC + '/counter/TOTAL.json'),
+      fetchCount(GC + '/counter/TOTAL.json?start=' + today)
+    ]).then(function (res) {
+      var total = res[0];
+      var todayN = res[1];
+      if (total === null && todayN === null) return;
+
+      /* 위젯이 사이드 패널과 검색 힌트 패널 두 곳에 include되므로 모든 인스턴스를 채움 */
+      document.querySelectorAll('.visitor-count').forEach(function (sec) {
+        sec.querySelector('.vc-today').textContent = todayN === null ? '-' : todayN.toLocaleString();
+        sec.querySelector('.vc-total').textContent = total === null ? '-' : total.toLocaleString();
+        sec.hidden = false;
+      });
+    });
+  })();
+</script>

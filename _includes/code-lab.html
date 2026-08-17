@@ -1,0 +1,181 @@
+<div id="code-lab" class="code-lab" lang="ko" hidden>
+  <button class="code-lab__backdrop" type="button" data-code-lab-close aria-label="Code Lab 닫기"></button>
+
+  <section
+    class="code-lab__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="code-lab-title"
+    aria-describedby="code-lab-description"
+    tabindex="-1"
+  >
+    <header class="code-lab__header">
+      <div class="code-lab__brand">
+        <span class="code-lab__brand-icon" aria-hidden="true"><i class="fas fa-terminal"></i></span>
+        <div>
+          <div class="code-lab__eyebrow">BROWSER PLAYGROUND</div>
+          <h2 id="code-lab-title">Code Lab</h2>
+        </div>
+      </div>
+
+      <div class="code-lab__header-actions">
+        <span class="code-lab__privacy">
+          <i class="fas fa-shield-halved" aria-hidden="true"></i>
+          Python은 브라우저에서, C/C++/Java는 격리 서버에서 실행됩니다
+        </span>
+        <button class="code-lab__icon-button" type="button" data-code-lab-close aria-label="Code Lab 닫기">
+          <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <p id="code-lab-description" class="code-lab__sr-only">
+      Python, C, C++, Java 코드를 작성하고 실행하는 학습용 도구입니다.
+      C, C++, Java 코드는 실행을 위해 Judge0 서버로 전송됩니다.
+    </p>
+
+    <div class="code-lab__language-bar">
+      <div class="code-lab__tabs" role="tablist" aria-label="프로그래밍 언어">
+        <button id="code-lab-tab-python" class="code-lab__tab is-active" type="button" role="tab" aria-selected="true" aria-controls="code-lab-editor-panel" data-language="python">
+          <span class="code-lab__language-mark code-lab__language-mark--python" aria-hidden="true">Py</span>
+          Python
+        </button>
+        <button id="code-lab-tab-c" class="code-lab__tab" type="button" role="tab" aria-selected="false" aria-controls="code-lab-editor-panel" data-language="c" tabindex="-1">
+          <span class="code-lab__language-mark" aria-hidden="true">C</span>
+          C
+        </button>
+        <button id="code-lab-tab-cpp" class="code-lab__tab" type="button" role="tab" aria-selected="false" aria-controls="code-lab-editor-panel" data-language="cpp" tabindex="-1">
+          <span class="code-lab__language-mark" aria-hidden="true">C++</span>
+          C++
+        </button>
+        <button id="code-lab-tab-java" class="code-lab__tab" type="button" role="tab" aria-selected="false" aria-controls="code-lab-editor-panel" data-language="java" tabindex="-1">
+          <span class="code-lab__language-mark code-lab__language-mark--java" aria-hidden="true">J</span>
+          Java
+        </button>
+      </div>
+
+      <div class="code-lab__runtime-note">
+        <span id="code-lab-runtime-dot" class="code-lab__runtime-dot" aria-hidden="true"></span>
+        <span id="code-lab-runtime-label">Pyodide · 첫 실행 시 로드</span>
+      </div>
+    </div>
+
+    <div class="code-lab__workspace">
+      <section id="code-lab-editor-panel" class="code-lab__pane code-lab__editor-pane" role="tabpanel" aria-labelledby="code-lab-tab-python">
+        <div class="code-lab__pane-heading">
+          <div>
+            <span class="code-lab__pane-kicker">EDITOR</span>
+            <strong id="code-lab-filename">main.py</strong>
+          </div>
+          <div class="code-lab__editor-meta">
+            <span id="code-lab-position">Ln 1, Col 1</span>
+            <span>Spaces: 4</span>
+          </div>
+        </div>
+
+        <div class="code-lab__editor">
+          <pre id="code-lab-line-numbers" class="code-lab__line-numbers" aria-hidden="true">1</pre>
+          <textarea
+            id="code-lab-source"
+            class="code-lab__source"
+            aria-label="소스 코드 편집기"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            wrap="off"
+            maxlength="65536"
+          ></textarea>
+        </div>
+
+        <details class="code-lab__stdin">
+          <summary>
+            <span><i class="fas fa-keyboard" aria-hidden="true"></i> 표준 입력(stdin)</span>
+            <span class="code-lab__stdin-hint">선택 사항</span>
+          </summary>
+          <textarea id="code-lab-stdin" rows="3" maxlength="16384" aria-label="표준 입력" placeholder="input(), scanf, cin, Scanner가 읽을 값을 입력하세요."></textarea>
+        </details>
+      </section>
+
+      <section class="code-lab__pane code-lab__result-pane" aria-labelledby="code-lab-output-title">
+        <div class="code-lab__pane-heading">
+          <div>
+            <span class="code-lab__pane-kicker">RESULT</span>
+            <strong id="code-lab-output-title">실행 결과</strong>
+          </div>
+          <button id="code-lab-clear-output" class="code-lab__text-button" type="button">지우기</button>
+        </div>
+
+        <div id="code-lab-output-view" class="code-lab__output-view">
+          <div id="code-lab-empty" class="code-lab__empty">
+            <span class="code-lab__empty-icon" aria-hidden="true"><i class="fas fa-play"></i></span>
+            <strong>코드를 실행해 보세요</strong>
+            <span><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd>로도 실행할 수 있습니다.</span>
+          </div>
+          <pre id="code-lab-output" class="code-lab__output" role="status" aria-live="polite" aria-atomic="true" tabindex="0" hidden></pre>
+        </div>
+
+        <section id="code-lab-trace" class="code-lab__trace" aria-label="Python 단계별 실행" hidden>
+          <div class="code-lab__trace-toolbar">
+            <div>
+              <span class="code-lab__pane-kicker">PYTHON TRACE</span>
+              <strong id="code-lab-step-count">0 / 0</strong>
+            </div>
+            <div class="code-lab__trace-actions">
+              <button id="code-lab-step-prev" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="이전 단계">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+              </button>
+              <button id="code-lab-step-next" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="다음 단계">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="code-lab__trace-grid">
+            <div>
+              <div class="code-lab__trace-label">실행 위치</div>
+              <pre id="code-lab-trace-source" class="code-lab__trace-source" aria-live="polite"></pre>
+            </div>
+            <div class="code-lab__trace-state">
+              <div class="code-lab__trace-label">호출 스택</div>
+              <div id="code-lab-stack" class="code-lab__stack"></div>
+              <div class="code-lab__trace-label">지역 변수</div>
+              <div id="code-lab-locals" class="code-lab__variables"></div>
+              <div class="code-lab__trace-label">현재까지의 출력</div>
+              <pre id="code-lab-trace-output" class="code-lab__trace-output"></pre>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <footer class="code-lab__footer">
+      <div class="code-lab__status-wrap">
+        <span id="code-lab-status-icon" class="code-lab__status-icon" aria-hidden="true"><i class="fas fa-circle-check"></i></span>
+        <span id="code-lab-status" role="status" aria-live="polite">준비됨</span>
+      </div>
+
+      <div class="code-lab__actions">
+        <button id="code-lab-reset" class="code-lab__button code-lab__button--ghost" type="button">
+          <i class="fas fa-rotate-left" aria-hidden="true"></i>
+          예제 복원
+        </button>
+        <button id="code-lab-stop" class="code-lab__button code-lab__button--danger" type="button" hidden>
+          <i class="fas fa-stop" aria-hidden="true"></i>
+          중지
+        </button>
+        <button id="code-lab-trace-run" class="code-lab__button code-lab__button--secondary" type="button">
+          <i class="fas fa-shoe-prints" aria-hidden="true"></i>
+          단계별 실행
+        </button>
+        <button id="code-lab-run" class="code-lab__button code-lab__button--primary" type="button">
+          <i class="fas fa-play" aria-hidden="true"></i>
+          실행
+          <span class="code-lab__shortcut">⌘↵</span>
+        </button>
+      </div>
+    </footer>
+  </section>
+</div>
+
+<script type="module" src="{{ '/assets/js/code-lab.js' | relative_url }}"></script>

@@ -1,0 +1,153 @@
+/* Library 그래프 — graph.css 를 깔고 그 위에 라이브러리 전용만 얹는다. */
+
+/* graph.css 는 #graph-canvas 를 아이디로 잡는다. 이쪽 캔버스는 별도로 크기를 준다. */
+#library-canvas {
+  cursor: grab;
+  display: block;
+  height: 38rem;
+  touch-action: none;
+  user-select: none;
+  width: 100%;
+}
+
+@media (max-width: 850px) {
+  #library-canvas {
+    height: 30rem;
+  }
+}
+
+/* 주제 군집을 감싸는 원과 이름표 */
+.library-hull {
+  pointer-events: none;
+}
+
+/* 뷰포트 전체가 축소돼 들어오므로(전체 보기에서 대략 0.4배) 이름표는
+   그 몫만큼 키워 둔다. 화면에서는 11px 안팎으로 보인다. */
+.library-hull-label {
+  font-size: 1.7rem;
+  font-weight: 700;
+  text-anchor: middle;
+  pointer-events: none;
+  letter-spacing: 0.01em;
+}
+
+/* 노드가 495개라 기본 반지름이 작다. 선택·검색 상태를 색이 아니라
+   크기와 불투명도로 알린다 — 색은 이미 주제가 쓰고 있다. */
+.library-node circle {
+  transition: r 0.12s ease, opacity 0.12s ease;
+}
+
+.library-node.is-dimmed {
+  opacity: 0.18;
+}
+
+.library-node.is-faded {
+  opacity: 0.12;
+}
+
+.library-node.is-match circle,
+.library-node.is-selected circle {
+  stroke: var(--text-color, #1b1b1e);
+  stroke-width: 1.6;
+}
+
+.library-node.is-selected {
+  opacity: 1;
+}
+
+/* 블로그에 리뷰가 있는 논문 */
+.library-ring {
+  stroke-width: 1.4;
+  stroke-opacity: 0.75;
+}
+
+.library-node.is-reviewed circle:first-of-type {
+  fill-opacity: 1;
+}
+
+.library-edge {
+  stroke-opacity: 0.28;
+  stroke-width: 1;
+}
+
+.library-edge.is-active {
+  stroke-opacity: 0.9;
+  stroke-width: 2;
+}
+
+.library-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+/* 테마의 폼 규칙이 입력 요소를 툴바 폭에 맞춰 늘린다. 체크박스는 고정 크기로 둔다. */
+.library-toggle input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.library-external {
+  font-size: 0.86rem;
+}
+
+/* 상세창의 축별 라벨. 누르면 그 라벨로 걸러진다. */
+.library-facet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.library-facet-name {
+  flex: 0 0 2.6rem;
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.library-chip {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.library-chip:hover {
+  filter: brightness(0.94);
+  text-decoration: underline;
+}
+
+.library-cluster-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.library-cluster-pick > span {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.library-legend-count,
+#library-legend small {
+  opacity: 0.55;
+  margin-left: 0.15rem;
+}
+
+.library-note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.graph-detail-title {
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+}

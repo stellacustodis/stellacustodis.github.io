@@ -1,0 +1,29 @@
+categories:
+  - name: AI 논문 리뷰
+    slug: ai/paper-review
+
+  - name: AI 구현
+    slug: ai/implementation
+
+  - name: 개발 공부
+    slug: dev
+    children:
+      - name: Python / PyTorch
+        slug: dev/python
+      - name: 알고리즘
+        slug: dev/algorithm
+      - name: 도구 & 환경
+        slug: dev/tools
+
+  - name: 취업 준비
+    slug: career
+    children:
+      - name: 취준 일지
+        slug: career/log
+      - name: 코딩테스트
+        slug: career/cote
+      - name: 면접 & 자소서
+        slug: career/interview
+
+  - name: 기타
+    slug: misc

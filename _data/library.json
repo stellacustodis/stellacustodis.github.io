@@ -1,0 +1,7384 @@
+{
+ "generated": "2026-08-18",
+ "facets": {
+  "family": [
+   {
+    "id": "diffusion",
+    "label": "확산"
+   },
+   {
+    "id": "autoregressive",
+    "label": "자기회귀"
+   },
+   {
+    "id": "flow",
+    "label": "Flow"
+   },
+   {
+    "id": "gan",
+    "label": "GAN"
+   },
+   {
+    "id": "vae",
+    "label": "VAE"
+   },
+   {
+    "id": "ebm",
+    "label": "EBM"
+   },
+   {
+    "id": "none",
+    "label": "계열 없음"
+   }
+  ],
+  "task": [
+   {
+    "id": "generation",
+    "label": "생성"
+   },
+   {
+    "id": "3d",
+    "label": "3D"
+   },
+   {
+    "id": "restoration",
+    "label": "복원"
+   },
+   {
+    "id": "editing",
+    "label": "편집"
+   },
+   {
+    "id": "representation",
+    "label": "표현학습"
+   },
+   {
+    "id": "recognition",
+    "label": "인식"
+   },
+   {
+    "id": "retrieval",
+    "label": "검색"
+   },
+   {
+    "id": "efficiency",
+    "label": "효율·경량화"
+   }
+  ],
+  "kind": [
+   {
+    "id": "method",
+    "label": "방법론"
+   },
+   {
+    "id": "survey",
+    "label": "서베이"
+   },
+   {
+    "id": "benchmark",
+    "label": "벤치마크"
+   },
+   {
+    "id": "theory",
+    "label": "이론"
+   }
+  ]
+ },
+ "papers": [
+  {
+   "id": "HHWJRR6H",
+   "title": "FSC: Few-point Shape Completion",
+   "year": "2024",
+   "author": "Wu",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Wu_FSC_Few-point_Shape_Completion_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "5GWHNFF7",
+   "title": "A Statistical Manifold Framework for Point Cloud Data",
+   "year": "2022",
+   "author": "Lee",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.mlr.press/v162/lee22d.html",
+   "post": ""
+  },
+  {
+   "id": "P4ES5MMM",
+   "title": "Canadian Adverse Driving Conditions Dataset",
+   "year": "2021",
+   "author": "Pitropov",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "benchmark",
+   "url": "http://arxiv.org/abs/2001.10117",
+   "post": ""
+  },
+  {
+   "id": "629596CT",
+   "title": "Deep Learning for 3D Point Clouds: A Survey",
+   "year": "2021",
+   "author": "Guo",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9127813/",
+   "post": ""
+  },
+  {
+   "id": "W4KI65VH",
+   "title": "LIBRE: The Multiple 3D LiDAR Dataset",
+   "year": "2020",
+   "author": "Carballo",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/9304681/?arnumber=9304681",
+   "post": ""
+  },
+  {
+   "id": "TK3223WG",
+   "title": "ShapeNet: An Information-Rich 3D Model Repository",
+   "year": "2015",
+   "author": "Chang",
+   "family": [],
+   "task": [
+    "3d"
+   ],
+   "kind": "benchmark",
+   "url": "http://arxiv.org/abs/1512.03012",
+   "post": ""
+  },
+  {
+   "id": "RZQGV3F9",
+   "title": "RGB2Point: 3D Point Cloud Generation from Single RGB Images",
+   "year": "2025",
+   "author": "Lee",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10943708",
+   "post": ""
+  },
+  {
+   "id": "2Q6TLJ6M",
+   "title": "LPCG: A Self-conditional Architecture for Labeled Point Cloud Generation",
+   "year": "2025",
+   "author": "Huang",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32378",
+   "post": ""
+  },
+  {
+   "id": "HFKMIQAX",
+   "title": "2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+   "year": "2024",
+   "author": "Huang",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3641519.3657428",
+   "post": ""
+  },
+  {
+   "id": "PHK6BBXY",
+   "title": "Advances in 3D Generation: A Survey",
+   "year": "2024",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2401.17807",
+   "post": ""
+  },
+  {
+   "id": "LMN79HHB",
+   "title": "Realistic Rainy Weather Simulation for LiDARs in CARLA Simulator",
+   "year": "2024",
+   "author": "Yang",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10802036",
+   "post": ""
+  },
+  {
+   "id": "N4F8DNT9",
+   "title": "Simulating Road Spray Effects in Automotive Lidar Sensor Models",
+   "year": "2024",
+   "author": "Scheuble",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10588834/?arnumber=10588834",
+   "post": ""
+  },
+  {
+   "id": "6DM2QE4J",
+   "title": "Text2NeRF: Text-Driven 3D Scene Generation With Neural Radiance Fields",
+   "year": "2024",
+   "author": "Zhang",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10422989",
+   "post": ""
+  },
+  {
+   "id": "4DF35CCG",
+   "title": "3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+   "year": "2023",
+   "author": "Kerbl",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3592433",
+   "post": ""
+  },
+  {
+   "id": "TMB3YCVQ",
+   "title": "Generative Range Imaging for Learning Scene Priors of 3D LiDAR Data",
+   "year": "2023",
+   "author": "Nakashima",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10030845/",
+   "post": ""
+  },
+  {
+   "id": "JJWPS5GU",
+   "title": "Comprehensive Review of Deep Learning-Based 3D Point Cloud Completion Processing and Analysis",
+   "year": "2022",
+   "author": "Fei",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/9857670/",
+   "post": ""
+  },
+  {
+   "id": "EFGYJ7H9",
+   "title": "NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+   "year": "2020",
+   "author": "Mildenhall",
+   "family": [],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-030-58452-8_24",
+   "post": ""
+  },
+  {
+   "id": "AZFMEUNW",
+   "title": "SceneCompleter: Dense 3D Scene Completion for Generative Novel View Synthesis",
+   "year": "2025",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "3d",
+    "generation",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2506.10981",
+   "post": ""
+  },
+  {
+   "id": "T23S5ZYI",
+   "title": "Point Cloud Based Scene Segmentation: A Survey",
+   "year": "2025",
+   "author": "Halperin",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2503.12595",
+   "post": ""
+  },
+  {
+   "id": "5INZLG2I",
+   "title": "Semi-supervised 3D Semantic Scene Completion with 2D Vision Foundation Model Guidance",
+   "year": "2025",
+   "author": "Pham",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32698",
+   "post": ""
+  },
+  {
+   "id": "ST52ASQB",
+   "title": "VLScene: Vision-Language Guidance Distillation for Camera-Based 3D Semantic Scene Completion",
+   "year": "2025",
+   "author": "Wang",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32841",
+   "post": ""
+  },
+  {
+   "id": "JMBG7QID",
+   "title": "VisHall3D: Monocular Semantic Scene Completion from Reconstructing the Visible Regions to Hallucinating the Invisible Regions",
+   "year": "2025",
+   "author": "Lu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Lu_VisHall3D_Monocular_Semantic_Scene_Completion_from_Reconstructing_the_Visible_Regions_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "MBMWPL7E",
+   "title": "Disentangling Instance and Scene Contexts for 3D Semantic Scene Completion",
+   "year": "2025",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Liu_Disentangling_Instance_and_Scene_Contexts_for_3D_Semantic_Scene_Completion_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "WAXQ87B5",
+   "title": "Feed-Forward SceneDINO for Unsupervised Semantic Scene Completion",
+   "year": "2025",
+   "author": "Jevtić",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Jevtic_Feed-Forward_SceneDINO_for_Unsupervised_Semantic_Scene_Completion_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "N67KUTIC",
+   "title": "SDFormer: Vision-based 3D Semantic Scene Completion via SAM-assisted Dual-channel Voxel Transformer",
+   "year": "2025",
+   "author": "Xue",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Xue_SDFormer_Vision-based_3D_Semantic_Scene_Completion_via_SAM-assisted_Dual-channel_Voxel_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "F3FVS673",
+   "title": "SOAP: Vision-Centric 3D Semantic Scene Completion with Scene-Adaptive Decoder and Occluded Region-Aware View Projection",
+   "year": "2025",
+   "author": "Lee",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Lee_SOAP_Vision-Centric_3D_Semantic_Scene_Completion_with_Scene-Adaptive_Decoder_and_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "T7CF7FPR",
+   "title": "SGFormer: Satellite-Ground Fusion for 3D Semantic Scene Completion",
+   "year": "2025",
+   "author": "Guo",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Guo_SGFormer_Satellite-Ground_Fusion_for_3D_Semantic_Scene_Completion_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "FG9BWL8E",
+   "title": "Effect of Fog Particle Size Distribution on 3D Object Detection Under Adverse Weather Conditions",
+   "year": "2024",
+   "author": "Shinde",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/2408.01085",
+   "post": ""
+  },
+  {
+   "id": "FD3C7MH2",
+   "title": "Point Transformer V3: Simpler Faster Stronger",
+   "year": "2024",
+   "author": "Wu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Wu_Point_Transformer_V3_Simpler_Faster_Stronger_CVPR_2024_paper",
+   "post": ""
+  },
+  {
+   "id": "9PS36IB7",
+   "title": "Sunshine to Rainstorm: Cross-Weather Knowledge Distillation for Robust 3D Object Detection",
+   "year": "2024",
+   "author": "Huang",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/28016",
+   "post": ""
+  },
+  {
+   "id": "RUWYZB8Q",
+   "title": "Enhancing Robustness of LiDAR-Based Perception in Adverse Weather using Point Cloud Augmentations",
+   "year": "2023",
+   "author": "Teufel",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10186696/?arnumber=10186696",
+   "post": ""
+  },
+  {
+   "id": "GCJ2KVPS",
+   "title": "Survey on LiDAR Perception in Adverse Weather Conditions",
+   "year": "2023",
+   "author": "Dreissig",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10186539/?arnumber=10186539",
+   "post": ""
+  },
+  {
+   "id": "32PU2UUG",
+   "title": "Towards Robust 3D Object Detection In Rainy Conditions",
+   "year": "2023",
+   "author": "Piroli",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10422250/?arnumber=10422250",
+   "post": ""
+  },
+  {
+   "id": "KTISZIVQ",
+   "title": "PV-RCNN++: Point-Voxel Feature Set Abstraction With Local Vector Representation for 3D Object Detection",
+   "year": "2023",
+   "author": "Shi",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/s11263-022-01710-9",
+   "post": ""
+  },
+  {
+   "id": "5TQAWPR7",
+   "title": "SCPNet: Semantic Scene Completion on Point Cloud",
+   "year": "2023",
+   "author": "Xia",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Xia_SCPNet_Semantic_Scene_Completion_on_Point_Cloud_CVPR_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "WIZ6GCV8",
+   "title": "LiDAR Snowfall Simulation for Robust 3D Object Detection",
+   "year": "2022",
+   "author": "Hahner",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9879145/",
+   "post": ""
+  },
+  {
+   "id": "9UKDKWUG",
+   "title": "Parallel LiDARs Meet the Foggy Weather",
+   "year": "2022",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9874864/?arnumber=9874864",
+   "post": ""
+  },
+  {
+   "id": "88HSXM8H",
+   "title": "Point Transformer V2: Grouped Vector Attention and Partition-based Pooling",
+   "year": "2022",
+   "author": "Wu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/d78ece6613953f46501b958b7bb4582f-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "K6YN5DJN",
+   "title": "Simulating Realistic Rain, Snow, and Fog Variations For Comprehensive Performance Characterization of LiDAR Perception",
+   "year": "2022",
+   "author": "Teufel",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9860868/?arnumber=9860868",
+   "post": ""
+  },
+  {
+   "id": "E4225LJM",
+   "title": "Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-Shot Cross-Dataset Transfer",
+   "year": "2022",
+   "author": "Ranftl",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9178977/?arnumber=9178977",
+   "post": ""
+  },
+  {
+   "id": "NT7G9JDR",
+   "title": "Geodesic Self-Attention for 3D Point Clouds",
+   "year": "2022",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/28e4ee96c94e31b2d040b4521d2b299e-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "XN2UULXV",
+   "title": "Adaptive Graph Convolution for Point Cloud Analysis",
+   "year": "2021",
+   "author": "Zhou",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9710382/",
+   "post": ""
+  },
+  {
+   "id": "KSLVIARY",
+   "title": "Fog Simulation ona Real LiDAR Point Clouds for 3D Object Detection in Adverse Weather",
+   "year": "2021",
+   "author": "Hahner",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9711095/",
+   "post": ""
+  },
+  {
+   "id": "LG3PSM3B",
+   "title": "Point Transformer",
+   "year": "2021",
+   "author": "Zhao",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2021/html/Zhao_Point_Transformer_ICCV_2021_paper.html?ref=;",
+   "post": ""
+  },
+  {
+   "id": "6JHQ8ZFF",
+   "title": "Center-Based 3D Object Detection and Tracking",
+   "year": "2021",
+   "author": "Yin",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2021/html/Yin_Center-Based_3D_Object_Detection_and_Tracking_CVPR_2021_paper.html",
+   "post": ""
+  },
+  {
+   "id": "4I2LT7SM",
+   "title": "Convolution in the Cloud: Learning Deformable Kernels in 3D Graph Convolution Networks for Point Cloud Analysis",
+   "year": "2020",
+   "author": "Lin",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9156514/",
+   "post": ""
+  },
+  {
+   "id": "DEYC6BLJ",
+   "title": "4D Spatio-Temporal ConvNets: Minkowski Convolutional Neural Networks",
+   "year": "2019",
+   "author": "Choy",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_CVPR_2019/html/Choy_4D_Spatio-Temporal_ConvNets_Minkowski_Convolutional_Neural_Networks_CVPR_2019_paper.html",
+   "post": ""
+  },
+  {
+   "id": "8GM7IRY8",
+   "title": "Dynamic Graph CNN for Learning on Point Clouds",
+   "year": "2019",
+   "author": "Wang",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3326362",
+   "post": ""
+  },
+  {
+   "id": "2UUE6R3S",
+   "title": "KPConv: Flexible and Deformable Convolution for Point Clouds",
+   "year": "2019",
+   "author": "Thomas",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_ICCV_2019/html/Thomas_KPConv_Flexible_and_Deformable_Convolution_for_Point_Clouds_ICCV_2019_paper.html",
+   "post": ""
+  },
+  {
+   "id": "S75EWVZS",
+   "title": "Multiresolution Tree Networks for 3D Point Cloud Processing",
+   "year": "2018",
+   "author": "Gadelha",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_ECCV_2018/html/Matheus_Gadelha_Multiresolution_Tree_Networks_ECCV_2018_paper.html",
+   "post": ""
+  },
+  {
+   "id": "EV2Q4ADI",
+   "title": "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation",
+   "year": "2017",
+   "author": "Qi",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_cvpr_2017/html/Qi_PointNet_Deep_Learning_CVPR_2017_paper.html",
+   "post": ""
+  },
+  {
+   "id": "8HKKUC5T",
+   "title": "PointNet++: Deep Hierarchical Feature Learning on Point Sets in a Metric Space",
+   "year": "2017",
+   "author": "Qi",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2017/hash/d8bf84be3800d12f74d8b05e9b89836f-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "J3ZHQUJF",
+   "title": "ScatterFormer: Efficient Voxel Transformer with Scattered Linear Attention",
+   "year": "2024",
+   "author": "He",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=cHyGqhAXlQ",
+   "post": ""
+  },
+  {
+   "id": "AYZFZ7GC",
+   "title": "Point-Voxel CNN for Efficient 3D Deep Learning",
+   "year": "2019",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "3d",
+    "recognition",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2019/hash/5737034557ef5b8c02c0e46513b98f90-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "7TZVYV3A",
+   "title": "Fourier Decomposition for Explicit Representation of 3D Point Cloud Attributes",
+   "year": "2025",
+   "author": "Kim",
+   "family": [],
+   "task": [
+    "3d",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2503.10055",
+   "post": ""
+  },
+  {
+   "id": "BXYWFRMF",
+   "title": "Unsupervised Point Cloud Representation Learning With Deep Neural Networks: A Survey",
+   "year": "2023",
+   "author": "Xiao",
+   "family": [],
+   "task": [
+    "3d",
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10086697/",
+   "post": ""
+  },
+  {
+   "id": "EIXVVHEV",
+   "title": "Multi-View Representation is What You Need for Point-Cloud Pre-Training",
+   "year": "2023",
+   "author": "Yan",
+   "family": [],
+   "task": [
+    "3d",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=imZcqOrbig",
+   "post": ""
+  },
+  {
+   "id": "762CCSM7",
+   "title": "PointRWKV: Efficient RWKV-Like Model for Hierarchical Point Cloud Learning",
+   "year": "2025",
+   "author": "He",
+   "family": [],
+   "task": [
+    "3d",
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32353",
+   "post": ""
+  },
+  {
+   "id": "3ED8TGCR",
+   "title": "SLAM3R: Real-Time Dense Scene Reconstruction from Monocular RGB Videos",
+   "year": "2025",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Liu_SLAM3R_Real-Time_Dense_Scene_Reconstruction_from_Monocular_RGB_Videos_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "782VDDM2",
+   "title": "InstaScene: Towards Complete 3D Instance Decomposition and Reconstruction from Cluttered Scenes",
+   "year": "2025",
+   "author": "Yang",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Yang_InstaScene_Towards_Complete_3D_Instance_Decomposition_and_Reconstruction_from_Cluttered_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "RR77NR49",
+   "title": "Revisiting Point Cloud Completion: Are We Ready For The Real-World?",
+   "year": "2025",
+   "author": "Pathak",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "survey",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Pathak_Revisiting_Point_Cloud_Completion_Are_We_Ready_For_The_Real-World_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "JHP54ZSW",
+   "title": "Geometric Alignment and Prior Modulation for View-Guided Point Cloud Completion on Unseen Categories",
+   "year": "2025",
+   "author": "Xiu",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Xiu_Geometric_Alignment_and_Prior_Modulation_for_View-Guided_Point_Cloud_Completion_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "JLMF4AMT",
+   "title": "Parametric Point Cloud Completion for Polygonal Surface Reconstruction",
+   "year": "2025",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Chen_Parametric_Point_Cloud_Completion_for_Polygonal_Surface_Reconstruction_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "WGMQ7NYJ",
+   "title": "GenPC: Zero-shot Point Cloud Completion via 3D Generative Priors",
+   "year": "2025",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Li_GenPC_Zero-shot_Point_Cloud_Completion_via_3D_Generative_Priors_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "GXFHQBWW",
+   "title": "TripleMixer: A 3D Point Cloud Denoising Model for Adverse Weather",
+   "year": "2024",
+   "author": "Zhao",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=PQxbQOHjcf",
+   "post": ""
+  },
+  {
+   "id": "VTIQET55",
+   "title": "SMART-Degradation: A Dataset for LiDAR Degradation Evaluation in Rain",
+   "year": "2023",
+   "author": "Zhang",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/10342323/?arnumber=10342323",
+   "post": ""
+  },
+  {
+   "id": "3AGMKXBX",
+   "title": "Advanced LiDAR Translation for Huge Domain Gap to Handle Adverse Weather Change",
+   "year": "2023",
+   "author": "Lee",
+   "family": [],
+   "task": [
+    "3d",
+    "restoration",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10200824/?arnumber=10200824",
+   "post": ""
+  },
+  {
+   "id": "LTKHMRHG",
+   "title": "Riemann-based Multi-scale Attention Reasoning Network for Text-3D Retrieval",
+   "year": "2025",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "3d",
+    "retrieval"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/34034",
+   "post": ""
+  },
+  {
+   "id": "QVI2WKT7",
+   "title": "PointCloud-Text Matching: Benchmark Dataset and Baseline",
+   "year": "2025",
+   "author": "Feng",
+   "family": [],
+   "task": [
+    "3d",
+    "retrieval"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/abstract/document/11086386",
+   "post": ""
+  },
+  {
+   "id": "FKQACESA",
+   "title": "SmartEdit: Exploring Complex Instruction-Based Image Editing with Multimodal Large Language Models",
+   "year": "2024",
+   "author": "Huang",
+   "family": [],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656752/",
+   "post": ""
+  },
+  {
+   "id": "BGHEU25A",
+   "title": "Guiding Instruction-based Image Editing via Multimodal Large Language Models",
+   "year": "2023",
+   "author": "Fu",
+   "family": [],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=S1RKWSyZ2Y&utm_source=www.airesearchinsights.com&utm_medium=referral&utm_campaign=apple-papers-spotlight-revolutionizing-ai-across-languages-visions-and-realms",
+   "post": ""
+  },
+  {
+   "id": "B5J77DGU",
+   "title": "Text2LIVE: Text-Driven Layered Image and Video Editing",
+   "year": "2022",
+   "author": "Avidan",
+   "family": [],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-19784-0_41",
+   "post": ""
+  },
+  {
+   "id": "RMT6PID8",
+   "title": "Visual Prompting via Image Inpainting",
+   "year": "2022",
+   "author": "Bar",
+   "family": [],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/9f09f316a3eaf59d9ced5ffaefe97e0f-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "RJLB6E8I",
+   "title": "Contrastive Learning for Unpaired Image-to-Image Translation",
+   "year": "2020",
+   "author": "Park",
+   "family": [],
+   "task": [
+    "editing",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-030-58545-7_19",
+   "post": ""
+  },
+  {
+   "id": "B7QVSZWM",
+   "title": "Transformers without Normalization",
+   "year": "2025",
+   "author": "Zhu",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Zhu_Transformers_without_Normalization_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "LKQDG68A",
+   "title": "MoH: Multi-Head Attention as Mixture-of-Head Attention",
+   "year": "2025",
+   "author": "Jin",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=eYtgs9k75o",
+   "post": ""
+  },
+  {
+   "id": "JEJB9M5G",
+   "title": "Data management for production quality deep learning models: Challenges and solutions",
+   "year": "2022",
+   "author": "Munappy",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "survey",
+   "url": "https://linkinghub.elsevier.com/retrieve/pii/S0164121222000905",
+   "post": ""
+  },
+  {
+   "id": "5EMQGC6N",
+   "title": "Token Merging: Your ViT But Faster",
+   "year": "2022",
+   "author": "Bolya",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=JroZRaRw7Eu",
+   "post": ""
+  },
+  {
+   "id": "HIG3RB36",
+   "title": "EViT: Expediting Vision Transformers via Token Reorganizations",
+   "year": "2021",
+   "author": "Liang",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=BjyvwnXXVn_",
+   "post": ""
+  },
+  {
+   "id": "SSQW94QJ",
+   "title": "DynamicViT: Efficient Vision Transformers with Dynamic Token Sparsification",
+   "year": "2021",
+   "author": "Rao",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/747d3443e319a22747fbb873e8b2f9f2-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "DEPEUY2T",
+   "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+   "year": "2015",
+   "author": "Ioffe",
+   "family": [],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v37/ioffe15.html",
+   "post": ""
+  },
+  {
+   "id": "IC3VTJJ6",
+   "title": "Nano World Models: A Minimalist Implementation of Future Video Prediction",
+   "year": "2026",
+   "author": "Huang",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2605.23993",
+   "post": ""
+  },
+  {
+   "id": "NBABIMG3",
+   "title": "A Survey on Long Video Generation: Challenges, Methods, and Prospects",
+   "year": "2024",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2403.16407",
+   "post": ""
+  },
+  {
+   "id": "BDBH3VBU",
+   "title": "Evaluating and Improving Compositional Text-to-Visual Generation",
+   "year": "2024",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/10677983/",
+   "post": ""
+  },
+  {
+   "id": "NBXMRQLA",
+   "title": "Generative Image Dynamics",
+   "year": "2024",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Li_Generative_Image_Dynamics_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "WKI2YUJE",
+   "title": "Generator Matching: Generative modeling with arbitrary Markov processes",
+   "year": "2024",
+   "author": "Holderrieth",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=RuP17cJtZo",
+   "post": ""
+  },
+  {
+   "id": "DZ4VKCEM",
+   "title": "A Comprehensive Survey of AI-Generated Content (AIGC): A History of Generative AI from GAN to ChatGPT",
+   "year": "2023",
+   "author": "Cao",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2303.04226",
+   "post": ""
+  },
+  {
+   "id": "3BLV45RX",
+   "title": "GenAug: Retargeting behaviors to unseen situations via Generative Augmentation",
+   "year": "2023",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://www.roboticsproceedings.org/rss19/p010.pdf",
+   "post": ""
+  },
+  {
+   "id": "YIEKZIJD",
+   "title": "Assessing Generative Models via Precision and Recall",
+   "year": "2018",
+   "author": "Sajjadi",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2018/hash/f7696a9b362ac5a51c3dc8f098b73923-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "QZ3MPE6T",
+   "title": "Numerical Solution of Stochastic Differential Equations",
+   "year": "1992",
+   "author": "Kloeden",
+   "family": [],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "http://ebookcentral.proquest.com/lib/seoultech/detail.action?docID=3099793",
+   "post": ""
+  },
+  {
+   "id": "F4XL7MIV",
+   "title": "A Systematic Survey of Prompt Engineering in Large Language Models: Techniques and Applications",
+   "year": "2025",
+   "author": "Sahoo",
+   "family": [],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2402.07927",
+   "post": ""
+  },
+  {
+   "id": "U3HTLSQT",
+   "title": "Generative Multimodal Models are In-Context Learners",
+   "year": "2024",
+   "author": "Sun",
+   "family": [],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Sun_Generative_Multimodal_Models_are_In-Context_Learners_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "CEAJ6EKW",
+   "title": "Rotary Position Embedding for Vision Transformer",
+   "year": "2025",
+   "author": "Heo",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-031-72684-2_17",
+   "post": ""
+  },
+  {
+   "id": "TCCW2MC7",
+   "title": "AEROBLADE: Training-Free Detection of Latent Diffusion Images Using Autoencoder Reconstruction Error",
+   "year": "2024",
+   "author": "Ricker",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656214/",
+   "post": ""
+  },
+  {
+   "id": "AXJAH7FZ",
+   "title": "Extracting Clean and Balanced Subset for Noisy Long-tailed Classification",
+   "year": "2024",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=HjdMyivrRT",
+   "post": ""
+  },
+  {
+   "id": "E895GJDA",
+   "title": "Learning With Imbalanced Noisy Data by Preventing Bias in Sample Selection",
+   "year": "2024",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10443531",
+   "post": ""
+  },
+  {
+   "id": "FAARIF25",
+   "title": "Mitigating Spurious Correlations via Disagreement Probability",
+   "year": "2024",
+   "author": "Han",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/879c5890a9d2ecdcb590c9674cda4a59-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "CZ4Z4CHM",
+   "title": "A Unified Framework for U-Net Design and Analysis",
+   "year": "2023",
+   "author": "Williams",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/58575be50c9b47902359920a4d5d1ab4-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "83WHJY54",
+   "title": "Benchmarks for Corruption Invariant Person Re-identification",
+   "year": "2022",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "benchmark",
+   "url": "http://arxiv.org/abs/2111.00880",
+   "post": ""
+  },
+  {
+   "id": "2A4DKFFR",
+   "title": "Exploring Plain Vision Transformer Backbones for Object Detection",
+   "year": "2022",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-031-20077-9_17",
+   "post": ""
+  },
+  {
+   "id": "X9XSH3FB",
+   "title": "Is Space-Time Attention All You Need for Video Understanding?",
+   "year": "2021",
+   "author": "Bertasius",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v139/bertasius21a.html",
+   "post": ""
+  },
+  {
+   "id": "KBLVDMMF",
+   "title": "Vision Transformers for Dense Prediction",
+   "year": "2021",
+   "author": "Ranftl",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9711226/",
+   "post": ""
+  },
+  {
+   "id": "E5G8UVX3",
+   "title": "Rethinking and Improving Relative Position Encoding for Vision Transformer",
+   "year": "2021",
+   "author": "Wu",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2021/html/Wu_Rethinking_and_Improving_Relative_Position_Encoding_for_Vision_Transformer_ICCV_2021_paper.html",
+   "post": ""
+  },
+  {
+   "id": "XIATGU6Y",
+   "title": "Swin Transformer: Hierarchical Vision Transformer Using Shifted Windows",
+   "year": "2021",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2021/html/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper",
+   "post": ""
+  },
+  {
+   "id": "4ZMNLNSC",
+   "title": "End-to-End Object Detection with Transformers",
+   "year": "2020",
+   "author": "Carion",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-030-58452-8_13",
+   "post": ""
+  },
+  {
+   "id": "MXXPYWE8",
+   "title": "Weather Influence and Classification with Automotive Lidar Sensors",
+   "year": "2019",
+   "author": "Heinzler",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/8814205/?arnumber=8814205",
+   "post": ""
+  },
+  {
+   "id": "7QWHH9SL",
+   "title": "A Benchmark for Lidar Sensors in Fog: Is Detection Breaking Down?",
+   "year": "2018",
+   "author": "Bijelic",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/8500543/?arnumber=8500543",
+   "post": ""
+  },
+  {
+   "id": "9E288B47",
+   "title": "Deep Residual Learning for Image Recognition",
+   "year": "2016",
+   "author": "He",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "http://ieeexplore.ieee.org/document/7780459/",
+   "post": ""
+  },
+  {
+   "id": "CW4HMRYT",
+   "title": "You Only Look Once: Unified, Real-Time Object Detection",
+   "year": "2016",
+   "author": "Redmon",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "http://ieeexplore.ieee.org/document/7780460/",
+   "post": ""
+  },
+  {
+   "id": "E4RLEWY9",
+   "title": "Effect of label noise in the complexity of classification problems",
+   "year": "2015",
+   "author": "Garcia",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "theory",
+   "url": "https://linkinghub.elsevier.com/retrieve/pii/S0925231215001241",
+   "post": ""
+  },
+  {
+   "id": "DXPS4I9L",
+   "title": "An Orthogonal Current-Reuse Amplifier for Multi-Channel Sensing",
+   "year": "2013",
+   "author": "Johnson",
+   "family": [],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/6510003/?arnumber=6510003",
+   "post": ""
+  },
+  {
+   "id": "Y6WWPZPH",
+   "title": "VideoMamba: State Space Model for Efficient Video Understanding",
+   "year": "2025",
+   "author": "Li",
+   "family": [],
+   "task": [
+    "recognition",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-031-73347-5_14",
+   "post": ""
+  },
+  {
+   "id": "HEWZZWSE",
+   "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+   "year": "2020",
+   "author": "Dosovitskiy",
+   "family": [],
+   "task": [
+    "recognition",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=YicbFdNTTy&utm_campaign=f86497ed3a-EMAIL_CAMPAIGN_2019_04_24_03_18_COPY_01&utm_medium=email&utm_source=Deep%20Learning%20Weekly&utm_term=0_384567b42d-f86497ed3a-72965345",
+   "post": ""
+  },
+  {
+   "id": "CJ27W8UA",
+   "title": "Seeing Through Fog Without Seeing Fog: Deep Multimodal Sensor Fusion in Unseen Adverse Weather",
+   "year": "2020",
+   "author": "Bijelic",
+   "family": [],
+   "task": [
+    "recognition",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9157107/",
+   "post": ""
+  },
+  {
+   "id": "Q7NV38VA",
+   "title": "Riemannian Metric Learning: Closer to You than You Imagine",
+   "year": "2025",
+   "author": "Gruffaz",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/2503.05321",
+   "post": ""
+  },
+  {
+   "id": "JH5X374S",
+   "title": "LARP: Tokenizing Videos with a Learned Autoregressive Generative Prior",
+   "year": "2024",
+   "author": "Wang",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=Wr3UuEx72f",
+   "post": ""
+  },
+  {
+   "id": "4B3D6TBT",
+   "title": "Scaling Instruction-Finetuned Language Models",
+   "year": "2024",
+   "author": "Chung",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://jmlr.org/papers/v25/23-0870.html",
+   "post": ""
+  },
+  {
+   "id": "JW6RYESP",
+   "title": "Tree-Wasserstein Distance for High Dimensional Data with a Latent Feature Hierarchy",
+   "year": "2024",
+   "author": "Lin",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "theory",
+   "url": "https://openreview.net/forum?id=nYjAzwor9R",
+   "post": ""
+  },
+  {
+   "id": "DD2X538T",
+   "title": "Exploring Prompt Engineering: A Systematic Review with SWOT Analysis",
+   "year": "2024",
+   "author": "Singh",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2410.12843",
+   "post": ""
+  },
+  {
+   "id": "I254KCVX",
+   "title": "Language Quantized AutoEncoders: Towards Unsupervised Text-Image Alignment",
+   "year": "2023",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/0df1738319f8c6e15b58cb16ea3cfa57-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "RHITCTD9",
+   "title": "DINOv2: Learning Robust Visual Features without Supervision",
+   "year": "2023",
+   "author": "Oquab",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=a68SUt6zFt",
+   "post": ""
+  },
+  {
+   "id": "GT65G3GE",
+   "title": "Foundation Models in Robotics: Applications, Challenges, and the Future",
+   "year": "2023",
+   "author": "Firoozi",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2312.07843",
+   "post": ""
+  },
+  {
+   "id": "N6W9VQRC",
+   "title": "Affordances From Human Videos as a Versatile Representation for Robotics",
+   "year": "2023",
+   "author": "Bahl",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Bahl_Affordances_From_Human_Videos_as_a_Versatile_Representation_for_Robotics_CVPR_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "LXUKHZ2G",
+   "title": "ViNT: A Foundation Model for Visual Navigation",
+   "year": "2023",
+   "author": "Shah",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=-K7-1WvKO3F",
+   "post": ""
+  },
+  {
+   "id": "UTEICH63",
+   "title": "SiT: Self-supervised vIsion Transformer",
+   "year": "2022",
+   "author": "Atito",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2104.03602",
+   "post": ""
+  },
+  {
+   "id": "SADYU92U",
+   "title": "Masked Autoencoders Are Scalable Vision Learners",
+   "year": "2022",
+   "author": "He",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2022/html/He_Masked_Autoencoders_Are_Scalable_Vision_Learners_CVPR_2022_paper",
+   "post": ""
+  },
+  {
+   "id": "LPVDEA2S",
+   "title": "CACTI: A Framework for Scalable Multi-Task Multi-Scene Visual Imitation Learning",
+   "year": "2022",
+   "author": "Mandi",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=dRHW9-QFj9",
+   "post": ""
+  },
+  {
+   "id": "JA5SUV7L",
+   "title": "Emerging Properties in Self-Supervised Vision Transformers",
+   "year": "2021",
+   "author": "Caron",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9709990/",
+   "post": ""
+  },
+  {
+   "id": "TLFQRBZU",
+   "title": "Generalizing from a Few Examples: A Survey on Few-shot Learning",
+   "year": "2021",
+   "author": "Wang",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "https://dl.acm.org/doi/10.1145/3386252",
+   "post": ""
+  },
+  {
+   "id": "J5WPV6UL",
+   "title": "Learning Transferable Visual Models From Natural Language Supervision",
+   "year": "2021",
+   "author": "Radford",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v139/radford21a.html",
+   "post": ""
+  },
+  {
+   "id": "5UHS6XV5",
+   "title": "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation",
+   "year": "2021",
+   "author": "Press",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=R8sQPpGCv0",
+   "post": ""
+  },
+  {
+   "id": "6IAX6BRI",
+   "title": "Data collection and quality challenges for deep learning",
+   "year": "2020",
+   "author": "Whang",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "https://dl.acm.org/doi/10.14778/3415478.3415562",
+   "post": ""
+  },
+  {
+   "id": "7YPYMV4U",
+   "title": "Improving Image Captioning with Better Use of Caption",
+   "year": "2020",
+   "author": "Shi",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://aclanthology.org/2020.acl-main.664/",
+   "post": ""
+  },
+  {
+   "id": "K3C2A7JR",
+   "title": "Bootstrap Your Own Latent - A New Approach to Self-Supervised Learning",
+   "year": "2020",
+   "author": "Grill",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/f3ada80d5c4ee70142b17b8192b2958e-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "LKNT4ZCD",
+   "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+   "year": "2020",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v119/chen20j.html",
+   "post": ""
+  },
+  {
+   "id": "B9ZAAWZ8",
+   "title": "Big Self-Supervised Models are Strong Semi-Supervised Learners",
+   "year": "2020",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/fcbc95ccdd551da181207c0c1400c655-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "CMC4WW32",
+   "title": "Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations",
+   "year": "2019",
+   "author": "Raissi",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://linkinghub.elsevier.com/retrieve/pii/S0021999118307125",
+   "post": ""
+  },
+  {
+   "id": "K6KUQ9HI",
+   "title": "Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks",
+   "year": "2019",
+   "author": "Lee",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v97/lee19d.html",
+   "post": ""
+  },
+  {
+   "id": "X34J5PQ8",
+   "title": "Neural Ordinary Differential Equations",
+   "year": "2018",
+   "author": "Chen",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2018/hash/69386f6bb1dfed68692a24c8686939b9-Abstract.html",
+   "post": "/posts/neural-ordinary-differential-equations/"
+  },
+  {
+   "id": "4DICWHVN",
+   "title": "Attention is All you Need",
+   "year": "2017",
+   "author": "Vaswani",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html",
+   "post": "/posts/paper-review-transformer/"
+  },
+  {
+   "id": "6K9HYMEN",
+   "title": "Deep Sets",
+   "year": "2017",
+   "author": "Zaheer",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/f22e4747da1aa27e363d86d40ff442fe-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "IPIL3SWW",
+   "title": "A primer on information theory, with applications to neuroscience",
+   "year": "2013",
+   "author": "Effenberger",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/1304.2333",
+   "post": ""
+  },
+  {
+   "id": "QL5HSA2I",
+   "title": "Numerical optimization",
+   "year": "2006",
+   "author": "Nocedal",
+   "family": [],
+   "task": [
+    "representation"
+   ],
+   "kind": "theory",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "5ATXWNXV",
+   "title": "Image and Video Tokenization with Binary Spherical Quantization",
+   "year": "2024",
+   "author": "Zhao",
+   "family": [],
+   "task": [
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=yGnsH3gQ6U",
+   "post": ""
+  },
+  {
+   "id": "SF5FZC9Z",
+   "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+   "year": "2024",
+   "author": "Gu",
+   "family": [],
+   "task": [
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=tEYskw1VY2",
+   "post": ""
+  },
+  {
+   "id": "RFU5UCVV",
+   "title": "Visual Prompt Tuning",
+   "year": "2022",
+   "author": "Avidan",
+   "family": [],
+   "task": [
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-19827-4_41",
+   "post": ""
+  },
+  {
+   "id": "TPYMQU99",
+   "title": "TokenLearner: Adaptive Space-Time Tokenization for Videos",
+   "year": "2021",
+   "author": "Ryoo",
+   "family": [],
+   "task": [
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=z-l1kpDXs88",
+   "post": ""
+  },
+  {
+   "id": "5GZUL7SQ",
+   "title": "Unsupervised Pre-training for Person Re-identification",
+   "year": "2021",
+   "author": "Fu",
+   "family": [],
+   "task": [
+    "representation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9578813/",
+   "post": ""
+  },
+  {
+   "id": "PA6YIEEN",
+   "title": "AllWeatherNet:Unified Image Enhancement for Autonomous Driving under Adverse Weather and Lowlight-conditions",
+   "year": "2025",
+   "author": "Qian",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2409.02045",
+   "post": ""
+  },
+  {
+   "id": "EV523PTD",
+   "title": "Curricular Contrastive Regularization for Physics-Aware Single Image Dehazing",
+   "year": "2023",
+   "author": "Zheng",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204264/",
+   "post": ""
+  },
+  {
+   "id": "NSMM3LJS",
+   "title": "LMQFormer: A Laplace-Prior-Guided Mask Query Transformer for Lightweight Snow Removal",
+   "year": "2023",
+   "author": "Lin",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10092769/?arnumber=10092769",
+   "post": ""
+  },
+  {
+   "id": "K7HBRUHG",
+   "title": "Retinexformer: One-stage Retinex-based Transformer for Low-light Image Enhancement",
+   "year": "2023",
+   "author": "Cai",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10377848/",
+   "post": ""
+  },
+  {
+   "id": "MDWDE8DX",
+   "title": "Toward Fast, Flexible, and Robust Low-Light Image Enhancement",
+   "year": "2022",
+   "author": "Ma",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9879599/",
+   "post": ""
+  },
+  {
+   "id": "NV3ABYRB",
+   "title": "Multi-Stage Progressive Image Restoration",
+   "year": "2021",
+   "author": "Zamir",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9577298/",
+   "post": ""
+  },
+  {
+   "id": "99ZQKPT4",
+   "title": "A Model-Based Approach to Simulate Rain Effects on Automotive Surround Sensor Data",
+   "year": "2018",
+   "author": "Hasirlioglu",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "benchmark",
+   "url": "https://ieeexplore.ieee.org/document/8569907/?arnumber=8569907",
+   "post": ""
+  },
+  {
+   "id": "K4IJXWED",
+   "title": "Density-Aware Single Image De-raining Using a Multi-stream Dense Network",
+   "year": "2018",
+   "author": "Zhang",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/8578177/",
+   "post": ""
+  },
+  {
+   "id": "BEB2QJ3X",
+   "title": "DesnowNet: Context-Aware Deep Network for Snow Removal",
+   "year": "2018",
+   "author": "Liu",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/8291596/?arnumber=8291596",
+   "post": ""
+  },
+  {
+   "id": "QYXKGRG5",
+   "title": "Clearing the Skies: A Deep Network Architecture for Single-Image Rain Removal",
+   "year": "2017",
+   "author": "Fu",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ui.adsabs.harvard.edu/abs/2017ITIP...26.2944F",
+   "post": ""
+  },
+  {
+   "id": "WNKNQFBV",
+   "title": "Towards simulating foggy and hazy images and evaluating their authenticity",
+   "year": "2017",
+   "author": "Zhang",
+   "family": [],
+   "task": [
+    "restoration"
+   ],
+   "kind": "benchmark",
+   "url": "https://research.utwente.nl/en/publications/towards-simulating-foggy-and-hazy-images-and-evaluating-their-aut",
+   "post": ""
+  },
+  {
+   "id": "CDWU93X8",
+   "title": "Scalable Person Re-identification: A Benchmark",
+   "year": "2015",
+   "author": "Zheng",
+   "family": [],
+   "task": [
+    "retrieval"
+   ],
+   "kind": "benchmark",
+   "url": "http://ieeexplore.ieee.org/document/7410490/",
+   "post": ""
+  },
+  {
+   "id": "ULQWJJTT",
+   "title": "3D Point Cloud Generation via Autoregressive Up-sampling",
+   "year": "2025",
+   "author": "Meng",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2503.08594",
+   "post": ""
+  },
+  {
+   "id": "YEEDM3SL",
+   "title": "PointGrow: Autoregressively Learned Point Cloud Generation with Self-Attention",
+   "year": "2020",
+   "author": "Sun",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_WACV_2020/html/Sun_PointGrow_Autoregressively_Learned_Point_Cloud_Generation_with_Self-Attention_WACV_2020_paper.html",
+   "post": ""
+  },
+  {
+   "id": "6WMNYEX8",
+   "title": "Training-Free Text-Guided Image Editing with Visual Autoregressive Model",
+   "year": "2025",
+   "author": "Wang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2503.23897",
+   "post": ""
+  },
+  {
+   "id": "LG7ZF73M",
+   "title": "Visual Autoregressive Modeling for Instruction-Guided Image Editing",
+   "year": "2025",
+   "author": "Mao",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2508.15772",
+   "post": ""
+  },
+  {
+   "id": "LRQE4AJI",
+   "title": "Scalable Graph Generative Modeling via Substructure Sequences",
+   "year": "2025",
+   "author": "Wang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2505.16130",
+   "post": ""
+  },
+  {
+   "id": "BLNWL8V2",
+   "title": "HMAR: Efficient Hierarchical Masked Auto-Regressive Image Generation",
+   "year": "2025",
+   "author": "Kumbong",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Kumbong_HMAR_Efficient_Hierarchical_Masked_Auto-Regressive_Image_Generation_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "HQK76B6U",
+   "title": "Autoregressive Model Beats Diffusion: Llama for Scalable Image Generation",
+   "year": "2024",
+   "author": "Sun",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=oORac1ZefA",
+   "post": ""
+  },
+  {
+   "id": "T53FYSLH",
+   "title": "Autoregressive Models in Vision: A Survey",
+   "year": "2024",
+   "author": "Xiong",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://openreview.net/forum?id=1BqXkjNEGP",
+   "post": ""
+  },
+  {
+   "id": "ZPNT88WE",
+   "title": "Denoising Autoregressive Transformers for Scalable Text-to-Image Generation",
+   "year": "2024",
+   "author": "Gu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=amDkNPVWcn",
+   "post": ""
+  },
+  {
+   "id": "PEEVVV2A",
+   "title": "Fluid: Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens",
+   "year": "2024",
+   "author": "Fan",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=jQP5o1VAVc",
+   "post": ""
+  },
+  {
+   "id": "GGURHU62",
+   "title": "Infinity: Scaling Bitwise AutoRegressive Modeling for High-Resolution Image Synthesis",
+   "year": "2024",
+   "author": "Han",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2412.04431",
+   "post": ""
+  },
+  {
+   "id": "8G6UJHJ6",
+   "title": "VideoPoet: A Large Language Model for Zero-Shot Video Generation",
+   "year": "2024",
+   "author": "Kondratyuk",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=LRkJwPIDuE",
+   "post": ""
+  },
+  {
+   "id": "HAGEWS6I",
+   "title": "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction",
+   "year": "2024",
+   "author": "Tian",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/9a24e284b187f662681440ba15c416fb-Abstract-Conference.html",
+   "post": "/posts/visual-autoregressive-modeling/"
+  },
+  {
+   "id": "LTK6JVC8",
+   "title": "Language Model Beats Diffusion - Tokenizer is key to visual generation",
+   "year": "2023",
+   "author": "Yu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=gzqrANCF4g",
+   "post": ""
+  },
+  {
+   "id": "Z4KDQQ2N",
+   "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models",
+   "year": "2023",
+   "author": "Touvron",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2307.09288",
+   "post": ""
+  },
+  {
+   "id": "LH9N65W2",
+   "title": "LLaMA: Open and Efficient Foundation Language Models",
+   "year": "2023",
+   "author": "Touvron",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2302.13971",
+   "post": ""
+  },
+  {
+   "id": "37ND26UT",
+   "title": "MAGVIT: Masked Generative Video Transformer",
+   "year": "2023",
+   "author": "Yu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Yu_MAGVIT_Masked_Generative_Video_Transformer_CVPR_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "QW9M5GL5",
+   "title": "PaLM: Scaling Language Modeling with Pathways",
+   "year": "2023",
+   "author": "Chowdhery",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://jmlr.org/papers/v24/22-1144.html",
+   "post": ""
+  },
+  {
+   "id": "QWJ6SM9G",
+   "title": "Scaling Autoregressive Multi-Modal Models: Pretraining and Instruction Tuning",
+   "year": "2023",
+   "author": "Yu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2309.02591",
+   "post": ""
+  },
+  {
+   "id": "PUAZBJVX",
+   "title": "CogVideo: Large-scale Pretraining for Text-to-Video Generation via Transformers",
+   "year": "2022",
+   "author": "Hong",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=rB6TpjAuSRy",
+   "post": ""
+  },
+  {
+   "id": "WA3NJE6B",
+   "title": "CogView2: Faster and Better Text-to-Image Generation via Hierarchical Transformers",
+   "year": "2022",
+   "author": "Ding",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/6baec7c4ba0a8734ccbd528a8090cb1f-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "6YRY2CV4",
+   "title": "Make-A-Scene: Scene-Based Text-to-Image Generation with Human Priors",
+   "year": "2022",
+   "author": "Gafni",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-031-19784-0_6",
+   "post": ""
+  },
+  {
+   "id": "YV4GRJ3S",
+   "title": "NUWA-Infinity: Autoregressive over Autoregressive Generation for Infinite Visual Synthesis",
+   "year": "2022",
+   "author": "Liang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/6358cd0cd6607fdf4870595795eb1710-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "K2X9WMHM",
+   "title": "Scaling Autoregressive Models for Content-Rich Text-to-Image Generation",
+   "year": "2022",
+   "author": "Yu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=AFDcYJKhND",
+   "post": ""
+  },
+  {
+   "id": "3WGXA2EN",
+   "title": "MaskGIT: Masked Generative Image Transformer",
+   "year": "2022",
+   "author": "Chang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2022/html/Chang_MaskGIT_Masked_Generative_Image_Transformer_CVPR_2022_paper.html",
+   "post": ""
+  },
+  {
+   "id": "FJGLPPQN",
+   "title": "GODIVA: Generating Open-DomaIn Videos from nAtural Descriptions",
+   "year": "2021",
+   "author": "Wu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2104.14806",
+   "post": ""
+  },
+  {
+   "id": "B8C8PXVN",
+   "title": "Taming Transformers for High-Resolution Image Synthesis",
+   "year": "2021",
+   "author": "Esser",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9578911/",
+   "post": "/posts/vqgan/"
+  },
+  {
+   "id": "6V2UYDUJ",
+   "title": "Zero-Shot Text-to-Image Generation",
+   "year": "2021",
+   "author": "Ramesh",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v139/ramesh21a.html",
+   "post": ""
+  },
+  {
+   "id": "JULDMNU9",
+   "title": "Scaling Laws for Autoregressive Generative Modeling",
+   "year": "2020",
+   "author": "Henighan",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/2010.14701",
+   "post": ""
+  },
+  {
+   "id": "32L7GG8B",
+   "title": "Scaling Laws for Neural Language Models",
+   "year": "2020",
+   "author": "Kaplan",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/2001.08361",
+   "post": ""
+  },
+  {
+   "id": "FT3UFPBP",
+   "title": "Image Transformer",
+   "year": "2018",
+   "author": "Parmar",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v80/parmar18a.html",
+   "post": ""
+  },
+  {
+   "id": "3ZC9TKXE",
+   "title": "PixelSNAIL: An Improved Autoregressive Generative Model",
+   "year": "2018",
+   "author": "Chen",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v80/chen18h.html",
+   "post": ""
+  },
+  {
+   "id": "9KVIWU98",
+   "title": "PixelCNN++: Improving the PixelCNN with Discretized Logistic Mixture Likelihood and Other Modifications",
+   "year": "2017",
+   "author": "Salimans",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=BJrFC6ceg",
+   "post": ""
+  },
+  {
+   "id": "Z8RB4BFC",
+   "title": "Conditional Image Generation with PixelCNN Decoders",
+   "year": "2016",
+   "author": "van den Oord",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2016/hash/b1301141feffabac455e1f90a7de2054-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "8FX9VTDL",
+   "title": "Pixel Recurrent Neural Networks",
+   "year": "2016",
+   "author": "Oord",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v48/oord16.html",
+   "post": ""
+  },
+  {
+   "id": "HH6CB5BF",
+   "title": "EditAR: Unified Conditional Generation with Autoregressive Models",
+   "year": "2025",
+   "author": "Mu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2501.04699",
+   "post": ""
+  },
+  {
+   "id": "6US6BG2C",
+   "title": "NÜWA: Visual Synthesis Pre-training for Neural visUal World creAtion",
+   "year": "2022",
+   "author": "Avidan",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-19787-1_41",
+   "post": ""
+  },
+  {
+   "id": "ILKKNFV2",
+   "title": "HART: Efficient Visual Generation with Hybrid Autoregressive Transformer",
+   "year": "2024",
+   "author": "Tang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=q5sOv4xQe4",
+   "post": ""
+  },
+  {
+   "id": "MBVXKVWU",
+   "title": "Autoregressive Image Generation using Residual Quantization",
+   "year": "2022",
+   "author": "Lee",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9879532/",
+   "post": ""
+  },
+  {
+   "id": "W2AQJNTW",
+   "title": "Chameleon: Mixed-Modal Early-Fusion Foundation Models",
+   "year": "2025",
+   "author": "Team",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2405.09818",
+   "post": ""
+  },
+  {
+   "id": "BB8CHAB9",
+   "title": "Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation",
+   "year": "2025",
+   "author": "Wu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Wu_Janus_Decoupling_Visual_Encoding_for_Unified_Multimodal_Understanding_and_Generation_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "CKZ3RCE4",
+   "title": "Emu3: Next-Token Prediction is All You Need",
+   "year": "2024",
+   "author": "Wang",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=xZnnoUYajo",
+   "post": ""
+  },
+  {
+   "id": "SIZ2F4RY",
+   "title": "Lumina-mGPT: Illuminate Flexible Photorealistic Text-to-Image Generation with Multimodal Generative Pretraining",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=JsYfB6ouw0",
+   "post": ""
+  },
+  {
+   "id": "CCZIUKW6",
+   "title": "SEED-X: Multimodal Models with Unified Multi-granularity Comprehension and Generation",
+   "year": "2024",
+   "author": "Ge",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=osoGaCdzlP",
+   "post": ""
+  },
+  {
+   "id": "4LJ85EUA",
+   "title": "Unified-IO 2: Scaling Autoregressive Multimodal Models with Vision Language Audio and Action",
+   "year": "2024",
+   "author": "Lu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Lu_Unified-IO_2_Scaling_Autoregressive_Multimodal_Models_with_Vision_Language_Audio_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "HQHW89G7",
+   "title": "UNIFIED-IO: A Unified Model for Vision, Language, and Multi-modal Tasks",
+   "year": "2022",
+   "author": "Lu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=E01k9048soZ",
+   "post": ""
+  },
+  {
+   "id": "BLCJYMR9",
+   "title": "An Image is Worth 32 Tokens for Reconstruction and Generation",
+   "year": "2024",
+   "author": "Yu",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/e91bf7dfba0477554994c6d64833e9d8-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "WNVHWH63",
+   "title": "Planting a SEED of Vision in Large Language Model",
+   "year": "2023",
+   "author": "Ge",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2307.08041",
+   "post": ""
+  },
+  {
+   "id": "U2YYLVJW",
+   "title": "Generative Pretraining From Pixels",
+   "year": "2020",
+   "author": "Chen",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v119/chen20s.html",
+   "post": ""
+  },
+  {
+   "id": "CVWMHP4S",
+   "title": "Language Models are Few-Shot Learners",
+   "year": "2020",
+   "author": "Brown",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/1457c0d6bfcb4967418bfb8ac142f64a-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "3J4AF2N4",
+   "title": "BEiT: BERT Pre-Training of Image Transformers",
+   "year": "2021",
+   "author": "Bao",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=p-BhZSz59o4",
+   "post": ""
+  },
+  {
+   "id": "BI9FC3QW",
+   "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "year": "2019",
+   "author": "Devlin",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/1810.04805",
+   "post": ""
+  },
+  {
+   "id": "JXP2J5JJ",
+   "title": "Sequential Modeling Enables Scalable Learning for Large Vision Models",
+   "year": "2024",
+   "author": "Bai",
+   "family": [
+    "autoregressive"
+   ],
+   "task": [
+    "representation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Bai_Sequential_Modeling_Enables_Scalable_Learning_for_Large_Vision_Models_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "69QBVIFX",
+   "title": "Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model",
+   "year": "2024",
+   "author": "Zhou",
+   "family": [
+    "autoregressive",
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=SI2hI0frk6",
+   "post": ""
+  },
+  {
+   "id": "TMY5D9BR",
+   "title": "Hierarchical Text-Conditional Image Generation with CLIP Latents",
+   "year": "2022",
+   "author": "Ramesh",
+   "family": [
+    "autoregressive",
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2204.06125",
+   "post": ""
+  },
+  {
+   "id": "DHXZDVAK",
+   "title": "ImageBART: Bidirectional Context with Multinomial Diffusion for Autoregressive Image Synthesis",
+   "year": "2021",
+   "author": "Esser",
+   "family": [
+    "autoregressive",
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/1cdf14d1e3699d61d237cf76ce1c2dca-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "D85DP2QG",
+   "title": "Denoising Token Prediction in Masked Autoregressive Models",
+   "year": "",
+   "author": "Yao",
+   "family": [
+    "autoregressive",
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "J2EWVGWW",
+   "title": "Show-o: One Single Transformer to Unify Multimodal Understanding and Generation",
+   "year": "2024",
+   "author": "Xie",
+   "family": [
+    "autoregressive",
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=o6Ynz6OIQ6",
+   "post": ""
+  },
+  {
+   "id": "6NZT3QQP",
+   "title": "FlowAR: Scale-wise Autoregressive Image Generation Meets Flow Matching",
+   "year": "2025",
+   "author": "Ren",
+   "family": [
+    "autoregressive",
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=JfLgvNe1tj",
+   "post": ""
+  },
+  {
+   "id": "HM7S3DDX",
+   "title": "CogView: Mastering Text-to-Image Generation via Transformers",
+   "year": "2021",
+   "author": "Ding",
+   "family": [
+    "autoregressive",
+    "vae"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/a4d92e2cd541fca87e4620aba658316d-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "NCXQFSIR",
+   "title": "Bayesian Diffusion Models for 3D Shape Reconstruction",
+   "year": "2024",
+   "author": "Xu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Xu_Bayesian_Diffusion_Models_for_3D_Shape_Reconstruction_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "MTXJJJXL",
+   "title": "Diffusion Reflectance Map: Single-Image Stochastic Inverse Rendering of Illumination and Reflectance",
+   "year": "2024",
+   "author": "Enyo",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10655870/",
+   "post": ""
+  },
+  {
+   "id": "7SGV9ZSB",
+   "title": "IPoD: Implicit Field Learning with Point Diffusion for Generalizable 3D Object Reconstruction from Single RGB-D Images",
+   "year": "2024",
+   "author": "Wu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Wu_IPoD_Implicit_Field_Learning_with_Point_Diffusion_for_Generalizable_3D_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "4FFXVFYZ",
+   "title": "ConsistDreamer: 3D-Consistent 2D Diffusion for High-Fidelity Scene Editing",
+   "year": "2024",
+   "author": "Chen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10655920/",
+   "post": ""
+  },
+  {
+   "id": "TNDPNXG9",
+   "title": "Diffusion Handles Enabling 3D Edits for Diffusion Models by Lifting Activations to 3D",
+   "year": "2024",
+   "author": "Pandey",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657993/",
+   "post": ""
+  },
+  {
+   "id": "FQZLJ575",
+   "title": "InstructP2P: Learning to Edit 3D Point Clouds with Text Instructions",
+   "year": "2023",
+   "author": "Xu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2306.07154",
+   "post": ""
+  },
+  {
+   "id": "69HDLPI6",
+   "title": "Rethinking Metrics and Diffusion Architecture for 3D Point Cloud Generation",
+   "year": "2026",
+   "author": "Bastico",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=ymzyZ29H0r",
+   "post": ""
+  },
+  {
+   "id": "23MPGN4Z",
+   "title": "SeaLion: Semantic Part-Aware Latent Point Diffusion Models for 3D Generation",
+   "year": "2025",
+   "author": "Zhu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Zhu_SeaLion_Semantic_Part-Aware_Latent_Point_Diffusion_Models_for_3D_Generation_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "XA34QJIT",
+   "title": "PDT: Point Distribution Transformation with Diffusion Models",
+   "year": "2025",
+   "author": "Wang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3721238.3730717",
+   "post": ""
+  },
+  {
+   "id": "YI7LM8QY",
+   "title": "3D Diffuser Actor: Policy Diffusion with 3D Scene Representations",
+   "year": "2025",
+   "author": "Ke",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v270/ke25a.html",
+   "post": ""
+  },
+  {
+   "id": "PN3U472S",
+   "title": "TopoDiT-3D: Topology-Aware Diffusion Transformer with Bottleneck Structure for 3D Point Cloud Generation",
+   "year": "2025",
+   "author": "Guan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2505.09140",
+   "post": ""
+  },
+  {
+   "id": "FG5WS29C",
+   "title": "VistaDream: Sampling multiview consistent images for single-view scene reconstruction",
+   "year": "2025",
+   "author": "Wang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Wang_VistaDream_Sampling_multiview_consistent_images_for_single-view_scene_reconstruction_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "LKQVZHSE",
+   "title": "SpatialCrafter: Unleashing the Imagination of Video Diffusion Models for Scene Reconstruction from Limited Observations",
+   "year": "2025",
+   "author": "Zhang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Zhang_SpatialCrafter_Unleashing_the_Imagination_of_Video_Diffusion_Models_for_Scene_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "YXSH7VV7",
+   "title": "Bolt3D: Generating 3D Scenes in Seconds",
+   "year": "2025",
+   "author": "Szymanowicz",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Szymanowicz_Bolt3D_Generating_3D_Scenes_in_Seconds_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "XWUIMIU4",
+   "title": "RealmDreamer: Text-Driven 3D Scene Generation with Inpainting and Depth Diffusion",
+   "year": "2025",
+   "author": "Shriram",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=m1p0IQ8gZk",
+   "post": ""
+  },
+  {
+   "id": "WGKY3TWL",
+   "title": "WonderWorld: Interactive 3D Scene Generation from a Single Image",
+   "year": "2025",
+   "author": "Yu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Yu_WonderWorld_Interactive_3D_Scene_Generation_from_a_Single_Image_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "XFEGJSZ6",
+   "title": "Voyager: Long-Range and World-Consistent Video Diffusion for Explorable 3D Scene Generation",
+   "year": "2025",
+   "author": "Huang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3763330",
+   "post": ""
+  },
+  {
+   "id": "DXVGMEXP",
+   "title": "Quartet of Diffusions: Structure-Aware Point Cloud Generation through Part and Symmetry Guidance",
+   "year": "2025",
+   "author": "Zhou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=BT9rsod6Hc",
+   "post": ""
+  },
+  {
+   "id": "ST49S9IZ",
+   "title": "FoldDiff: Folding in Point Cloud Diffusion",
+   "year": "2025",
+   "author": "Zhao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=pmRabMH1JW",
+   "post": ""
+  },
+  {
+   "id": "7HP4A5U6",
+   "title": "ConsistNet: Enforcing 3D Consistency for Multi-View Images Diffusion",
+   "year": "2024",
+   "author": "Yang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658393/",
+   "post": ""
+  },
+  {
+   "id": "538ZKAJY",
+   "title": "DiffAssemble: A Unified Graph-Diffusion Model for 2D and 3D Reassembly",
+   "year": "2024",
+   "author": "Scarpellini",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656970/",
+   "post": ""
+  },
+  {
+   "id": "UJJH7G9Y",
+   "title": "TIGER: Time-Varying Denoising Model for 3D Point Cloud Generation with Diffusion Process",
+   "year": "2024",
+   "author": "Ren",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Ren_TIGER_Time-Varying_Denoising_Model_for_3D_Point_Cloud_Generation_with_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "5UKLCUTA",
+   "title": "XCube: Large-Scale 3D Generative Modeling using Sparse Voxel Hierarchies",
+   "year": "2024",
+   "author": "Ren",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Ren_XCube_Large-Scale_3D_Generative_Modeling_using_Sparse_Voxel_Hierarchies_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "Y5IMFFKU",
+   "title": "ComPC: Completing a 3D Point Cloud with 2D Diffusion Priors",
+   "year": "2024",
+   "author": "Huang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=SoUwcVplq4&noteId=Pzj2L4G0ag",
+   "post": ""
+  },
+  {
+   "id": "AWAZJMTL",
+   "title": "WonderJourney: Going from Anywhere to Everywhere",
+   "year": "2024",
+   "author": "Yu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Yu_WonderJourney_Going_from_Anywhere_to_Everywhere_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "YLVSHJWQ",
+   "title": "DiT-3D: Exploring Plain Diffusion Transformers for 3D Shape Generation",
+   "year": "2023",
+   "author": "Mo",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/d6c01b025cad37d5c8bab4ba18846c02-Abstract-Conference.html",
+   "post": "/posts/DiT-3D/"
+  },
+  {
+   "id": "75KD3PQU",
+   "title": "Point Cloud Completion with Pretrained Text-to-Image Diffusion Models",
+   "year": "2023",
+   "author": "Kasten",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/284afdc2309f9667d2d4fb9290235b0c-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "PRS48F8R",
+   "title": "StructDiffusion: Language-Guided Creation of Physically-Valid Structures using Unseen Objects",
+   "year": "2023",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=yMvmZaYJZW",
+   "post": ""
+  },
+  {
+   "id": "299HB5CZ",
+   "title": "Generative Novel View Synthesis with 3D-Aware Diffusion Models",
+   "year": "2023",
+   "author": "Chan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2023/html/Chan_Generative_Novel_View_Synthesis_with_3D-Aware_Diffusion_Models_ICCV_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "3S3CCXT5",
+   "title": "MVDiffusion: Enabling Holistic Multi-view Image Generation with Correspondence-Aware Diffusion",
+   "year": "2023",
+   "author": "Tang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=vA0vj1mY77",
+   "post": ""
+  },
+  {
+   "id": "RUGF6BEK",
+   "title": "DreamFusion: Text-to-3D using 2D Diffusion",
+   "year": "2022",
+   "author": "Poole",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=FjNys5c7VyY",
+   "post": ""
+  },
+  {
+   "id": "2B8VVZNI",
+   "title": "LION: Latent Point Diffusion Models for 3D Shape Generation",
+   "year": "2022",
+   "author": "Zeng",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/40e56dabe12095a5fc44a6e4c3835948-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "B43WGSNU",
+   "title": "Point-E: A System for Generating 3D Point Clouds from Complex Prompts",
+   "year": "2022",
+   "author": "Nichol",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2212.08751",
+   "post": ""
+  },
+  {
+   "id": "Z825J44Y",
+   "title": "3D Shape Generation and Completion Through Point-Voxel Diffusion",
+   "year": "2021",
+   "author": "Zhou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2021/html/Zhou_3D_Shape_Generation_and_Completion_Through_Point-Voxel_Diffusion_ICCV_2021_paper.html?ref=https://githubhelp.com",
+   "post": ""
+  },
+  {
+   "id": "J8S6KK5F",
+   "title": "Learning Gradient Fields for Shape Generation",
+   "year": "2020",
+   "author": "Cai",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-030-58580-8_22",
+   "post": ""
+  },
+  {
+   "id": "6R32H7LB",
+   "title": "EdgeDiff: Edge-aware Diffusion Network for Building Reconstruction from Point Clouds",
+   "year": "",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "6KX4HWI8",
+   "title": "Pyramid Diffusion for Fine 3D Large Scene Generation",
+   "year": "",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "X4U4X7H9",
+   "title": "State of the Art on Diffusion Models for Visual Computing",
+   "year": "2024",
+   "author": "Po",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation",
+    "editing"
+   ],
+   "kind": "survey",
+   "url": "https://onlinelibrary.wiley.com/doi/10.1111/cgf.15063",
+   "post": ""
+  },
+  {
+   "id": "YMK6C9IB",
+   "title": "TFDM: Time-Variant Frequency-Based Point Cloud Diffusion with Mamba",
+   "year": "2025",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2503.13004",
+   "post": ""
+  },
+  {
+   "id": "R9EVKZKT",
+   "title": "Fast Training of Diffusion Transformer with Extreme Masking for 3D Point Clouds Generation",
+   "year": "2025",
+   "author": "Leonardis",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-72907-2_21",
+   "post": ""
+  },
+  {
+   "id": "EZK3DK44",
+   "title": "NeuSDFusion: A Spatial-Aware Generative Model for 3D Shape Completion, Reconstruction, and Generation",
+   "year": "2025",
+   "author": "Leonardis",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "generation",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-72655-2_1",
+   "post": ""
+  },
+  {
+   "id": "VX35ZKSY",
+   "title": "Atlantis: Enabling Underwater Depth Estimation with Stable Diffusion",
+   "year": "2024",
+   "author": "Zhang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Zhang_Atlantis_Enabling_Underwater_Depth_Estimation_with_Stable_Diffusion_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "SSAC5IPB",
+   "title": "DIFIX3D+: Improving 3D Reconstructions with Single-Step Diffusion Models",
+   "year": "2025",
+   "author": "Wu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Wu_DIFIX3D_Improving_3D_Reconstructions_with_Single-Step_Diffusion_Models_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "74MWESXJ",
+   "title": "DiffSSC: Semantic LiDAR Scan Completion using Denoising Diffusion Probabilistic Models",
+   "year": "2025",
+   "author": "Cao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/11246951",
+   "post": ""
+  },
+  {
+   "id": "54Y38I2G",
+   "title": "PCDreamer: Point Cloud Completion Through Multi-view Diffusion Priors",
+   "year": "2025",
+   "author": "Wei",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Wei_PCDreamer_Point_Cloud_Completion_Through_Multi-view_Diffusion_Priors_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "2L6GIBYV",
+   "title": "SuperPC: A Single Diffusion Model for Point Cloud Completion, Upsampling, Denoising, and Colorization",
+   "year": "2025",
+   "author": "Du",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Du_SuperPC_A_Single_Diffusion_Model_for_Point_Cloud_Completion_Upsampling_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "IHIAEV9X",
+   "title": "Distilling Diffusion Models to Efficient 3D LiDAR Scene Completion",
+   "year": "2025",
+   "author": "Zhang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "3d",
+    "restoration",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Zhang_Distilling_Diffusion_Models_to_Efficient_3D_LiDAR_Scene_Completion_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "33EKRRD2",
+   "title": "Click2Mask: Local Editing with Dynamic Mask Generation",
+   "year": "2025",
+   "author": "Regev",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32720",
+   "post": ""
+  },
+  {
+   "id": "BGIDF7QX",
+   "title": "Exploring Fixed Point in Image Editing: Theoretical Support and Convergence Optimization",
+   "year": "2025",
+   "author": "Hang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/23c32cb7ac397f612b7c16aaa2bf0340-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "FFYJTXZX",
+   "title": "SwapAnything: Enabling Arbitrary Object Swapping in Personalized Image Editing",
+   "year": "2025",
+   "author": "Gu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1007/978-3-031-73411-3_23",
+   "post": ""
+  },
+  {
+   "id": "CCUGKC2T",
+   "title": "DiT4Edit: Diffusion Transformer for Image Editing",
+   "year": "2025",
+   "author": "Feng",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/32304",
+   "post": ""
+  },
+  {
+   "id": "V8NIYY2E",
+   "title": "Exploring Multimodal Diffusion Transformers for Enhanced Prompt-based Image Editing",
+   "year": "2025",
+   "author": "Shin",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2508.07519",
+   "post": ""
+  },
+  {
+   "id": "JFZNA369",
+   "title": "Alchemist: Parametric Control of Material Properties with Diffusion Models",
+   "year": "2024",
+   "author": "Sharma",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656698/",
+   "post": ""
+  },
+  {
+   "id": "XM3AYW35",
+   "title": "An Edit Friendly DDPM Noise Space: Inversion and Manipulations",
+   "year": "2024",
+   "author": "Huberman-Spiegelglas",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657449/",
+   "post": ""
+  },
+  {
+   "id": "T43QPN2T",
+   "title": "Contrastive Denoising Score for Text-Guided Latent Diffusion Image Editing",
+   "year": "2024",
+   "author": "Nam",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657048/",
+   "post": ""
+  },
+  {
+   "id": "4LKDXYC8",
+   "title": "DEADiff: An Efficient Stylization Diffusion Model with Disentangled Representations",
+   "year": "2024",
+   "author": "Qi",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656274/",
+   "post": ""
+  },
+  {
+   "id": "L5VQT8E2",
+   "title": "DiffEditor: Boosting Accuracy and Flexibility on Diffusion-Based Image Editing",
+   "year": "2024",
+   "author": "Mou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657160/",
+   "post": ""
+  },
+  {
+   "id": "YENK9XSW",
+   "title": "DiffMorpher: Unleashing the Capability of Diffusion Models for Image Morphing",
+   "year": "2024",
+   "author": "Zhang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656216/",
+   "post": ""
+  },
+  {
+   "id": "P4ZBBZ7Q",
+   "title": "Distraction is All You Need: Memory-Efficient Image Immunization against Diffusion-Based Image Editing",
+   "year": "2024",
+   "author": "Lo",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657341/",
+   "post": ""
+  },
+  {
+   "id": "HXQCC8WQ",
+   "title": "Drag Your Noise: Interactive Point-based Editing via Diffusion Semantic Propagation",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656506/",
+   "post": ""
+  },
+  {
+   "id": "KGBDIEJ5",
+   "title": "Focus on Your Instruction: Fine-grained and Multi-instruction Image Editing by Attention Modulation",
+   "year": "2024",
+   "author": "Guo",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658036/",
+   "post": ""
+  },
+  {
+   "id": "73AXRRNC",
+   "title": "Inversion-Free Image Editing with Language-Guided Diffusion Models",
+   "year": "2024",
+   "author": "Xu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658214/",
+   "post": ""
+  },
+  {
+   "id": "ZLG839JY",
+   "title": "Iterative Multi-granular Image Editing using Diffusion Models",
+   "year": "2024",
+   "author": "Joseph",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10483816/",
+   "post": ""
+  },
+  {
+   "id": "M7AWYPKE",
+   "title": "LEDITS++: Limitless Image Editing Using Text-to-Image Models",
+   "year": "2024",
+   "author": "Brack",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656542/",
+   "post": ""
+  },
+  {
+   "id": "C2UX8REF",
+   "title": "Lightning-Fast Image Inversion and Editing for Text-to-Image Diffusion Models",
+   "year": "2024",
+   "author": "Samuel",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=t9l63huPRt",
+   "post": ""
+  },
+  {
+   "id": "WS8W4SUK",
+   "title": "LoMOE: Localized Multi-Object Editing via Multi-Diffusion",
+   "year": "2024",
+   "author": "Chakrabarty",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://doi.org/10.1145/3664647.3681199",
+   "post": ""
+  },
+  {
+   "id": "7DKYW7SB",
+   "title": "PAIR Diffusion: A Comprehensive Multimodal Object-Level Image Editor",
+   "year": "2024",
+   "author": "Goel",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658470/",
+   "post": ""
+  },
+  {
+   "id": "WFU5HCT7",
+   "title": "ProxEdit: Improving Tuning-Free Real Image Editing with Proximal Guidance",
+   "year": "2024",
+   "author": "Han",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10483814/",
+   "post": ""
+  },
+  {
+   "id": "93T7F5AA",
+   "title": "Referring Image Editing: Object-Level Image Editing via Referring Expressions",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657402/",
+   "post": ""
+  },
+  {
+   "id": "X53YYGCY",
+   "title": "Text-Driven Image Editing via Learnable Regions",
+   "year": "2024",
+   "author": "Lin",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Lin_Text-Driven_Image_Editing_via_Learnable_Regions_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "BKQNW8FF",
+   "title": "TurboEdit: Text-Based Image Editing Using Few-Step Diffusion Models",
+   "year": "2024",
+   "author": "Deutch",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3680528.3687612",
+   "post": ""
+  },
+  {
+   "id": "U4JLJUEL",
+   "title": "Zero-Shot Video Editing through Adaptive Sliding Score Distillation",
+   "year": "2024",
+   "author": "Zhu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=toKS7yGqYl",
+   "post": ""
+  },
+  {
+   "id": "VVZ86S2B",
+   "title": "ZONE: Zero-Shot Instruction-Guided Local Editing",
+   "year": "2024",
+   "author": "Li",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Li_ZONE_Zero-Shot_Instruction-Guided_Local_Editing_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "BT5HHLC6",
+   "title": "A Latent Space of Stochastic Diffusion Models for Zero-Shot Image Editing and Guidance",
+   "year": "2023",
+   "author": "Wu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10376878/",
+   "post": ""
+  },
+  {
+   "id": "QJ74EE3X",
+   "title": "Delta Denoising Score",
+   "year": "2023",
+   "author": "Hertz",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10377809/",
+   "post": ""
+  },
+  {
+   "id": "2MRH499V",
+   "title": "DragonDiffusion: Enabling Drag-style Manipulation on Diffusion Models",
+   "year": "2023",
+   "author": "Mou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=OEL4FJMg1b",
+   "post": ""
+  },
+  {
+   "id": "4JY3D8HD",
+   "title": "EDICT: Exact Diffusion Inversion via Coupled Transformations",
+   "year": "2023",
+   "author": "Wallace",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204740/",
+   "post": ""
+  },
+  {
+   "id": "89MGLKLX",
+   "title": "Fixed-point Inversion for Text-to-image diffusion models",
+   "year": "2023",
+   "author": "Meiri",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=429H8ZQ0wa",
+   "post": ""
+  },
+  {
+   "id": "WT8WPN3W",
+   "title": "Improving Tuning-Free Real Image Editing with Proximal Guidance",
+   "year": "2023",
+   "author": "Han",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2306.05414",
+   "post": ""
+  },
+  {
+   "id": "Q6JQXC2E",
+   "title": "InstructPix2Pix: Learning to Follow Image Editing Instructions",
+   "year": "2023",
+   "author": "Brooks",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204579/",
+   "post": ""
+  },
+  {
+   "id": "SD5L5232",
+   "title": "MasaCtrl: Tuning-Free Mutual Self-Attention Control for Consistent Image Synthesis and Editing",
+   "year": "2023",
+   "author": "Cao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10377929/",
+   "post": ""
+  },
+  {
+   "id": "57BX4MT8",
+   "title": "Noise Map Guidance: Inversion with Spatial Context for Real Image Editing",
+   "year": "2023",
+   "author": "Cho",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=mhgm0IXtHw",
+   "post": ""
+  },
+  {
+   "id": "BVHGZXKK",
+   "title": "Null-text Inversion for Editing Real Images using Guided Diffusion Models",
+   "year": "2023",
+   "author": "Mokady",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10205188/",
+   "post": ""
+  },
+  {
+   "id": "S3VD8FT4",
+   "title": "Object-Aware Inversion and Reassembly for Image Editing",
+   "year": "2023",
+   "author": "Yang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=dpcVXiMlcv",
+   "post": ""
+  },
+  {
+   "id": "PQQ97RRJ",
+   "title": "Plug-and-Play Diffusion Features for Text-Driven Image-to-Image Translation",
+   "year": "2023",
+   "author": "Tumanyan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204217/",
+   "post": ""
+  },
+  {
+   "id": "GPBYD3T3",
+   "title": "PnP Inversion: Boosting Diffusion-based Editing with 3 Lines of Code",
+   "year": "2023",
+   "author": "Ju",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=FoMZ4ljhVw",
+   "post": ""
+  },
+  {
+   "id": "WB6L77MQ",
+   "title": "Visual Instruction Inversion: Image Editing via Image Prompting",
+   "year": "2023",
+   "author": "Nguyen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/1e75f7539cbde5de895fab238ff42519-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "BQ344VWH",
+   "title": "Zero-shot Image-to-Image Translation",
+   "year": "2023",
+   "author": "Parmar",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3588432.3591513",
+   "post": ""
+  },
+  {
+   "id": "WEGK843D",
+   "title": "DiffEdit: Diffusion-based semantic image editing with mask guidance",
+   "year": "2022",
+   "author": "Couairon",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=3lge0p5o-M-",
+   "post": ""
+  },
+  {
+   "id": "3V4KD5TJ",
+   "title": "Diffusion-based Image Translation using disentangled style and content representation",
+   "year": "2022",
+   "author": "Kwon",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=Nayau9fwXU",
+   "post": ""
+  },
+  {
+   "id": "9SCU6HAN",
+   "title": "DiffusionCLIP: Text-Guided Diffusion Models for Robust Image Manipulation",
+   "year": "2022",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9879284/",
+   "post": ""
+  },
+  {
+   "id": "W9ZIYL85",
+   "title": "Dual Diffusion Implicit Bridges for Image-to-Image Translation",
+   "year": "2022",
+   "author": "Su",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=5HLoTvVGDe",
+   "post": ""
+  },
+  {
+   "id": "3YXJC4ZZ",
+   "title": "Prompt-to-Prompt Image Editing with Cross-Attention Control",
+   "year": "2022",
+   "author": "Hertz",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=_CDixzkzeyb",
+   "post": ""
+  },
+  {
+   "id": "S9BUGMLF",
+   "title": "Lazy Diffusion Transformer for Interactive Image Editing",
+   "year": "2025",
+   "author": "Leonardis",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "editing",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-72691-0_4",
+   "post": ""
+  },
+  {
+   "id": "36TLV2M5",
+   "title": "SVDiff: Compact Parameter Space for Diffusion Fine-Tuning",
+   "year": "2023",
+   "author": "Han",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2023/html/Han_SVDiff_Compact_Parameter_Space_for_Diffusion_Fine-Tuning_ICCV_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "8LCSQDRL",
+   "title": "A Survey on Video Diffusion Models",
+   "year": "2025",
+   "author": "Xing",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://dl.acm.org/doi/10.1145/3696415",
+   "post": ""
+  },
+  {
+   "id": "H3F6AP3V",
+   "title": "Diffusion Model Patching via Mixture-of-Prompts",
+   "year": "2025",
+   "author": "Ham",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/33871",
+   "post": ""
+  },
+  {
+   "id": "2DQ9L8AT",
+   "title": "MIGC++: Advanced Multi-Instance Generation Controller for Image Synthesis",
+   "year": "2025",
+   "author": "Zhou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10794618",
+   "post": ""
+  },
+  {
+   "id": "T8GNXZN6",
+   "title": "Minority-Focused Text-to-Image Generation via Prompt Optimization",
+   "year": "2025",
+   "author": "Um",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Um_Minority-Focused_Text-to-Image_Generation_via_Prompt_Optimization_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "BXSJWVC9",
+   "title": "Large Language Diffusion Models",
+   "year": "2025",
+   "author": "Nie",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2502.09992",
+   "post": ""
+  },
+  {
+   "id": "9M8QE8QU",
+   "title": "Aligning Text to Image in Diffusion Models is Easier Than You Think",
+   "year": "2025",
+   "author": "Lee",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=ToMjBgXwhw",
+   "post": ""
+  },
+  {
+   "id": "MW38TGAE",
+   "title": "A Survey of Text-to-Image Diffusion Models in Generative AI",
+   "year": "2024",
+   "author": "Kandwal",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10463372/?arnumber=10463372",
+   "post": ""
+  },
+  {
+   "id": "URUAHHZA",
+   "title": "A Survey on Generative Diffusion Models",
+   "year": "2024",
+   "author": "Cao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10419041",
+   "post": ""
+  },
+  {
+   "id": "H48ZZFGB",
+   "title": "Adapting Diffusion Models for Improved Prompt Compliance and Controllable Image Synthesis",
+   "year": "2024",
+   "author": "Sridhar",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/0d3090c00d6e877c6e7267efe2734e1b-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "YQCHXF2J",
+   "title": "Analyzing and Improving the Training Dynamics of Diffusion Models",
+   "year": "2024",
+   "author": "Karras",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656949/",
+   "post": ""
+  },
+  {
+   "id": "VN57B5JH",
+   "title": "Balancing Act: Distribution-Guided Debiasing in Diffusion Models",
+   "year": "2024",
+   "author": "Parihar",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656936/",
+   "post": ""
+  },
+  {
+   "id": "24RI79TY",
+   "title": "Can Protective Perturbation Safeguard Personal Data from Being Exploited by Stable Diffusion?",
+   "year": "2024",
+   "author": "Zhao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656194/",
+   "post": ""
+  },
+  {
+   "id": "52TZ8F3H",
+   "title": "CommonCanvas: Open Diffusion Models Trained on Creative-Commons Images",
+   "year": "2024",
+   "author": "Gokaslan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "benchmark",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Gokaslan_CommonCanvas_Open_Diffusion_Models_Trained_on_Creative-Commons_Images_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "I5BECQ5J",
+   "title": "CONFORM: Contrast is All You Need For High-Fidelity Text-to-Image Diffusion Models",
+   "year": "2024",
+   "author": "Salih Meral",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10655387/",
+   "post": ""
+  },
+  {
+   "id": "6QM25B7V",
+   "title": "Correcting Diffusion Generation Through Resampling",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656825/",
+   "post": ""
+  },
+  {
+   "id": "XAZDU4XQ",
+   "title": "D^4: Dataset Distillation via Disentangled Diffusion Model",
+   "year": "2024",
+   "author": "Su",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Su_D4_Dataset_Distillation_via_Disentangled_Diffusion_Model_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "G9UWDEV8",
+   "title": "Don't Drop Your Samples! Coherence-Aware Training Benefits Conditional Diffusion",
+   "year": "2024",
+   "author": "Dufour",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657407/",
+   "post": ""
+  },
+  {
+   "id": "7YII66ZP",
+   "title": "DREAM: Diffusion Rectification and Estimation-Adaptive Models",
+   "year": "2024",
+   "author": "Zhou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10655552/",
+   "post": ""
+  },
+  {
+   "id": "52RASPIX",
+   "title": "Generating Images of Rare Concepts Using Pre-trained Diffusion Models",
+   "year": "2024",
+   "author": "Samuel",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/28270",
+   "post": ""
+  },
+  {
+   "id": "EX93FHUT",
+   "title": "Hierarchical Patch Diffusion Models for High-Resolution Video Generation",
+   "year": "2024",
+   "author": "Skorokhodov",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Skorokhodov_Hierarchical_Patch_Diffusion_Models_for_High-Resolution_Video_Generation_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "8SCBA7P9",
+   "title": "InstanceDiffusion: Instance-Level Control for Image Generation",
+   "year": "2024",
+   "author": "Wang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657791/",
+   "post": ""
+  },
+  {
+   "id": "9JQJBFPS",
+   "title": "JeDi: Joint-Image Diffusion Models for Finetuning-Free Personalized Text-to-Image Generation",
+   "year": "2024",
+   "author": "Zeng",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656241/",
+   "post": ""
+  },
+  {
+   "id": "FWZTM57W",
+   "title": "MIGC: Multi-Instance Generation Controller for Text-to-Image Synthesis",
+   "year": "2024",
+   "author": "Zhou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658514/",
+   "post": ""
+  },
+  {
+   "id": "K5A5XGWH",
+   "title": "MS-Diffusion: Multi-subject Zero-shot Image Personalization with Layout Guidance",
+   "year": "2024",
+   "author": "Wang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=PJqP0wyQek",
+   "post": ""
+  },
+  {
+   "id": "FG6VF35S",
+   "title": "Personalized Residuals for Concept-Driven Text-to-Image Generation",
+   "year": "2024",
+   "author": "Ham",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658090/",
+   "post": ""
+  },
+  {
+   "id": "Z739LNFC",
+   "title": "Physics-Informed Diffusion Models",
+   "year": "2024",
+   "author": "Bastek",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=tpYeermigp",
+   "post": ""
+  },
+  {
+   "id": "ITAF4NG7",
+   "title": "Residual Denoising Diffusion Models",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Liu_Residual_Denoising_Diffusion_Models_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "FTPAW2RY",
+   "title": "Stochastic Conditional Diffusion Models for Robust Semantic Image Synthesis",
+   "year": "2024",
+   "author": "Ko",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v235/ko24e.html",
+   "post": ""
+  },
+  {
+   "id": "4WSMW4Q8",
+   "title": "Theoretical insights for diffusion guidance: A case study for Gaussian mixture models",
+   "year": "2024",
+   "author": "Wu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.mlr.press/v235/wu24b.html",
+   "post": ""
+  },
+  {
+   "id": "K46WSEZ3",
+   "title": "Enhancing MMDiT-Based Text-to-Image Models for Similar Subject Generation",
+   "year": "2024",
+   "author": "Wei",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2411.18301",
+   "post": ""
+  },
+  {
+   "id": "YWP9LZ69",
+   "title": "RDT-1B: a Diffusion Foundation Model for Bimanual Manipulation",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=yAzN4tz7oI",
+   "post": ""
+  },
+  {
+   "id": "VLXFELXV",
+   "title": "NoMaD: Goal Masked Diffusion Policies for Navigation and Exploration",
+   "year": "2024",
+   "author": "Sridhar",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10610665",
+   "post": ""
+  },
+  {
+   "id": "TYQRR4RW",
+   "title": "U-DiTs: Downsample Tokens in U-Shaped Diffusion Transformers",
+   "year": "2024",
+   "author": "Tian",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/5d2e24df9cfaad3189833b819c40b392-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "QPEZR7SZ",
+   "title": "All Are Worth Words: A ViT Backbone for Diffusion Models",
+   "year": "2023",
+   "author": "Bao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Bao_All_Are_Worth_Words_A_ViT_Backbone_for_Diffusion_Models_CVPR_2023_paper.html",
+   "post": "/posts/u-vit/"
+  },
+  {
+   "id": "GSMZQD4F",
+   "title": "Attend-and-Excite: Attention-Based Semantic Guidance for Text-to-Image Diffusion Models",
+   "year": "2023",
+   "author": "Chefer",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3592116",
+   "post": ""
+  },
+  {
+   "id": "4NE3SUL2",
+   "title": "Collaborative Score Distillation for Consistent Visual Synthesis",
+   "year": "2023",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2307.04787",
+   "post": ""
+  },
+  {
+   "id": "BDP4CXKG",
+   "title": "Diffusion Models in Vision: A Survey",
+   "year": "2023",
+   "author": "Croitoru",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10081412/?arnumber=10081412",
+   "post": ""
+  },
+  {
+   "id": "ULPQ7Z5W",
+   "title": "DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation",
+   "year": "2023",
+   "author": "Ruiz",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204880/",
+   "post": ""
+  },
+  {
+   "id": "NB46RBJ8",
+   "title": "Localizing Object-level Shape Variations with Text-to-Image Diffusion Models",
+   "year": "2023",
+   "author": "Patashnik",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10376595/",
+   "post": ""
+  },
+  {
+   "id": "RSRP6RMA",
+   "title": "MultiDiffusion: Fusing Diffusion Paths for Controlled Image Generation",
+   "year": "2023",
+   "author": "Bar-Tal",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=D4ajVWmgLB",
+   "post": ""
+  },
+  {
+   "id": "CQ8DHWR3",
+   "title": "NUWA-XL: Diffusion over Diffusion for eXtremely Long Video Generation",
+   "year": "2023",
+   "author": "Yin",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://aclanthology.org/2023.acl-long.73/",
+   "post": ""
+  },
+  {
+   "id": "BZ5GDJL8",
+   "title": "On the Importance of Noise Scheduling for Diffusion Models",
+   "year": "2023",
+   "author": "Chen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2301.10972",
+   "post": ""
+  },
+  {
+   "id": "5MKC9KI4",
+   "title": "Scalable Diffusion Models with Transformers",
+   "year": "2023",
+   "author": "Peebles",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10377858/",
+   "post": "/posts/dit/"
+  },
+  {
+   "id": "9N836RPD",
+   "title": "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis",
+   "year": "2023",
+   "author": "Podell",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=di52zR8xgf",
+   "post": ""
+  },
+  {
+   "id": "NEUST8KB",
+   "title": "simple diffusion: End-to-end diffusion for high resolution images",
+   "year": "2023",
+   "author": "Hoogeboom",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v202/hoogeboom23a.html",
+   "post": ""
+  },
+  {
+   "id": "JU9QCV6N",
+   "title": "StyleDrop: Text-to-Image Synthesis of Any Style",
+   "year": "2023",
+   "author": "Sohn",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/d33b177b69425e7685b0b1c05bd2a5e4-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "GD7VUAKI",
+   "title": "Towards Safe Self-Distillation of Internet-Scale Text-to-Image Diffusion Models",
+   "year": "2023",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2307.05977",
+   "post": ""
+  },
+  {
+   "id": "IK5JBIEH",
+   "title": "DALL-E-Bot: Introducing Web-Scale Diffusion Models to Robotics",
+   "year": "2023",
+   "author": "Kapelyukh",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/abstract/document/10114570",
+   "post": ""
+  },
+  {
+   "id": "YHUE8GXI",
+   "title": "Affordance Diffusion: Synthesizing Hand-Object Interactions",
+   "year": "2023",
+   "author": "Ye",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10204191/",
+   "post": ""
+  },
+  {
+   "id": "ICBC8Z7N",
+   "title": "Stable Video Diffusion: Scaling Latent Video Diffusion Models to Large Datasets",
+   "year": "2023",
+   "author": "Blattmann",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2311.15127",
+   "post": ""
+  },
+  {
+   "id": "CPBPYSQM",
+   "title": "Compositional Visual Generation with Composable Diffusion Models",
+   "year": "2022",
+   "author": "Avidan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-19790-1_26",
+   "post": ""
+  },
+  {
+   "id": "2Z2TLGF3",
+   "title": "Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding",
+   "year": "2022",
+   "author": "Saharia",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/ec795aeadae0b7d230fa35cbaf04c041-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "HWQQ2DQJ",
+   "title": "Understanding Diffusion Models: A Unified Perspective",
+   "year": "2022",
+   "author": "Luo",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2208.11970",
+   "post": ""
+  },
+  {
+   "id": "SPU33QX7",
+   "title": "Riemannian Score-Based Generative Modelling",
+   "year": "2022",
+   "author": "De Bortoli",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/105112d52254f86d5854f3da734a52b4-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "6EVVUQY5",
+   "title": "Planning with Diffusion for Flexible Behavior Synthesis",
+   "year": "2022",
+   "author": "Janner",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v162/janner22a.html",
+   "post": ""
+  },
+  {
+   "id": "4SZ65N3Y",
+   "title": "Perception Prioritized Training of Diffusion Models",
+   "year": "2022",
+   "author": "Choi",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2022/html/Choi_Perception_Prioritized_Training_of_Diffusion_Models_CVPR_2022_paper.html",
+   "post": ""
+  },
+  {
+   "id": "VAFQG69C",
+   "title": "Classifier-Free Diffusion Guidance",
+   "year": "2021",
+   "author": "Ho",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=qw8AKxfYbI&_hsenc=p2ANqtz-8x1u8iiVdztrPz7MsKz--4T7G3-b8L3RsGWCtkvf1hnN-nqvoAD_zpR8XSKjCoNR3kavee",
+   "post": "/posts/cfg/"
+  },
+  {
+   "id": "5HRA97NU",
+   "title": "Diffusion Models Beat GANs on Image Synthesis",
+   "year": "2021",
+   "author": "Dhariwal",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2021/hash/49ad23d1ec9fa4bd8d77d02681df5cfa-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "7ZE5ANUM",
+   "title": "Variational Diffusion Models",
+   "year": "2021",
+   "author": "Kingma",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/b578f2a52a0229873fefc2a4b06377fa-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "VP6B2ZEV",
+   "title": "Denoising Diffusion Probabilistic Models",
+   "year": "2020",
+   "author": "Ho",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/4c5bcfec8584af0d967f1ab10179ca4b-Abstract.html",
+   "post": "/posts/ddpm/"
+  },
+  {
+   "id": "SX6RGYV3",
+   "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+   "year": "2020",
+   "author": "Song",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=PxTIG12RRHS&utm_campaign=NLP%20News&utm_medium=email&utm_source=Revue%20newsletter",
+   "post": "/posts/score-sde/"
+  },
+  {
+   "id": "N5MA9JDI",
+   "title": "Generative Modeling by Estimating Gradients of the Data Distribution",
+   "year": "2019",
+   "author": "Song",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2019/hash/3001ef257407d5a371a96dcd947c7d93-Abstract.html?ref=https://githubhelp.com",
+   "post": "/posts/ncsn/"
+  },
+  {
+   "id": "KBK63DB7",
+   "title": "Deep Unsupervised Learning using Nonequilibrium Thermodynamics",
+   "year": "2015",
+   "author": "Sohl-Dickstein",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v37/sohl-dickstein15.html",
+   "post": ""
+  },
+  {
+   "id": "WPLEZ3QG",
+   "title": "Deep Generative Models - Diffusion Models",
+   "year": "",
+   "author": "Beigy",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "RTA7T54V",
+   "title": "Diffusion Model-Based Image Editing: A Survey",
+   "year": "2025",
+   "author": "Huang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10884879/",
+   "post": ""
+  },
+  {
+   "id": "T9G66WUK",
+   "title": "Editable Image Elements for Controllable Synthesis",
+   "year": "2025",
+   "author": "Leonardis",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-72627-9_3",
+   "post": ""
+  },
+  {
+   "id": "XM7VIP4I",
+   "title": "CFG++: Manifold-constrained Classifier Free Guidance for Diffusion Models",
+   "year": "2024",
+   "author": "Chung",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=E77uvbOTtp",
+   "post": ""
+  },
+  {
+   "id": "TWIB6FMD",
+   "title": "Break-A-Scene: Extracting Multiple Concepts from a Single Image",
+   "year": "2023",
+   "author": "Avrahami",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3610548.3618154",
+   "post": ""
+  },
+  {
+   "id": "RKGNWMKB",
+   "title": "Key-Locked Rank One Editing for Text-to-Image Personalization",
+   "year": "2023",
+   "author": "Tewel",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3588432.3591506",
+   "post": ""
+  },
+  {
+   "id": "DUIHJTEK",
+   "title": "Multi-Concept Customization of Text-to-Image Diffusion",
+   "year": "2023",
+   "author": "Kumari",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10203856/",
+   "post": ""
+  },
+  {
+   "id": "IXYW4GF4",
+   "title": "An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion",
+   "year": "2022",
+   "author": "Gal",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=NAQvF08TcyG",
+   "post": ""
+  },
+  {
+   "id": "B3RPENY2",
+   "title": "Towards Stabilized and Efficient Diffusion Transformers through Long-Skip-Connections with Spectral Constraints",
+   "year": "2025",
+   "author": "Chen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Chen_Towards_Stabilized_and_Efficient_Diffusion_Transformers_through_Long-Skip-Connections_with_Spectral_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "JZWLH7QV",
+   "title": "Efficient Diffusion Transformer with Step-Wise Dynamic Attention Mediators",
+   "year": "2025",
+   "author": "Leonardis",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-031-72633-0_24",
+   "post": ""
+  },
+  {
+   "id": "SVQJWC28",
+   "title": "Accelerating Diffusion Sampling with Optimized Time Steps",
+   "year": "2024",
+   "author": "Xue",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657720/",
+   "post": ""
+  },
+  {
+   "id": "Q6BIK7U4",
+   "title": "ACT-Diffusion: Efficient Adversarial Consistency Training for One-Step Diffusion Models",
+   "year": "2024",
+   "author": "Kong",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10655337/",
+   "post": ""
+  },
+  {
+   "id": "U59VNK2H",
+   "title": "Attention-Driven Training-Free Efficiency Enhancement of Diffusion Models",
+   "year": "2024",
+   "author": "Wang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658428/",
+   "post": ""
+  },
+  {
+   "id": "38VNTRQ4",
+   "title": "Boosting Diffusion Models with Moving Average Sampling in Frequency Domain",
+   "year": "2024",
+   "author": "Qian",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657165/",
+   "post": ""
+  },
+  {
+   "id": "PTNUEFVZ",
+   "title": "Cache Me if You Can: Accelerating Diffusion Models through Block Caching",
+   "year": "2024",
+   "author": "Wimbauer",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Wimbauer_Cache_Me_if_You_Can_Accelerating_Diffusion_Models_through_Block_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "97ZWLXN4",
+   "title": "Clockwork Diffusion: Efficient Generation With Model-Step Distillation",
+   "year": "2024",
+   "author": "Habibian",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658293/",
+   "post": ""
+  },
+  {
+   "id": "6E9UZ6PR",
+   "title": "CoDi: Conditional Diffusion Distillation for Higher-Fidelity and Faster Image Generation",
+   "year": "2024",
+   "author": "Mei",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657611/",
+   "post": ""
+  },
+  {
+   "id": "TQM9I3K9",
+   "title": "Common Diffusion Noise Schedules and Sample Steps are Flawed",
+   "year": "2024",
+   "author": "Lin",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "theory",
+   "url": "https://ieeexplore.ieee.org/document/10484327/",
+   "post": ""
+  },
+  {
+   "id": "3BQ8KSFN",
+   "title": "DeepCache: Accelerating Diffusion Models for Free",
+   "year": "2024",
+   "author": "Ma",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Ma_DeepCache_Accelerating_Diffusion_Models_for_Free_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "FDLEM7QR",
+   "title": "Diffusion Models Without Attention",
+   "year": "2024",
+   "author": "Yan",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2311.18257",
+   "post": ""
+  },
+  {
+   "id": "E47PCK4A",
+   "title": "DiM: Diffusion Mamba for Efficient High-Resolution Image Synthesis",
+   "year": "2024",
+   "author": "Teng",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=sbqGsd5f9T",
+   "post": "/posts/dim-mamba/"
+  },
+  {
+   "id": "IKQLQQSW",
+   "title": "Dimba: Transformer-Mamba Diffusion Models",
+   "year": "2024",
+   "author": "Fei",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2406.01159",
+   "post": ""
+  },
+  {
+   "id": "C53BWSQ9",
+   "title": "Distilling ODE Solvers of Diffusion Models into Smaller Steps",
+   "year": "2024",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656860/",
+   "post": ""
+  },
+  {
+   "id": "I96TW57A",
+   "title": "DistriFusion: Distributed Parallel Inference for High-Resolution Diffusion Models",
+   "year": "2024",
+   "author": "Li",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657352/",
+   "post": ""
+  },
+  {
+   "id": "TCPBJRWP",
+   "title": "SCEdit: Efficient and Controllable Image Diffusion Generation via Skip Connection Editing",
+   "year": "2024",
+   "author": "Jiang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10657395/",
+   "post": ""
+  },
+  {
+   "id": "RU24ZM7W",
+   "title": "Learning-to-Cache: Accelerating Diffusion Transformer via Layer Caching",
+   "year": "2024",
+   "author": "Ma",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/f0b1515be276f6ba82b4f2b25e50bef0-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "2YN6PE6J",
+   "title": "Dynamic Diffusion Transformer",
+   "year": "2024",
+   "author": "Zhao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=taHwqSrbrb",
+   "post": ""
+  },
+  {
+   "id": "G7AENVKV",
+   "title": "SnapFusion: Text-to-Image Diffusion Model on Mobile Devices within Two Seconds",
+   "year": "2023",
+   "author": "Li",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/41bcc9d3bddd9c90e1f44b29e26d97ff-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "X67FZS9Y",
+   "title": "DiffFit: Unlocking Transferability of Large Diffusion Models via Simple Parameter-efficient Fine-Tuning",
+   "year": "2023",
+   "author": "Xie",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2023/html/Xie_DiffFit_Unlocking_Transferability_of_Large_Diffusion_Models_via_Simple_Parameter-efficient_ICCV_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "WNKQCZUD",
+   "title": "Fast Training of Diffusion Models with Masked Transformers",
+   "year": "2023",
+   "author": "Zheng",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=vTBjBtGioE",
+   "post": ""
+  },
+  {
+   "id": "H42CCD9N",
+   "title": "Token Merging for Fast Stable Diffusion",
+   "year": "2023",
+   "author": "Bolya",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023W/ECV/html/Bolya_Token_Merging_for_Fast_Stable_Diffusion_CVPRW_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "BDL24XGZ",
+   "title": "CADS: Unleashing the Diversity of Diffusion Models through Condition-Annealed Sampling",
+   "year": "2023",
+   "author": "Sadat",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=zMoNrajk2X",
+   "post": ""
+  },
+  {
+   "id": "DRZA9284",
+   "title": "PixArt-$\\alpha$: Fast Training of Diffusion Transformer for Photorealistic Text-to-Image Synthesis",
+   "year": "2023",
+   "author": "Chen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=eAKmQPe3m1",
+   "post": "/posts/pixart-alpha/"
+  },
+  {
+   "id": "G9D4WMD2",
+   "title": "DPM-Solver: A Fast ODE Solver for Diffusion Probabilistic Model Sampling in Around 10 Steps",
+   "year": "2022",
+   "author": "Lu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/260a14acce2a89dad36adc8eefe7c59e-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "N3E3CX9P",
+   "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+   "year": "2022",
+   "author": "Rombach",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9878449/",
+   "post": "/posts/ldm/"
+  },
+  {
+   "id": "3MWZGQYL",
+   "title": "Elucidating the Design Space of Diffusion-Based Generative Models",
+   "year": "2022",
+   "author": "Karras",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/a98846e9d9cc01cfb87eb694d946ce6b-Abstract-Conference.html",
+   "post": "/posts/edm/"
+  },
+  {
+   "id": "H8RJ5S35",
+   "title": "Improved Denoising Diffusion Probabilistic Models",
+   "year": "2021",
+   "author": "Nichol",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v139/nichol21a.html",
+   "post": ""
+  },
+  {
+   "id": "X57YC7RE",
+   "title": "Denoising Diffusion Implicit Models",
+   "year": "2020",
+   "author": "Song",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=St1giarCHLP",
+   "post": "/posts/ddim/"
+  },
+  {
+   "id": "SDHKSPKD",
+   "title": "DiffuMask: Synthesizing Images with Pixel-level Annotations for Semantic Segmentation Using Diffusion Models",
+   "year": "2023",
+   "author": "Wu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10376904/",
+   "post": ""
+  },
+  {
+   "id": "5UVMSTAZ",
+   "title": "Arbitrary-Scale Image Generation and Upsampling Using Latent Diffusion Model and Implicit Neural Decoder",
+   "year": "2024",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "generation",
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656931/",
+   "post": ""
+  },
+  {
+   "id": "C327SGT6",
+   "title": "Derivative-Free Diffusion Manifold-Constrained Gradient for Unified XAI",
+   "year": "2025",
+   "author": "Kim",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Kim_Derivative-Free_Diffusion_Manifold-Constrained_Gradient_for_Unified_XAI_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "4JXUKB7B",
+   "title": "Exploring Cross-Attention Maps in Multi-modal Diffusion Transformers for Training-Free Semantic Segmentation",
+   "year": "2025",
+   "author": "Cho",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-981-96-2641-0_18",
+   "post": ""
+  },
+  {
+   "id": "4NDLQHM3",
+   "title": "CrowdDiff: Multi-Hypothesis Crowd Density Estimation Using Diffusion Models",
+   "year": "2024",
+   "author": "Ranasinghe",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656347/",
+   "post": ""
+  },
+  {
+   "id": "35WTR65Z",
+   "title": "Diffuse Attend and Segment: Unsupervised Zero-Shot Segmentation using Stable Diffusion",
+   "year": "2024",
+   "author": "Tian",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Tian_Diffuse_Attend_and_Segment_Unsupervised_Zero-Shot_Segmentation_using_Stable_Diffusion_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "XNWFTAJG",
+   "title": "Open-vocabulary Object Segmentation with Diffusion Models",
+   "year": "2023",
+   "author": "Li",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "recognition"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10376666/",
+   "post": ""
+  },
+  {
+   "id": "8AMNKV8T",
+   "title": "Harnessing Text-to-Image Diffusion Models for Point Cloud Self-Supervised Learning",
+   "year": "2025",
+   "author": "Chen",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Chen_Harnessing_Text-to-Image_Diffusion_Models_for_Point_Cloud_Self-Supervised_Learning_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "LXQVZ2N2",
+   "title": "De-Diffusion Makes Text a Strong Cross-Modal Interface",
+   "year": "2024",
+   "author": "Wei",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Wei_De-Diffusion_Makes_Text_a_Strong_Cross-Modal_Interface_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "4FS4R8NH",
+   "title": "Interpreting the Weight Space of Customized Diffusion Models",
+   "year": "2024",
+   "author": "Dravid",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=DAO2BFzMfy&referrer=%5Bthe%20profile%20of%20Yossi%20Gandelsman%5D(%2Fprofile%3Fid%3D~Yossi_Gandelsman2)",
+   "post": ""
+  },
+  {
+   "id": "YISHNLXP",
+   "title": "Understanding the Latent Space of Diffusion Models through the Lens of Riemannian Geometry",
+   "year": "2023",
+   "author": "Park",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "theory",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/4bfcebedf7a2967c410b64670f27f904-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "YNDCQZJY",
+   "title": "Amodal Completion via Progressive Mixed Context Diffusion",
+   "year": "2024",
+   "author": "Xu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656240/",
+   "post": ""
+  },
+  {
+   "id": "7QCEWMID",
+   "title": "Beyond First-Order Tweedie: Solving Inverse Problems using Latent Diffusion",
+   "year": "2024",
+   "author": "Rout",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Rout_Beyond_First-Order_Tweedie_Solving_Inverse_Problems_using_Latent_Diffusion_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "IMCU67T5",
+   "title": "CDFormer: When Degradation Prediction Embraces Diffusion Model for Blind Image Super-Resolution",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2024/html/Liu_CDFormer_When_Degradation_Prediction_Embraces_Diffusion_Model_for_Blind_Image_CVPR_2024_paper.html",
+   "post": ""
+  },
+  {
+   "id": "YI2SVXT9",
+   "title": "Diff-Plugin: Revitalizing Details for Diffusion-Based Low-Level Tasks",
+   "year": "2024",
+   "author": "Liu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656833/",
+   "post": ""
+  },
+  {
+   "id": "IHIATBCY",
+   "title": "Diffusion Models, Image Super-Resolution, and Everything: A Survey",
+   "year": "2024",
+   "author": "Moser",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/10737883/?arnumber=10737883",
+   "post": ""
+  },
+  {
+   "id": "LWICSLBK",
+   "title": "Genuine Knowledge from Practice: Diffusion Test-Time Adaptation for Video Adverse Weather Removal",
+   "year": "2024",
+   "author": "Yang",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10656364/",
+   "post": ""
+  },
+  {
+   "id": "3NDJ3WWI",
+   "title": "Global structure-aware diffusion process for low-light image enhancement",
+   "year": "2024",
+   "author": "Hou",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "P83TIWGI",
+   "title": "Diffusion Models for Image Restoration and Enhancement -- A Comprehensive Survey",
+   "year": "2023",
+   "author": "Li",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2308.09388",
+   "post": ""
+  },
+  {
+   "id": "GHMIABNB",
+   "title": "Diffusion Posterior Sampling for General Noisy Inverse Problems",
+   "year": "2022",
+   "author": "Chung",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=OnD9zGAGT0k",
+   "post": ""
+  },
+  {
+   "id": "H2RGYCX2",
+   "title": "Deep Equilibrium Diffusion Restoration with Parallel Sampling",
+   "year": "2024",
+   "author": "Cao",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "restoration",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658596/",
+   "post": ""
+  },
+  {
+   "id": "6PIADMT4",
+   "title": "CompoDiff: Versatile Composed Image Retrieval With Latent Diffusion",
+   "year": "2024",
+   "author": "Gu",
+   "family": [
+    "diffusion"
+   ],
+   "task": [
+    "retrieval"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=mKtlzW0bWc",
+   "post": ""
+  },
+  {
+   "id": "BFEQJ72P",
+   "title": "Reduce, Reuse, Recycle: Compositional Generation with Energy-Based Diffusion Models and MCMC",
+   "year": "2023",
+   "author": "Du",
+   "family": [
+    "diffusion",
+    "ebm"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v202/du23a.html",
+   "post": ""
+  },
+  {
+   "id": "YMSI6D2H",
+   "title": "An Introduction to Flow Matching and Diffusion Models",
+   "year": "2025",
+   "author": "Holderrieth",
+   "family": [
+    "diffusion",
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "theory",
+   "url": "http://arxiv.org/abs/2506.02070",
+   "post": ""
+  },
+  {
+   "id": "32EZSGNZ",
+   "title": "Diffusion Normalizing Flow",
+   "year": "2021",
+   "author": "Zhang",
+   "family": [
+    "diffusion",
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/876f1f9954de0aa402d91bb988d12cd4-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "G7C2RY4X",
+   "title": "PeRFlow: Piecewise Rectified Flow as Universal Plug-and-Play Accelerator",
+   "year": "2024",
+   "author": "Yan",
+   "family": [
+    "diffusion",
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=SKj44I4rf0",
+   "post": ""
+  },
+  {
+   "id": "QI2PJ3ES",
+   "title": "Diffusion-Driven GAN Inversion for Multi-Modal Face Image Generation",
+   "year": "2024",
+   "author": "Kim",
+   "family": [
+    "diffusion",
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/10658059/",
+   "post": ""
+  },
+  {
+   "id": "FTCMGW4T",
+   "title": "Flow to the Mode: Mode-Seeking Diffusion Autoencoders for State-of-the-Art Image Tokenization",
+   "year": "",
+   "author": "Sargent",
+   "family": [
+    "diffusion",
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "XAGWNLSB",
+   "title": "Controllable and Compositional Generation with Latent-Space Energy-Based Models",
+   "year": "2021",
+   "author": "Nie",
+   "family": [
+    "ebm"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2021/hash/701d804549a4a23d3cae801dac6c2c75-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "J9K6X9RY",
+   "title": "A Tutorial on Energy-Based Learning",
+   "year": "2006",
+   "author": "Lecun",
+   "family": [
+    "ebm"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "survey",
+   "url": "",
+   "post": ""
+  },
+  {
+   "id": "MPFVGI5I",
+   "title": "EAGLE: Contextual Point Cloud Generation via Adaptive Continuous Normalizing Flow with Self-Attention",
+   "year": "2025",
+   "author": "Wang",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2503.13479",
+   "post": ""
+  },
+  {
+   "id": "UGLAPETY",
+   "title": "Fast Point Cloud Generation With Straight Flows",
+   "year": "2023",
+   "author": "Wu",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2023/html/Wu_Fast_Point_Cloud_Generation_With_Straight_Flows_CVPR_2023_paper.html",
+   "post": ""
+  },
+  {
+   "id": "3PZAN3CU",
+   "title": "Discrete Point Flow Networks for Efficient Point Cloud Generation",
+   "year": "2020",
+   "author": "Vedaldi",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://link.springer.com/10.1007/978-3-030-58592-1_41",
+   "post": ""
+  },
+  {
+   "id": "YCXG6DKJ",
+   "title": "SoftFlow: Probabilistic Framework for Normalizing Flow on Manifolds",
+   "year": "2020",
+   "author": "Kim",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/bdbca288fee7f92f2bfa9f7012727740-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "W9FEH5G9",
+   "title": "PointFlow: 3D Point Cloud Generation With Continuous Normalizing Flows",
+   "year": "2019",
+   "author": "Yang",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "3d",
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content_ICCV_2019/html/Yang_PointFlow_3D_Point_Cloud_Generation_With_Continuous_Normalizing_Flows_ICCV_2019_paper.html",
+   "post": ""
+  },
+  {
+   "id": "9FYEVV7E",
+   "title": "Latent Space Editing in Transformer-Based Flow Matching",
+   "year": "2024",
+   "author": "Hu",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://ojs.aaai.org/index.php/AAAI/article/view/27998",
+   "post": ""
+  },
+  {
+   "id": "569IMIAV",
+   "title": "Semantic Image Inversion and Editing using Rectified Stochastic Differential Equations",
+   "year": "2024",
+   "author": "Rout",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=Hu0FSOSEyS",
+   "post": ""
+  },
+  {
+   "id": "IYPL6RBT",
+   "title": "Flow Matching Guide and Code",
+   "year": "2024",
+   "author": "Lipman",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "https://openreview.net/forum?id=T0KOpdAxD9",
+   "post": ""
+  },
+  {
+   "id": "G5XJ4HGR",
+   "title": "Improving the Training of Rectified Flows",
+   "year": "2024",
+   "author": "Lee",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/7343a5c976f8399880b695267f1f9e9f-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "8EVLNBNH",
+   "title": "Discrete Flow Matching",
+   "year": "2024",
+   "author": "Gat",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/f0d629a734b56a642701bba7bc8bb3ed-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "ACY2IT2N",
+   "title": "Categorical Flow Matching on Statistical Manifolds",
+   "year": "2024",
+   "author": "Cheng",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/62a58f2130894e44e8a272c563a2c6f1-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "HWRZ642N",
+   "title": "Metric Flow Matching for Smooth Interpolations on the Data Manifold",
+   "year": "2024",
+   "author": "Kapuśniak",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/f381114cf5aba4e45552869863deaaa7-Abstract-Conference.html",
+   "post": ""
+  },
+  {
+   "id": "SNHGPA9D",
+   "title": "Flow Matching on General Geometries",
+   "year": "2023",
+   "author": "Chen",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=g7ohDlTITL",
+   "post": ""
+  },
+  {
+   "id": "94UQP488",
+   "title": "Flow Matching for Generative Modeling",
+   "year": "2022",
+   "author": "Lipman",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=PqvMRDCJT9t",
+   "post": "/posts/flow-matching/"
+  },
+  {
+   "id": "6DZHP45K",
+   "title": "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow",
+   "year": "2022",
+   "author": "Liu",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=XVjTT1nw5z",
+   "post": "/posts/rectified-flow/"
+  },
+  {
+   "id": "LIZX4R8Y",
+   "title": "Flow++: Improving Flow-Based Generative Models with Variational Dequantization and Architecture Design",
+   "year": "2019",
+   "author": "Ho",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v97/ho19a.html",
+   "post": ""
+  },
+  {
+   "id": "LNEMTFB8",
+   "title": "Neural Spline Flows",
+   "year": "2019",
+   "author": "Durkan",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2019/hash/7ac71d433f282034e088473244df8c02-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "3EWU66DU",
+   "title": "Residual Flows for Invertible Generative Modeling",
+   "year": "2019",
+   "author": "Chen",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2019/hash/5d0d5594d24f0f955548f0fc0ff83d10-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "62M5WLJG",
+   "title": "FFJORD: Free-Form Continuous Dynamics for Scalable Reversible Generative Models",
+   "year": "2018",
+   "author": "Grathwohl",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=rJxgknCcK7",
+   "post": ""
+  },
+  {
+   "id": "FR6KCFR4",
+   "title": "Glow: Generative Flow with Invertible 1x1 Convolutions",
+   "year": "2018",
+   "author": "Kingma",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2018/hash/d139db6a236200b21cc7f752979132d0-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "7WF4669M",
+   "title": "Density estimation using Real NVP",
+   "year": "2017",
+   "author": "Dinh",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=HkpbnH9lx",
+   "post": ""
+  },
+  {
+   "id": "8UMFKNLI",
+   "title": "Pyramidal Flow Matching for Efficient Video Generative Modeling",
+   "year": "2024",
+   "author": "Jin",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=66NzcRQuOq",
+   "post": ""
+  },
+  {
+   "id": "9DGJF2DU",
+   "title": "Scaling Rectified Flow Transformers for High-Resolution Image Synthesis",
+   "year": "2024",
+   "author": "Esser",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=FPnUhsQJ5B",
+   "post": "/posts/sd3/"
+  },
+  {
+   "id": "7BHCKAX6",
+   "title": "Exploring Straighter Trajectories of Flow Matching with Diffusion Guidance",
+   "year": "2023",
+   "author": "Xing",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2311.16507",
+   "post": ""
+  },
+  {
+   "id": "XIB2XYZT",
+   "title": "Self-Supervised Flow Matching for Scalable Multi-Modal Synthesis",
+   "year": "2026",
+   "author": "Chefer",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/2603.06507",
+   "post": "/posts/Self-Flow/"
+  },
+  {
+   "id": "LTQ6QVWV",
+   "title": "Invertible Residual Networks",
+   "year": "2019",
+   "author": "Behrmann",
+   "family": [
+    "flow"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v97/behrmann19a.html",
+   "post": ""
+  },
+  {
+   "id": "XG6DCK74",
+   "title": "SurVAE Flows: Surjections to Bridge the Gap between VAEs and Flows",
+   "year": "2020",
+   "author": "Nielsen",
+   "family": [
+    "flow",
+    "vae"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2020/hash/9578a63fbe545bd82cc5bbe749636af1-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "KDM95Z3W",
+   "title": "NICE: Non-linear Independent Components Estimation",
+   "year": "2015",
+   "author": "Dinh",
+   "family": [
+    "flow",
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/1410.8516",
+   "post": ""
+  },
+  {
+   "id": "JJYL88YV",
+   "title": "Variational Inference with Normalizing Flows",
+   "year": "2015",
+   "author": "Rezende",
+   "family": [
+    "flow",
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v37/rezende15.html",
+   "post": ""
+  },
+  {
+   "id": "I3GPGMI8",
+   "title": "Drag Your GAN: Interactive Point-based Manipulation on the Generative Image Manifold",
+   "year": "2023",
+   "author": "Pan",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "method",
+   "url": "https://dl.acm.org/doi/10.1145/3588432.3591500",
+   "post": ""
+  },
+  {
+   "id": "MX6KBTRC",
+   "title": "GAN Inversion: A Survey",
+   "year": "2023",
+   "author": "Xia",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "editing"
+   ],
+   "kind": "survey",
+   "url": "https://ieeexplore.ieee.org/document/9792208/",
+   "post": ""
+  },
+  {
+   "id": "JENVKVIC",
+   "title": "Large Scale GAN Training for High Fidelity Natural Image Synthesis",
+   "year": "2018",
+   "author": "Brock",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=B1xsqj09Fm&",
+   "post": ""
+  },
+  {
+   "id": "EJ3H3EX5",
+   "title": "NIPS 2016 Tutorial: Generative Adversarial Networks",
+   "year": "2017",
+   "author": "Goodfellow",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/1701.00160",
+   "post": ""
+  },
+  {
+   "id": "2CWRGSZY",
+   "title": "Plug & Play Generative Networks: Conditional Iterative Generation of Images in Latent Space",
+   "year": "2017",
+   "author": "Nguyen",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "http://ieeexplore.ieee.org/document/8099857/",
+   "post": ""
+  },
+  {
+   "id": "LL6FV39E",
+   "title": "Unrolled Generative Adversarial Networks",
+   "year": "2017",
+   "author": "Metz",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=BydrOIcle",
+   "post": ""
+  },
+  {
+   "id": "KPNZMLBA",
+   "title": "Learning in Implicit Generative Models",
+   "year": "2016",
+   "author": "Mohamed",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=B16Jem9xe",
+   "post": ""
+  },
+  {
+   "id": "ND7WIINB",
+   "title": "Generative Adversarial Nets",
+   "year": "2014",
+   "author": "Goodfellow",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html",
+   "post": ""
+  },
+  {
+   "id": "JTP68292",
+   "title": "GAN-Based Rain Noise Removal From Single-Image Considering Rain Composite Models",
+   "year": "2020",
+   "author": "Matsui",
+   "family": [
+    "gan"
+   ],
+   "task": [
+    "restoration"
+   ],
+   "kind": "method",
+   "url": "https://ieeexplore.ieee.org/document/9016251/?arnumber=9016251",
+   "post": ""
+  },
+  {
+   "id": "G3LGKK25",
+   "title": "Image Inversion: A Survey from GANs to Diffusion and Beyond",
+   "year": "2025",
+   "author": "Chen",
+   "family": [
+    "gan",
+    "diffusion"
+   ],
+   "task": [
+    "restoration",
+    "editing"
+   ],
+   "kind": "survey",
+   "url": "http://arxiv.org/abs/2502.11974",
+   "post": ""
+  },
+  {
+   "id": "TY658PG3",
+   "title": "VideoVAE+: Large Motion Video Autoencoding with Cross-modal Video VAE",
+   "year": "2025",
+   "author": "Xing",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/ICCV2025/html/Xing_VideoVAE_Large_Motion_Video_Autoencoding_with_Cross-modal_Video_VAE_ICCV_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "KQM8LY9L",
+   "title": "SetVAE: Learning Hierarchical Composition for Generative Modeling of Set-Structured Data",
+   "year": "2021",
+   "author": "Kim",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "generation"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2021/html/Kim_SetVAE_Learning_Hierarchical_Composition_for_Generative_Modeling_of_Set-Structured_Data_CVPR_2021_paper.html",
+   "post": ""
+  },
+  {
+   "id": "8RUFTBY2",
+   "title": "Improved Video VAE for Latent Video Diffusion Model",
+   "year": "2025",
+   "author": "Wu",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "generation",
+    "efficiency"
+   ],
+   "kind": "method",
+   "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Wu_Improved_Video_VAE_for_Latent_Video_Diffusion_Model_CVPR_2025_paper.html",
+   "post": ""
+  },
+  {
+   "id": "6VNQ7IM8",
+   "title": "Geometry-Aware Generative Autoencoders for Warped Riemannian Metric Learning and Generative Modeling on Data Manifolds",
+   "year": "2025",
+   "author": "Sun",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "generation",
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v258/sun25c.html",
+   "post": ""
+  },
+  {
+   "id": "SFRJM6KZ",
+   "title": "Auto-Encoding Variational Bayes",
+   "year": "2022",
+   "author": "Kingma",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "http://arxiv.org/abs/1312.6114",
+   "post": ""
+  },
+  {
+   "id": "G286YVH2",
+   "title": "Variational Lossy Autoencoder",
+   "year": "2017",
+   "author": "Chen",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://openreview.net/forum?id=BysvGP5ee",
+   "post": ""
+  },
+  {
+   "id": "XVTKFCY4",
+   "title": "Neural Variational Inference and Learning in Belief Networks",
+   "year": "2014",
+   "author": "Mnih",
+   "family": [
+    "vae"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.mlr.press/v32/mnih14.html",
+   "post": ""
+  },
+  {
+   "id": "43KIZU8N",
+   "title": "Neural Discrete Representation Learning",
+   "year": "2017",
+   "author": "van den Oord",
+   "family": [
+    "vae",
+    "autoregressive"
+   ],
+   "task": [
+    "representation"
+   ],
+   "kind": "method",
+   "url": "https://proceedings.neurips.cc/paper/2017/hash/7a98af17e63a0ac09ce2e96d03992fbc-Abstract.html",
+   "post": ""
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+  // Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  // Shopify Liquid
+  "files.associations": {
+    "*.html": "liquid"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  // Formatter
+  "[html][liquid]": {
+    "editor.defaultFormatter": "Shopify.theme-check-vscode"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "mkhl.shfmt"
+  },
+  // Disable vscode built-in stylelint
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  // Stylint extension settings
+  "stylelint.snippet": ["css", "scss"],
+  "stylelint.validate": ["css", "scss"],
+  // Run tasks in macOS
+  "terminal.integrated.profiles.osx": {
+    "zsh": { "path": "/bin/zsh", "args": ["-l", "-i"] }
+  },
+  // Paste/drop an image into a post -> assets/img/posts/<post-slug>/
+  // The date prefix is stripped from the file name so that
+  // _posts/2026-07-15-skala-prompt-engineering.md
+  //   -> assets/img/posts/skala-prompt-engineering/image.png
+  "markdown.copyFiles.destination": {
+    "/_posts/**/*": "${documentWorkspaceFolder}/assets/img/posts/${documentBaseName/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(.*)$/$1/}/${fileName}"
+  },
+  "markdown.copyFiles.overwriteBehavior": "nameIncrementally",
+  "markdown.editor.filePaste.copyIntoWorkspace": "mediaFiles",
+  "markdown.editor.drop.copyIntoWorkspace": "mediaFiles",
+  // Renaming an image in the Explorer (F2) rewrites the links that point at it,
+  // so a pasted image.png can be given a real name after the fact.
+  // The default `include` globs already cover png/jpg/webp/svg.
+  "markdown.updateLinksOnFileMove.enabled": "always"
+}
