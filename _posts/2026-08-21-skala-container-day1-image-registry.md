@@ -81,7 +81,7 @@ CMD ["nginx", "-g", "daemon off;"]                      # 레이어 아님 (설�
 **공유 레이어는 함부로 지워지지 않는다.** 이미지 A를 삭제해도 레이어 1, 2, 3은 남는다. 다른 이미지가 같은 레이어를 참조하고 있을 수 있기 때문이다. `docker rmi`를 했는데 디스크가 안 줄어드는 이유가 여기 있다.
 
 {: .prompt-info }
-> 이 레이어 구조가 실제 파일로 어떻게 생겼는지는 [2일차 ⑥](/posts/skala-container-day2-image-anatomy/)에서 `docker save`로 tar를 풀어 직접 확인한다. 그리고 그것이 실행 시점에 어떻게 하나의 파일시스템으로 합쳐지는지는 [2일차 ⑦](/posts/skala-container-day2-kernel/)의 OverlayFS에서 다룬다.
+> 이 레이어 구조가 실제 파일로 어떻게 생겼는지는 2일차 ⑥에서 `docker save`로 tar를 풀어 직접 확인한다. 그리고 그것이 실행 시점에 어떻게 하나의 파일시스템으로 합쳐지는지는 2일차 ⑦의 OverlayFS에서 다룬다.
 
 이 사실은 Dockerfile 작성 방식에 곧바로 영향을 준다. `RUN`을 여러 줄로 나누면 레이어가 그만큼 늘어난다. 그래서 `&&`로 묶는 관례가 생긴다. 자세한 내용은 [다음 편](/posts/skala-container-day1-dockerfile/)에서 다룬다.
 
