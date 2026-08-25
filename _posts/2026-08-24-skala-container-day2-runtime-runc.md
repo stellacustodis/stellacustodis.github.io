@@ -403,6 +403,55 @@ HOST 프로세스                          Container 내 프로세스
 
 컨테이너는 **호스트 환경의 파일 디렉터리와 프로세스로 동작한다.** 별도의 무언가가 아니다.
 
+## 쿠버네티스에서는 이 계층이 어떻게 되나
+
+앞의 계층도에서 **`dockerd` 자리를 대신하는 것**이 kubelet이다.
+
+```text
+[ Docker ]                          [ Kubernetes ]
+  dockerd                             kubelet          ← 노드마다 하나씩
+     ↓                                   ↓  CRI
+  containerd                          containerd (또는 CRI-O)
+     ↓                                   ↓
+  containerd-shim                     containerd-shim
+     ↓                                   ↓
+  runc                                runc
+```
+
+kubelet은 각 노드에서 도는 에이전트다. 컨트롤 플레인에서 "이 노드에 이 Pod를 띄워라"를 받아
+**CRI**(Container Runtime Interface)로 containerd에 실행을 요청하고, 상태를 보고하며,
+probe를 찔러 보고 실패하면 재시작하거나 트래픽에서 뺀다.
+
+여기서 **kubelet이 dockerd를 거치지 않는다**는 점이 중요하다.
+2020년의 "쿠버네티스가 Docker를 버린다"는 소동이 여기서 나왔는데,
+버린 것은 dockerd라는 중간 계층이지 컨테이너나 이미지 형식이 아니다.
+**OCI 표준을 지키므로 `docker build`로 만든 이미지는 그대로 돈다.**
+
+계층 아래쪽(`containerd`, `shim`, `runc`)은 그대로다.
+이 실습에서 손으로 만져 본 `config.json`과 rootfs도 쿠버네티스에서 똑같이 쓰인다.
+
+### replica — 되살리는 것이 아니라 개수를 맞춘다
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 3        # 항상 3개를 유지한다
+```
+
+Compose의 `restart` 정책과 대비하면 성격이 분명해진다.
+
+| | Compose `restart` | Kubernetes `replicas` |
+|---|---|---|
+| 관심사 | **이 컨테이너**가 살아 있는가 | **몇 개**가 살아 있는가 |
+| 하나 죽으면 | 그 컨테이너를 다시 시작한다 | **새 Pod를 만든다** (죽은 것은 버린다) |
+| 노드가 통째로 죽으면 | 방법이 없다 | 다른 노드에 새로 만든다 |
+| 개수 조절 | 없음 | `kubectl scale`, 오토스케일링 |
+
+쿠버네티스는 죽은 컨테이너를 고쳐 쓰지 않는다. **버리고 새로 만든다.**
+그래서 컨테이너에 상태를 두면 안 되고, 상태는 볼륨이나 외부 저장소로 빼야 한다.
+이 장 앞부분에서 확인한 "변경분은 upperdir에만 쌓인다"는 성질과 같은 이야기다.
+
 ## 도구 지형
 
 같은 규격을 구현한 도구가 여럿이다.
@@ -441,64 +490,6 @@ HOST 프로세스                          Container 내 프로세스
 | kata-runtime | 경량 VM 기반 격리 |
 
 마지막 둘이 흥미롭다. 커널 공유가 보안상 부담이 되는 환경을 위해 **격리 수준을 VM 쪽으로 되돌린** 선택지다. [1일차 ①](/posts/skala-container-day1-virtualization/)의 VM과 컨테이너 대비가 양자택일이 아니라는 뜻이기도 하다.
-
-## 수업 중 나온 질문
-
-### kubelet은 무엇이고 이 계층 어디에 들어가나
-
-이 장에서 본 계층에서 **`dockerd` 자리를 대신하는 것**이 kubelet이다.
-
-```text
-[ Docker ]                          [ Kubernetes ]
-  dockerd                             kubelet          ← 노드마다 하나씩
-     ↓                                   ↓  CRI
-  containerd                          containerd (또는 CRI-O)
-     ↓                                   ↓
-  containerd-shim                     containerd-shim
-     ↓                                   ↓
-  runc                                runc
-```
-
-kubelet은 **각 노드에서 도는 에이전트**다. 하는 일은 이렇다.
-
-- 컨트롤 플레인에서 "이 노드에 이 Pod를 띄워라"를 받는다
-- **CRI**(Container Runtime Interface)로 containerd나 CRI-O에 실제 실행을 요청한다
-- 컨테이너 상태와 노드 자원을 컨트롤 플레인에 보고한다
-- **probe**를 주기적으로 찔러 보고 실패하면 재시작하거나 트래픽에서 뺀다
-
-여기서 이 장의 내용이 이어진다. **kubelet은 dockerd를 거치지 않는다.**
-containerd와 CRI로 직접 말한다. 쿠버네티스가 Docker 없이도 컨테이너를 돌리는 이유가 이것이고,
-2020년의 "Kubernetes가 Docker를 버린다"는 소동도 여기서 나왔다.
-버린 것은 dockerd라는 중간 계층이지 컨테이너나 이미지 형식이 아니다.
-**OCI 표준을 지키므로 `docker build`로 만든 이미지는 그대로 돈다.**
-
-### replica는 뭔가
-
-**같은 Pod를 몇 개 띄울지**다. 보통 Deployment가 ReplicaSet을 통해 관리한다.
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-spec:
-  replicas: 3        # 항상 3개를 유지한다
-```
-
-Compose의 `restart` 정책과 대비하면 성격이 분명해진다.
-
-| | Compose `restart` | Kubernetes `replicas` |
-|---|---|---|
-| 관심사 | **이 컨테이너**가 살아 있는가 | **몇 개**가 살아 있는가 |
-| 하나 죽으면 | 그 컨테이너를 다시 시작한다 | **새 Pod를 만든다** (죽은 것은 버린다) |
-| 노드가 통째로 죽으면 | 방법이 없다 | 다른 노드에 새로 만든다 |
-| 개수 조절 | 없음 | `kubectl scale`, 오토스케일링 |
-
-**"되살린다"와 "개수를 맞춘다"의 차이**가 핵심이다.
-쿠버네티스는 죽은 컨테이너를 고쳐 쓰지 않는다. 버리고 새로 만든다.
-그래서 컨테이너에 상태를 두면 안 되고, 상태는 볼륨이나 외부 저장소로 빼야 한다.
-
-이 사고방식이 [2일차 ⑩](/posts/skala-container-day2-compose/)에서 다루는 Compose의
-**선언형** 설정과 이어진다. "무엇을 해라"가 아니라 "이런 상태였으면 좋겠다"를 적고,
-그 상태를 유지하는 일은 시스템이 맡는다.
 
 ## 이 장에서 남는 것
 

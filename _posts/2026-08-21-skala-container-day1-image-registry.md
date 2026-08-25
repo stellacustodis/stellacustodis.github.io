@@ -85,6 +85,36 @@ CMD ["nginx", "-g", "daemon off;"]                      # 레이어 아님 (설�
 
 이 사실은 Dockerfile 작성 방식에 곧바로 영향을 준다. `RUN`을 여러 줄로 나누면 레이어가 그만큼 늘어난다. 그래서 `&&`로 묶는 관례가 생긴다. 자세한 내용은 [다음 편](/posts/skala-container-day1-dockerfile/)에서 다룬다.
 
+## 곁가지 — AppImage는 컨테이너 이미지인가
+
+리눅스에서 앱을 배포할 때 쓰는 AppImage도 "이미지"라는 이름을 달고 있다.
+푸는 문제도 겹친다. 앱과 의존 라이브러리를 **파일 하나**로 묶어 배포판을 가리지 않고 실행되게 한다.
+
+```bash
+chmod +x MyApp-x86_64.AppImage
+./MyApp-x86_64.AppImage
+```
+
+동작 방식의 뼈대도 비슷하다. AppImage 파일은 SquashFS 이미지이고,
+실행하면 FUSE로 임시 마운트한 뒤 그 안의 진입점을 실행한다.
+**"이미지를 마운트해서 실행한다"**까지는 컨테이너와 같다.
+
+갈라지는 지점은 하나다.
+
+| | 컨테이너 이미지 | AppImage |
+|---|---|---|
+| 의존성 묶기 | O | O |
+| 실행 형태 | 레이어를 OverlayFS로 합쳐 rootfs로 | SquashFS를 FUSE로 마운트 |
+| **격리** | namespace + cgroup으로 **격리한다** | **없다.** 호스트의 평범한 프로세스다 |
+| 보는 파일시스템 | 자기 rootfs | **호스트 것 그대로** |
+
+AppImage로 실행한 프로그램은 홈 디렉터리도, 네트워크도, 프로세스 목록도 전부 호스트 것을 본다.
+격리가 목적이 아니라 **"설치 없이 어디서든 실행"**이 목적이기 때문이다.
+
+Flatpak과 Snap은 중간쯤에 있다. 이쪽은 namespace와 seccomp로 어느 정도 격리한다.
+Flatpak이 쓰는 bubblewrap은 [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 다루는 namespace를 그대로 활용한다.
+**커널 기능은 같고 어디까지 쓰느냐가 다를 뿐이다.**
+
 ## 이미지 라이프사이클
 
 이미지를 다루는 흐름은 정해져 있다.
@@ -180,39 +210,6 @@ docker exec -it hello /bin/bash           # 셸로 접속
 docker ps
 docker inspect ${CONTAINER_ID}
 ```
-
-## 수업 중 나온 질문
-
-### 이미지는 알겠는데 AppImage는 뭔가
-
-이름이 닮았고 푸는 문제도 비슷하지만 **격리가 없다는 점이 결정적으로 다르다.**
-
-AppImage는 리눅스 애플리케이션 배포 형식이다. 앱과 의존 라이브러리를 **파일 하나**로 묶어,
-배포판을 가리지 않고 실행 권한만 주면 설치 없이 돌아가게 한다.
-
-```bash
-chmod +x MyApp-x86_64.AppImage
-./MyApp-x86_64.AppImage
-```
-
-동작 방식도 컨테이너와 겹치는 데가 있다. AppImage 파일은 SquashFS 이미지이고,
-실행하면 FUSE로 임시 마운트한 뒤 그 안의 진입점을 실행한다.
-**"이미지를 마운트해서 실행한다"**는 뼈대는 같다.
-
-| | 컨테이너 이미지 | AppImage |
-|---|---|---|
-| 푸는 문제 | 의존성을 함께 묶어 "내 PC에선 되는데"를 없앤다 | 같다 |
-| 실행 형태 | 레이어를 OverlayFS로 합쳐 rootfs로 삼는다 | SquashFS를 FUSE로 마운트한다 |
-| **격리** | namespace + cgroup으로 **격리한다** | **없다.** 호스트의 평범한 프로세스다 |
-| 보는 파일시스템 | 자기 rootfs | **호스트 것 그대로** |
-| 주 용도 | 서버 애플리케이션 배포 | 데스크톱 앱 배포 |
-
-AppImage로 실행한 프로그램은 홈 디렉터리도, 네트워크도, 프로세스 목록도 전부 호스트 것을 본다.
-격리가 목적이 아니라 **"설치 없이 어디서든 실행"**이 목적이기 때문이다.
-
-같은 계열의 Flatpak과 Snap은 중간쯤에 있다. 이쪽은 namespace와 seccomp로 어느 정도 격리한다.
-Flatpak은 bubblewrap이라는 도구를 쓰는데, [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 다루는
-namespace를 그대로 활용한다. **커널 기능은 같고 어디까지 쓰느냐가 다를 뿐이다.**
 
 ## 이 장에서 남는 것
 

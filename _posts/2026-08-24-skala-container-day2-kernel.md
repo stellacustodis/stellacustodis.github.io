@@ -194,6 +194,45 @@ spec:
 
 이것이 **여러 컨테이너가 같은 이미지를 공유하면서도 서로 간섭하지 않는 이유**다. lowerdir은 공유하고 upperdir만 각자 갖는다. 그래서 컨테이너 하나 더 띄우는 비용이 거의 없다.
 
+### 파이썬 venv와는 무엇이 다른가
+
+"공통 바탕 + 내 변경분을 겹친다"는 발상은 venv와 닮았다. 그런데 **동작하는 층이 다르고**,
+그 차이가 성질을 갈라놓는다.
+
+| | venv | OverlayFS |
+|---|---|---|
+| 동작하는 층 | **파이썬 인터프리터** | **리눅스 커널** |
+| 하는 일 | `sys.path` 조작 — 어느 `site-packages`를 볼지 정한다 | 파일시스템 합성 — 프로세스가 보는 `/` 자체를 만든다 |
+| 적용 범위 | 파이썬 모듈만 | **모든 파일** |
+| 바탕 보호 | 없음. `sudo pip`로 시스템 것을 고칠 수 있다 | **lowerdir은 읽기 전용이 강제된다** |
+| 변경 분리 | 수동 (어디에 설치할지 내가 정함) | **자동 (Copy-on-Write)** |
+
+venv 안에서도 `/etc/hosts`나 `/usr/bin/ls`는 시스템 것을 그대로 본다. 파이썬 밖은 아무것도 안 바뀐다.
+반면 컨테이너 안에서는 `/usr/bin/ls`부터 다른 파일이다.
+
+특히 **lowerdir이 읽기 전용이라는 점**이 다르다. venv는 규율에 의존하지만 OverlayFS는 커널이 강제한다.
+그래서 컨테이너를 아무리 망가뜨려도 이미지는 멀쩡하고, 같은 이미지로 새로 띄우면 처음 상태로 돌아온다.
+
+굳이 대응시키자면 **컨테이너 = venv + chroot + 프로세스 격리 + 자원 제한**이고,
+venv는 그중 "의존성 분리" 한 조각만 담당한다.
+
+그래서 컨테이너 안에서 venv를 또 쓸 이유는 대개 없다. 컨테이너 하나에 애플리케이션 하나를 넣으면
+의존성이 충돌할 상대가 없기 때문이다. 예외는 멀티스테이지 빌드다 —
+**venv 디렉터리 하나만 다음 스테이지로 복사**하면 빌드 도구를 남기지 않고 의존성만 넘길 수 있다.
+
+```dockerfile
+FROM python:3.11 AS builder
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.11-slim
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+```
+
+이때 venv는 격리 수단이 아니라 **옮기기 쉬운 묶음**으로 쓰인다.
+
 ## 실습: OverlayFS를 직접 마운트해 보기
 
 말로 들으면 추상적이므로 직접 마운트한다. 커널 기능을 만져야 하므로 `--privileged`가 필요하다.
@@ -287,57 +326,6 @@ cat /mnt/ovtest/merged/a.txt  # upper 쪽 내용이 보인다
 | 제한 | cgroups, Capabilities, SELinux | 무엇을 **할 수 있는가** |
 
 Netfilter는 네트워크 쪽에서 두 역할을 겸하는데, [2일차 ⑨](/posts/skala-container-day2-network/)에서 따로 다룬다.
-
-## 수업 중 나온 질문
-
-### OverlayFS가 파이썬 venv와 비슷한 건가
-
-발상은 닮았지만 **동작하는 층이 다르다.** 그 차이가 성질을 갈라놓는다.
-
-닮은 점부터 보면, 둘 다 **"공통 바탕 + 내 변경분"**을 겹쳐 하나처럼 보여 준다.
-venv는 시스템 파이썬을 그대로 두고 내 패키지만 따로 쌓고,
-OverlayFS는 이미지 레이어를 그대로 두고 컨테이너의 변경분만 따로 쌓는다.
-
-다른 점이 본질이다.
-
-| | venv | OverlayFS |
-|---|---|---|
-| 동작하는 층 | **파이썬 인터프리터** | **리눅스 커널** |
-| 하는 일 | `sys.path` 조작 — 어느 `site-packages`를 볼지 정한다 | 파일시스템 합성 — 프로세스가 보는 `/` 자체를 만든다 |
-| 적용 범위 | 파이썬 모듈만 | **모든 파일** |
-| 바탕 보호 | 없음. `sudo pip`로 시스템 것을 고칠 수 있다 | **lowerdir은 읽기 전용이 강제된다** |
-| 변경 분리 | 수동 (어디에 설치할지 내가 정함) | **자동 (Copy-on-Write)** |
-
-venv 안에서도 `/etc/hosts`나 `/usr/bin/ls`는 시스템 것을 그대로 본다.
-파이썬 밖은 아무것도 안 바뀐다. 반면 컨테이너 안에서는 `/usr/bin/ls`부터 다른 파일이다.
-
-**"lowerdir이 읽기 전용"이라는 점**이 특히 다르다. venv는 규율에 의존하지만
-OverlayFS는 커널이 강제한다. 그래서 컨테이너를 아무리 망가뜨려도 이미지는 멀쩡하고,
-같은 이미지로 새로 띄우면 처음 상태로 돌아온다.
-
-굳이 파이썬 쪽에서 비유를 찾자면 venv보다는 **컨테이너 = venv + chroot + 프로세스 격리 + 자원 제한**에 가깝다.
-venv는 그중 "의존성 분리" 한 조각만 담당한다.
-
-### 그러면 컨테이너 안에서 venv를 쓸 필요가 있나
-
-대개 없다. 컨테이너 하나에 애플리케이션 하나를 넣으면 의존성이 충돌할 상대가 없다.
-`pip install`을 시스템 파이썬에 그냥 해도 된다.
-
-그래도 쓰는 경우가 있다. 멀티스테이지 빌드에서 **venv 디렉터리 하나만 다음 스테이지로 복사**하면
-빌드 도구를 남기지 않고 의존성만 넘길 수 있다.
-
-```dockerfile
-FROM python:3.11 AS builder
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir -r requirements.txt
-
-FROM python:3.11-slim
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-```
-
-이때 venv는 격리 수단이 아니라 **옮기기 쉬운 묶음**으로 쓰인다.
 
 ## 이 장에서 남는 것
 

@@ -75,6 +75,36 @@ docker run --name hello-nginx -d --net bridge -p 8080:80 \
 ENTRYPOINT, CMD, ENV, WORKDIR, EXPOSE, USER, VOLUME, LABEL …
 ```
 
+실무에서는 "명령은 build 때 실행되고 환경변수는 run 때 들어간다" 정도로 뭉뚱그리기 쉬운데,
+정확히는 **세 갈래**다.
+
+| 갈래 | 명령 | 언제 |
+|---|---|---|
+| 빌드 시점에 **실행**된다 | `RUN`, `COPY`, `ADD` | `docker build` — 결과가 레이어로 굳는다 |
+| 빌드 때 **기록**되고 실행 때 **적용**된다 | `ENV`, `WORKDIR`, `EXPOSE`, `USER`, `LABEL`, `VOLUME` | 양쪽 |
+| 실행 시점에 **동작**한다 | `CMD`, `ENTRYPOINT` | `docker run` |
+
+가운데 갈래가 헷갈리는 자리다. **`ENV`는 런타임에만 들어가는 것이 아니라 빌드 도중에도 유효하다.**
+
+```dockerfile
+ENV APP_HOME=/opt/myapp
+WORKDIR $APP_HOME          # 빌드 때 이 값이 쓰인다
+RUN echo $APP_HOME         # 빌드 로그에 /opt/myapp 이 찍힌다
+```
+
+`ENV`로 선언한 값은 이미지 설정에 **박혀서** 실행할 때도 그대로 살아 있다.
+그래서 비밀값을 `ENV`에 넣으면 안 된다 — `docker inspect`로 그대로 보인다.
+
+런타임에만 들어오는 것은 실행할 때 주입하는 값이다.
+
+```bash
+docker run -e APP_ENV=prod myimage      # 이미지에 없던 값
+docker run -e APP_HOME=/tmp myimage     # ENV 로 박아 둔 값을 덮어쓴다
+```
+
+한 줄로 줄이면 이렇다. **`RUN`은 빌드 때 실행되고, `ENV`는 빌드 때 정해져 런타임까지 따라가며,
+`-e`로 준 값이 그것을 런타임에 덮어쓴다.**
+
 이 구분이 왜 중요한가. **이미지 크기를 줄이려면 앞 그룹만 신경 쓰면 된다.** `EXPOSE`를 열 줄 써도 이미지는 1바이트도 안 커진다. 반면 `RUN`을 한 줄 잘못 나누면 수백 MB가 늘어난다.
 
 [2일차 ⑥](/posts/skala-container-day2-image-anatomy/)에서 이미지를 tar로 풀면 이 두 그룹이 각각 `blobs/`의 레이어 파일과 `manifest.json`의 설정으로 갈라져 있는 것을 눈으로 확인하게 된다.
@@ -431,47 +461,6 @@ docker rm linux-container       # 삭제
 ```
 
 `docker run --rm`을 쓰면 종료 시 자동 삭제되므로 반복 실습에서 이 충돌을 피할 수 있다.
-
-## 수업 중 나온 질문
-
-### Dockerfile의 모든 명령은 build 때 실행되고, 환경변수는 run 때 들어가나
-
-절반만 맞다. 앞의 [핵심 분류](#이-장의-핵심-분류)를 다른 각도에서 물은 것인데,
-실제로는 **세 갈래**다.
-
-| 갈래 | 명령 | 언제 |
-|---|---|---|
-| 빌드 시점에 **실행**된다 | `RUN`, `COPY`, `ADD` | `docker build` — 결과가 레이어로 굳는다 |
-| 빌드 때 **기록**되고 실행 때 **적용**된다 | `ENV`, `WORKDIR`, `EXPOSE`, `USER`, `LABEL`, `VOLUME` | 양쪽 |
-| 실행 시점에 **동작**한다 | `CMD`, `ENTRYPOINT` | `docker run` |
-
-두 번째 갈래가 헷갈리는 지점이다.
-
-**`ENV`는 런타임에만 들어가는 것이 아니다.** 빌드 도중에도 유효하다.
-
-```dockerfile
-ENV APP_HOME=/opt/myapp
-WORKDIR $APP_HOME          # 빌드 때 이 값이 쓰인다
-RUN echo $APP_HOME         # 빌드 로그에 /opt/myapp 이 찍힌다
-```
-
-`ENV`로 선언한 값은 이미지 설정에 **박혀서** 컨테이너를 실행할 때도 그대로 살아 있다.
-그래서 비밀값을 `ENV`에 넣으면 안 된다. `docker inspect`로 그대로 보인다.
-
-**런타임에만 들어오는 것**은 실행할 때 주입하는 값이다.
-
-```bash
-docker run -e APP_ENV=prod myimage        # 이미지에 없던 값
-docker run -e APP_HOME=/tmp myimage       # ENV 로 박아 둔 값을 덮어쓴다
-```
-
-한 줄로 정리하면 이렇다.
-
-> `RUN`은 빌드 때 **실행**되고, `ENV`는 빌드 때 **정해져서 런타임까지 따라가며**,
-> `-e`로 준 값이 그것을 런타임에 **덮어쓴다.**
-
-`ARG`와의 관계는 앞의 [ARG 절](#arg--빌드-시점-변수)에서 다뤘다.
-`ARG`는 빌드 시점까지만 살고 최종 이미지에 남지 않는다.
 
 ## 이 장에서 남는 것
 
