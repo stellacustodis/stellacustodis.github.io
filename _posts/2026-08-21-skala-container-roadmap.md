@@ -55,11 +55,11 @@ description: "Docker를 명령어 모음이 아니라 리눅스 커널 기능의
 | [1일차 ③ Dockerfile 명령어](/posts/skala-container-day1-dockerfile/) | 어떤 명령이 레이어를 만들고 어떤 명령이 설정만 남기는가 |
 | [1일차 ④ 볼륨과 PID 1](/posts/skala-container-day1-volume-signal/) | 컨테이너를 지워도 데이터가 남으려면, 그리고 곱게 죽으려면 |
 | [1일차 ⑤ 웹 서비스 컨테이너화](/posts/skala-container-day1-webservice/) | 프런트·백엔드·DB 세 컨테이너를 어떻게 잇는가 |
-| 2일차 ⑥ 이미지를 tar로 뜯어보기 | 이미지 파일 안에는 실제로 무엇이 들어 있는가 |
-| 2일차 ⑦ 커널 기능으로 본 컨테이너 | 격리는 어떤 커널 기능이 만드는가 |
-| 2일차 ⑧ 런타임 계층과 runc | `docker run`과 실제 프로세스 사이에 무엇이 있는가 |
-| 2일차 ⑨ Docker 네트워크 | 컨테이너 이름으로 통신이 되는 이유는 무엇인가 |
-| 2일차 ⑩ Docker Compose | 여러 컨테이너의 순서와 경계를 어떻게 선언하는가 |
+| [2일차 ⑥ 이미지를 tar로 뜯어보기](/posts/skala-container-day2-image-anatomy/) | 이미지 파일 안에는 실제로 무엇이 들어 있는가 |
+| [2일차 ⑦ 커널 기능으로 본 컨테이너](/posts/skala-container-day2-kernel/) | 격리는 어떤 커널 기능이 만드는가 |
+| [2일차 ⑧ 런타임 계층과 runc](/posts/skala-container-day2-runtime-runc/) | `docker run`과 실제 프로세스 사이에 무엇이 있는가 |
+| [2일차 ⑨ Docker 네트워크](/posts/skala-container-day2-network/) | 컨테이너 이름으로 통신이 되는 이유는 무엇인가 |
+| [2일차 ⑩ Docker Compose](/posts/skala-container-day2-compose/) | 여러 컨테이너의 순서와 경계를 어떻게 선언하는가 |
 
 2일차 다섯 편은 해당 수업일 이후에 순서대로 올린다.
 

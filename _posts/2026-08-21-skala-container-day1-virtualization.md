@@ -148,7 +148,7 @@ docker run -d \
 
 **첫 줄이 왜 있는지가 이 실습의 숨은 요점이다.** `docker network create --driver bridge skala`로 커스텀 브리지를 먼저 만든다. 기본 `bridge`를 그냥 써도 컨테이너는 뜬다. 그런데 나중에 백엔드 컨테이너가 이 DB에 붙을 때 `jdbc:mariadb://mariadb:3306/skala`처럼 **컨테이너 이름으로 접속**하게 되는데, 기본 브리지에는 이름을 풀어 줄 DNS가 없다. 커스텀 브리지에만 있다.
 
-지금 단계에서는 그냥 따라 치는 한 줄이지만, [1일차 ⑤](/posts/skala-container-day1-webservice/)에서 세 컨테이너를 이을 때 이 한 줄이 전제가 된다. 네트워크 유형별 차이는 2일차 ⑨에서 따로 다룬다.
+지금 단계에서는 그냥 따라 치는 한 줄이지만, [1일차 ⑤](/posts/skala-container-day1-webservice/)에서 세 컨테이너를 이을 때 이 한 줄이 전제가 된다. 네트워크 유형별 차이는 [2일차 ⑨](/posts/skala-container-day2-network/)에서 따로 다룬다.
 
 {: .prompt-info }
 > `docker network inspect skala >/dev/null 2>&1 || docker network create ...` 형태는 "없으면 만든다"를 한 줄로 처리하는 관용구다. 스크립트를 여러 번 돌려도 안전하다.

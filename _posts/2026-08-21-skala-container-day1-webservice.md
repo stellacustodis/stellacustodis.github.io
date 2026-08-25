@@ -124,7 +124,7 @@ spring:
 
 **`jdbc:mariadb://mariadb:3306/skala`** — 호스트 자리에 IP가 아니라 `mariadb`라는 **컨테이너 이름**이 들어간다. 이 이름이 풀리려면 두 컨테이너가 같은 **커스텀 브리지** 네트워크에 있어야 한다. 기본 `bridge`에는 DNS가 없어서 이름이 풀리지 않는다.
 
-[1일차 ①](/posts/skala-container-day1-virtualization/)에서 그냥 따라 쳤던 `docker network create --driver bridge skala` 한 줄이 여기서 전제가 된다. 이 DNS가 어디서 오는지는 2일차 ⑨에서 다룬다.
+[1일차 ①](/posts/skala-container-day1-virtualization/)에서 그냥 따라 쳤던 `docker network create --driver bridge skala` 한 줄이 여기서 전제가 된다. 이 DNS가 어디서 오는지는 [2일차 ⑨](/posts/skala-container-day2-network/)에서 다룬다.
 
 {: .prompt-warning }
 > `ddl-auto: create-drop`은 애플리케이션이 뜰 때 스키마를 새로 만들고 내려갈 때 지운다. 실습용으로는 편하지만, **컨테이너를 재시작할 때마다 데이터가 사라진다.** 볼륨을 붙였더라도 이 설정이 켜져 있으면 데이터는 남지 않는다.
@@ -302,7 +302,7 @@ dist
 | `frontend` | 9090 | 80 | `http://localhost:9090/` |
 | `vue-frontend` | 8090 | 80 | `http://localhost:8090/` |
 
-프런트엔드 두 개가 컨테이너 내부에서는 똑같이 80을 쓰지만 호스트 포트가 달라 충돌하지 않는다. **컨테이너마다 네트워크 네임스페이스가 분리되어 있기 때문**인데, 이 구조는 2일차 ⑦에서 다룬다.
+프런트엔드 두 개가 컨테이너 내부에서는 똑같이 80을 쓰지만 호스트 포트가 달라 충돌하지 않는다. **컨테이너마다 네트워크 네임스페이스가 분리되어 있기 때문**인데, 이 구조는 [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 다룬다.
 
 ## 이 실습이 남기는 문제
 
@@ -317,7 +317,7 @@ dist
 
 > 컨테이너가 많아질수록 명령어가 복잡 / 네트워크·볼륨·환경변수 반복 설정 / 실행 순서 관리 어려움
 
-Compose는 2일차 ⑩에서 다룬다. 그 전에 2일차는 지금까지 쓴 `docker run`이 실제로 무엇을 하는지를 안쪽에서 확인하는 순서로 이어진다.
+Compose는 [2일차 ⑩](/posts/skala-container-day2-compose/)에서 다룬다. 그 전에 2일차는 지금까지 쓴 `docker run`이 실제로 무엇을 하는지를 안쪽에서 확인하는 순서로 이어진다.
 
 ## 이 장에서 남는 것
 

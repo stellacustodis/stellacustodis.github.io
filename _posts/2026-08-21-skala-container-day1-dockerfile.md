@@ -77,7 +77,7 @@ ENTRYPOINT, CMD, ENV, WORKDIR, EXPOSE, USER, VOLUME, LABEL …
 
 이 구분이 왜 중요한가. **이미지 크기를 줄이려면 앞 그룹만 신경 쓰면 된다.** `EXPOSE`를 열 줄 써도 이미지는 1바이트도 안 커진다. 반면 `RUN`을 한 줄 잘못 나누면 수백 MB가 늘어난다.
 
-2일차 ⑥에서 이미지를 tar로 풀면 이 두 그룹이 각각 `blobs/`의 레이어 파일과 `manifest.json`의 설정으로 갈라져 있는 것을 눈으로 확인하게 된다.
+[2일차 ⑥](/posts/skala-container-day2-image-anatomy/)에서 이미지를 tar로 풀면 이 두 그룹이 각각 `blobs/`의 레이어 파일과 `manifest.json`의 설정으로 갈라져 있는 것을 눈으로 확인하게 된다.
 
 ## 명령어별로 보기
 
@@ -397,7 +397,7 @@ CMD ["nginx", "-g", "daemon off;"]
 `USER skala` 줄만 주석 처리하면 다시 뜬다. 무엇이 원인이었는지 확인하는 데 쓸 수 있다.
 
 {: .prompt-info }
-> 특권 포트 제약은 리눅스의 오래된 규칙이고, 이것을 세분화한 것이 `CAP_NET_BIND_SERVICE`라는 Capability다. root 권한을 통째로 주지 않고 "1024 미만 포트 바인딩"만 허용하는 방식이다. 이 개념은 2일차 ⑦에서 다룬다.
+> 특권 포트 제약은 리눅스의 오래된 규칙이고, 이것을 세분화한 것이 `CAP_NET_BIND_SERVICE`라는 Capability다. root 권한을 통째로 주지 않고 "1024 미만 포트 바인딩"만 허용하는 방식이다. 이 개념은 [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 다룬다.
 
 실습 저장소에는 권한을 미리 점검하고 실패 시 이유를 출력하는 진입 스크립트도 들어 있다.
 
