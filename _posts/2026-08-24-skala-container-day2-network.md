@@ -229,6 +229,57 @@ url: jdbc:mariadb://mariadb:3306/skala
 
 [다음 편](/posts/skala-container-day2-compose/)의 Docker Compose는 이 커스텀 브리지를 **자동으로 만들고 서비스 이름을 DNS에 등록**한다. `docker network create`를 손으로 칠 일이 없어진다.
 
+## 수업 중 나온 질문
+
+### Docker로 네트워크를 깊게 설계할 수도 있나
+
+**가능하다.** 다만 한계가 뚜렷해서 실무에서는 어느 선까지만 간다.
+
+할 수 있는 것부터 보면 이 정도다.
+
+| 기능 | 쓰임 |
+|---|---|
+| 커스텀 브리지 여러 개 | 서비스 그룹별 망 분리 |
+| `internal: true` | 외부로 나가는 경로 차단 |
+| IPAM 지정 | 서브넷·게이트웨이·컨테이너 IP 고정 |
+| `macvlan` / `ipvlan` | 컨테이너에 **물리망 IP를 직접** 부여 |
+| `overlay` (Swarm) | **여러 노드**에 걸친 컨테이너 통신 |
+
+IP를 고정하고 싶으면 이렇게 한다.
+
+```bash
+docker network create --driver bridge \
+  --subnet 172.28.0.0/16 --gateway 172.28.0.1 mynet
+
+docker run -d --name db --network mynet --ip 172.28.0.10 postgres:15
+```
+
+`macvlan`은 더 나아가서, 컨테이너가 **물리 스위치에서 별도 장비처럼** 보이게 한다.
+레거시 시스템이 컨테이너를 일반 서버로 취급해야 할 때 쓴다.
+
+```bash
+docker network create -d macvlan \
+  --subnet 192.168.1.0/24 --gateway 192.168.1.1 \
+  -o parent=eth0 lan
+```
+
+### 그런데 왜 실무에서는 깊게 안 가나
+
+**이식되지 않기 때문이다.**
+
+이 장에서 본 대로 Docker Network는 **단일 노드**용이다.
+여러 노드로 넘어가는 순간 쿠버네티스와 CNI(Calico, Cilium 등)가 그 역할을 가져간다.
+그리고 CNI의 모델은 Docker Network와 다르다. Pod마다 IP가 있고,
+접근 통제는 `NetworkPolicy`로 선언하며, 서비스 디스커버리는 CoreDNS가 맡는다.
+
+Docker Network로 정교하게 설계해 둔 것이 쿠버네티스로 옮길 때 대부분 다시 쓰이지 못한다.
+그래서 로컬 개발과 단일 노드 운영에서는 **커스텀 브리지 + 네트워크 분리** 정도로 끊고,
+그 이상은 배포 플랫폼에 맡기는 것이 일반적이다.
+
+`macvlan`처럼 물리망에 직접 붙이는 방식은 예외적으로 쓰인다.
+IoT 게이트웨이, 방송 장비, 레거시 연동처럼 **컨테이너가 진짜 장비처럼 보여야 하는** 경우다.
+클라우드에서는 대개 막혀 있다.
+
 ## 이 장에서 남는 것
 
 - 기본 `bridge`에는 DNS가 없다. **커스텀 브리지에만 있다.** 실무 기본이 커스텀 브리지인 이유다.

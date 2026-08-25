@@ -781,6 +781,59 @@ networks:
 
 2주 뒤 쿠버네티스 과정에서는 이 구조가 다시 등장한다. Pod가 컨테이너의 묶음이고, CNI가 Docker 네트워크를 대체하며, probe가 healthcheck를 대체한다. 이번 과정의 내용이 그때 어디에 대응하는지 확인하는 것이 다음 목표다.
 
+## 수업 중 나온 질문
+
+### Compose는 결국 여러 셸 스크립트를 yaml로 묶은 건가
+
+느낌은 비슷한데 **결정적인 차이가 하나 있다. 명령형과 선언형의 차이다.**
+
+셸 스크립트는 **무엇을 할지 순서대로** 적는다.
+
+```bash
+docker network create skala
+docker run -d --name mariadb ... mariadb:latest
+docker run -d --name backend ... backend:1.0
+```
+
+Compose 파일은 **어떤 상태였으면 좋겠는지**를 적는다.
+
+```yaml
+services:
+  mariadb: { image: mariadb:latest, ... }
+  backend: { build: ./backend, ... }
+```
+
+차이는 **두 번 실행해 보면** 드러난다.
+
+| | 두 번째 실행 |
+|---|---|
+| 셸 스크립트 | 이름 충돌로 실패하거나 두 벌이 뜬다 |
+| `docker compose up -d` | **아무 일도 일어나지 않는다.** 이미 원하는 상태이므로 |
+
+이것을 **멱등(idempotent)**하다고 한다. 셸 스크립트로 같은 성질을 만들려면
+"이미 있으면 건너뛴다"를 전부 손으로 써야 한다.
+[1일차 ①](/posts/skala-container-day1-virtualization/)에서 쓴 이 한 줄이 그 예다.
+
+```bash
+docker network inspect skala >/dev/null 2>&1 || docker network create --driver bridge skala
+```
+
+서비스가 셋만 돼도 이런 조건문이 사방에 생긴다. Compose는 그 일을 대신한다.
+
+선언형이라서 얻는 것이 더 있다.
+
+- **차이만 반영한다** — 파일에서 한 서비스만 고치고 `up -d` 하면 그것만 재생성된다
+- **의존 관계를 순서가 아니라 조건으로 적는다** — `depends_on` + `condition: service_healthy`
+- **현재 상태를 물어볼 수 있다** — `docker compose ps`
+
+그리고 이 사고방식이 **쿠버네티스로 그대로 이어진다.**
+`kubectl apply -f`도 "이 상태로 만들어라"이지 "이 명령을 실행해라"가 아니다.
+[2일차 ⑧](/posts/skala-container-day2-runtime-runc/)에서 다룬 `replicas`도 같은 성격이다 —
+"3개를 띄워라"가 아니라 "3개인 상태를 유지해라"다.
+
+굳이 비유하자면 셸 스크립트는 **요리 순서**이고 Compose는 **완성된 상차림 사진**이다.
+사진을 보고 무엇을 더 하고 무엇을 그대로 둘지는 시스템이 판단한다.
+
 ## 이 장에서 남는 것
 
 - Compose는 **custom bridge를 자동 생성**하고 서비스 이름을 DNS에 등록한다. `docker network create`가 사라진다.

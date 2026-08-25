@@ -432,6 +432,47 @@ docker rm linux-container       # 삭제
 
 `docker run --rm`을 쓰면 종료 시 자동 삭제되므로 반복 실습에서 이 충돌을 피할 수 있다.
 
+## 수업 중 나온 질문
+
+### Dockerfile의 모든 명령은 build 때 실행되고, 환경변수는 run 때 들어가나
+
+절반만 맞다. 앞의 [핵심 분류](#이-장의-핵심-분류)를 다른 각도에서 물은 것인데,
+실제로는 **세 갈래**다.
+
+| 갈래 | 명령 | 언제 |
+|---|---|---|
+| 빌드 시점에 **실행**된다 | `RUN`, `COPY`, `ADD` | `docker build` — 결과가 레이어로 굳는다 |
+| 빌드 때 **기록**되고 실행 때 **적용**된다 | `ENV`, `WORKDIR`, `EXPOSE`, `USER`, `LABEL`, `VOLUME` | 양쪽 |
+| 실행 시점에 **동작**한다 | `CMD`, `ENTRYPOINT` | `docker run` |
+
+두 번째 갈래가 헷갈리는 지점이다.
+
+**`ENV`는 런타임에만 들어가는 것이 아니다.** 빌드 도중에도 유효하다.
+
+```dockerfile
+ENV APP_HOME=/opt/myapp
+WORKDIR $APP_HOME          # 빌드 때 이 값이 쓰인다
+RUN echo $APP_HOME         # 빌드 로그에 /opt/myapp 이 찍힌다
+```
+
+`ENV`로 선언한 값은 이미지 설정에 **박혀서** 컨테이너를 실행할 때도 그대로 살아 있다.
+그래서 비밀값을 `ENV`에 넣으면 안 된다. `docker inspect`로 그대로 보인다.
+
+**런타임에만 들어오는 것**은 실행할 때 주입하는 값이다.
+
+```bash
+docker run -e APP_ENV=prod myimage        # 이미지에 없던 값
+docker run -e APP_HOME=/tmp myimage       # ENV 로 박아 둔 값을 덮어쓴다
+```
+
+한 줄로 정리하면 이렇다.
+
+> `RUN`은 빌드 때 **실행**되고, `ENV`는 빌드 때 **정해져서 런타임까지 따라가며**,
+> `-e`로 준 값이 그것을 런타임에 **덮어쓴다.**
+
+`ARG`와의 관계는 앞의 [ARG 절](#arg--빌드-시점-변수)에서 다뤘다.
+`ARG`는 빌드 시점까지만 살고 최종 이미지에 남지 않는다.
+
 ## 이 장에서 남는 것
 
 - 명령어는 **레이어를 만드는 것**(`RUN`, `COPY`, `ADD`)과 **설정만 남기는 것**(`CMD`, `ENV`, `EXPOSE`, `USER`, `LABEL` 등)으로 갈린다.

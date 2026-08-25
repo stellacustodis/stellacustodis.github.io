@@ -246,6 +246,72 @@ drwxr-xr-x 0/0  usr/local/bin/
 
 `docker pull`을 돌릴 때 어떤 줄은 `Pull complete`이고 어떤 줄은 `Already exists`인 이유가 이것이다.
 
+## 수업 중 나온 질문
+
+### tar이 압축 형식이 아니라면, 나는 그동안 뭘 한 건가
+
+`tar`은 **Tape ARchive**의 줄임말이고, 이름 그대로 여러 파일을 **하나로 묶기만** 한다.
+압축은 하지 않는다. 그래서 `.tar` 파일은 원본 파일들을 합친 것보다 오히려 조금 크다
+(파일마다 헤더가 붙는다).
+
+그동안 압축이 된 것은 옵션을 함께 줬기 때문이다.
+
+```bash
+tar cf  archive.tar  dir/      # 묶기만 한다
+tar czf archive.tar.gz dir/    # z = gzip 을 함께 부른다
+tar cJf archive.tar.xz dir/    # J = xz
+```
+
+`z`가 **gzip을 호출한 것**이지 tar이 압축한 것이 아니다.
+`tar czf`는 사실상 `tar cf - dir | gzip > archive.tar.gz`와 같다.
+
+두 일을 나눠 둔 것이 오히려 쓸모가 있다. 압축 알고리즘을 갈아 끼울 수 있고,
+압축 없이 스트림으로 흘려보낼 수도 있다.
+
+### 서버 간 전송할 때 tar로 묶는 게 안전하다고 들었는데
+
+맞는데, "안전"의 뜻이 무결성보다는 **구조 보존**에 가깝다.
+
+**파일 개수 문제.** 작은 파일 수만 개를 하나씩 보내면 파일마다 왕복이 생겨 느리다.
+하나로 묶으면 스트림 한 번이다.
+
+**메타데이터 보존.** tar은 권한, 소유자, 타임스탬프, 심볼릭 링크, 하드 링크를 그대로 담는다.
+단순 복사나 일부 전송 도구는 이것들을 잃는다. 실행 권한이 사라져 배포가 깨지는 사고가 여기서 나온다.
+
+**중간 파일 없이 흘려보낼 수 있다.**
+
+```bash
+tar cf - /src | ssh host 'tar xf - -C /dst'
+```
+
+디스크에 `.tar`를 만들지 않고 파이프로 바로 넘긴다.
+이 장의 [20번 실습](/posts/skala-container-day2-runtime-runc/)에서 쓴 명령이 정확히 같은 구조다.
+
+```bash
+docker export $(docker create alpine:latest) | tar -C rootfs -xf -
+```
+
+다만 tar 자체는 **손상을 검출하지 못한다.** 전송 중 비트가 뒤집혀도 알려 주지 않는다.
+무결성이 필요하면 체크섬을 따로 확인한다.
+
+```bash
+sha256sum archive.tar.gz
+```
+
+실무에서 서버 간 동기화라면 `rsync`가 더 낫다. 변경분만 보내고 재시도와 검증이 내장돼 있다.
+tar은 **한 덩어리로 떠서 옮기는** 상황에 맞는다.
+
+### 그래서 Docker 이미지 레이어는 어느 쪽인가
+
+**gzip으로 압축된 tar**이다. 이 장에서 `file *`을 쳤을 때 나온 출력이 그 증거다.
+
+```text
+231032373bb3...: gzip compressed data, was "bf05b927....tar", max compression
+```
+
+원본이 `.tar`였다는 흔적이 gzip 헤더에 남아 있다.
+**묶는 일(tar)과 줄이는 일(gzip)이 나뉘어 있다**는 것이 여기서도 그대로 보인다.
+
 ## 이 장에서 남는 것
 
 - 이미지는 `manifest.json`(목차) + `blobs/sha256/`(gzip 레이어 + JSON 설정)의 조합이다.
