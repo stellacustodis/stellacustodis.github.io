@@ -45,3 +45,6 @@ claude/*
 # Jekyll 빌드 산출물. 예전에 이름이 깨진 `_site\r` 디렉토리가 커밋된 적이 있어
 # 접두사로 막는다.
 _site*
+
+# VSCode 워크스페이스 (로컬 설정)
+*.code-workspace
