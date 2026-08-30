@@ -48,3 +48,6 @@ _site*
 
 # VSCode 워크스페이스 (로컬 설정)
 *.code-workspace
+
+# 에이전트 규칙 문서 — 실물은 볼트에 있고 여기엔 심링크만 둔다
+POST-RULES.md
