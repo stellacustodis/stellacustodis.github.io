@@ -1212,8 +1212,8 @@ FM-OT는 세 데이터셋에서 NLL, FID, NFE가 모두 가장 낮다. CIFAR-10�
 
 FM-Diffusion도 DDPM·Score Matching·ScoreFlow보다 전반적으로 적은 NFE를 기록한다. 이는 같은 diffusion path에서도 학습 parameterization을 FM으로 바꾸는 효과가 있음을 보여준다. 이후 FM-Diffusion을 FM-OT와 비교하면 경로 선택의 추가 효과를 볼 수 있다.
 
-![확산 손실 기반 모델과 FM 기반 모델의 NLL, FID, NFE 종합 비교](/assets/img/posts/flow-matching/table1.png){: w="700" }
-_그림 4. 이 표의 핵심은 FM-OT가 품질 지표만 개선한 것이 아니라 동일한 adaptive solver 조건에서 함수 평가 횟수도 함께 낮췄다는 점이다._
+![CIFAR-10·ImageNet 32/64의 NLL·FID·NFE와 ImageNet-128의 NLL·FID 비교](/assets/img/posts/flow-matching/table1.png){: w="700" }
+_표 1. 왼쪽은 CIFAR-10과 ImageNet 32×32·64×64에서 학습 목적별 NLL·FID·NFE를, 오른쪽은 ImageNet 128×128에서 FM-OT와 기존 생성 모델의 NLL·FID를 비교한다. FM-OT는 왼쪽 세 데이터셋에서 품질 지표와 함수 평가 횟수를 함께 낮췄다._
 
 ImageNet-128의 무조건부 비교는 다음과 같다. conditioning을 사용하는 IC-GAN은 제외됐다.
 

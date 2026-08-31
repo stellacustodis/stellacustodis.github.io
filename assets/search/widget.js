@@ -84,7 +84,8 @@
       const { pipeline, env } = await import(
         "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6");
       env.allowLocalModels = false;
-      embed = await pipeline("feature-extraction", MODEL, { dtype: "fp32" });
+      // q8은 8비트 가중치를 받아 첫 다운로드를 약 1/4로 줄인다.
+      embed = await pipeline("feature-extraction", MODEL, { dtype: "q8" });
 
       // 16비트로 저장한 벡터를 한 번만 펼쳐 둔다
       const s = index.scale, d = index.dim;

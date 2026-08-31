@@ -23,7 +23,8 @@ async function boot() {
     index = await r.json();
 
     say(`모델을 내려받는 중… 처음 한 번만 걸린다 (문단 ${index.chunks.length}개)`, true);
-    embed = await pipeline("feature-extraction", MODEL, { dtype: "fp32" });
+    // q8은 8비트 가중치를 받아 첫 다운로드를 약 1/4로 줄인다.
+    embed = await pipeline("feature-extraction", MODEL, { dtype: "q8" });
 
     // 16비트 정수로 저장한 벡터를 되돌려 한 번만 펼쳐 둔다
     const s = index.scale, d = index.dim;
