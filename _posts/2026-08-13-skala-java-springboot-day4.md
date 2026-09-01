@@ -328,7 +328,7 @@ public CompletableFuture<Void> sendNotification() {
 
 여기서 `@Async`가 작업 자체의 실행 시간을 줄이는 것은 아니다. 요청 스레드가 오래 걸리는 작업을 직접 기다리지 않도록 실행 경로를 분리하는 것이다. 결과가 필요하다면 `CompletableFuture`를 통해 완료 이후의 흐름을 연결해야 한다.
 
-기본 `SimpleAsyncTaskExecutor`는 스레드를 무제한으로 생성할 수 있으므로 그대로 의존하지 않고 커스텀 스레드 풀을 정의해야 한다. 비동기 작업을 늘리는 것만 보고 자원 경계를 설정하지 않으면 요청이 몰릴 때 생성되는 실행 단위를 통제하기 어렵다.
+Spring Boot는 기본적으로 `ThreadPoolTaskExecutor`를 자동 구성하고, 가상 스레드를 활성화했을 때는 `SimpleAsyncTaskExecutor`를 사용한다. 순수 Spring Framework의 `@EnableAsync` fallback과 Boot 자동 구성을 구분해야 하며, 어느 쪽이든 운영 부하에 맞는 자원 경계를 확인해야 한다.
 
 `@Async` 역시 AOP와 같은 프록시 기반 기능이다. 같은 클래스 안에서 비동기 메서드를 `this.asyncMethod()`로 호출하면 프록시를 거치지 않으므로 별도 스레드에서 실행되지 않는다.
 

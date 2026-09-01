@@ -16,7 +16,7 @@ PyTorch 모델을 저장하고 불러올 때 가장 자주 만나는 객체가 `
 
 `model.state_dict()`는 이름과 tensor를 연결하는 `dict` 형태의 객체다. 크게 두 종류가 포함된다.
 
-1. 학습 가능한 parameter
+1. 등록된 parameter
 2. persistent로 등록된 buffer
 
 ```python
@@ -24,7 +24,7 @@ for name, tensor in model.state_dict().items():
     print(name, tensor.shape, tensor.device)
 ```
 
-Parameter에는 `nn.Linear`나 `nn.Conv2d`의 `weight`, `bias`처럼 optimizer가 갱신하는 값이 들어간다. 직접 만든 값이라면 `nn.Parameter`로 등록되어 있어야 한다.
+Parameter에는 `nn.Linear`나 `nn.Conv2d`의 `weight`, `bias`처럼 학습에 사용할 수 있는 값이 들어간다. 직접 만든 값이라면 `nn.Parameter`로 등록되어 있어야 하며, 실제 갱신 여부는 `requires_grad`와 optimizer에 전달했는지에 따라 달라진다.
 
 ```python
 class ScaleLayer(nn.Module):
@@ -46,7 +46,7 @@ class PositionalEncoding(nn.Module):
 
 ## parameters()와 무엇이 다른가
 
-`model.parameters()`는 optimizer가 갱신할 학습 가능한 parameter만 순회한다. 반면 `model.state_dict()`에는 parameter와 persistent buffer가 모두 들어간다.
+`model.parameters()`는 등록된 parameter를 `requires_grad` 여부와 관계없이 순회한다. optimizer는 그중 자신에게 전달되고 gradient가 있는 parameter를 갱신한다. 반면 `model.state_dict()`에는 parameter와 persistent buffer가 모두 들어간다.
 
 ```python
 parameter_names = {name for name, _ in model.named_parameters()}
@@ -117,7 +117,7 @@ model.to("cuda")
 model.eval()
 ```
 
-`state_dict()`가 tensor의 깊은 복사본을 새로 만드는 것도 주의해야 한다. 반환된 dictionary의 값은 기본적으로 module parameter와 storage를 공유하는 얕은 참조다. 학습 중 “최고 성능 weight”를 메모리에 보관하려면 `copy.deepcopy(model.state_dict())`를 사용하거나 즉시 파일로 저장해야 한다.
+`state_dict()`가 tensor의 깊은 복사본을 새로 만들지 않는다는 점도 주의해야 한다. 반환된 dictionary의 값은 기본적으로 module parameter와 storage를 공유하는 얕은 참조다. 학습 중 “최고 성능 weight”를 메모리에 보관하려면 `copy.deepcopy(model.state_dict())`를 사용하거나 즉시 파일로 저장해야 한다.
 
 ```python
 from copy import deepcopy

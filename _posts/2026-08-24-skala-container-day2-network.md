@@ -75,9 +75,8 @@ Docker는 컨테이너마다 가상 NIC를 할당하고, 기본 게이트웨이�
    Container 172.17.0.2
 ```
 
-`docker0`가 하는 일은 둘이다.
+`docker0`는 L2 브리지로서 컨테이너 사이의 프레임을 전달한다. NAT는 `docker0` 자체가 아니라 Docker가 커널 Netfilter에 설치한 규칙이 수행한다.
 
-- 외부 네트워크와 교환하는 패킷에 **NAT 작업 수행**
 - **컨테이너 간 네트워크 연결**
 
 각 컨테이너는 격리된 네트워크 공간을 갖고 `eth0`에 IP를 할당받는다. `docker0`를 포함한 브리지는 **L2 스위치 역할**을 하며 MAC 기반으로 `vethXX`와 `eth0`를 잇는다.
@@ -89,11 +88,11 @@ Docker는 컨테이너마다 가상 NIC를 할당하고, 기본 게이트웨이�
 ### 1. 호스트 물리 NIC 진입 → Netfilter가 낚아챈다
 
 ```text
-외부 Client → eth0 → Netfilter PREROUTING → iptables NAT 규칙
+외부 Client → eth0 → Netfilter PREROUTING → 방화벽 백엔드의 NAT 규칙
              → 8888을 172.17.0.3:8080으로 DNAT
 ```
 
-**Netfilter**가 [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 나열한 커널 기능 중 하나다. 패킷을 가로채고 검사하고 변경한다. `-p` 옵션은 결국 여기에 iptables 규칙을 하나 넣는 일이다.
+**Netfilter**가 [2일차 ⑦](/posts/skala-container-day2-kernel/)에서 나열한 커널 기능 중 하나다. 패킷을 가로채고 검사하고 변경한다. `-p` 옵션은 결국 Docker가 선택한 방화벽 백엔드(iptables 또는 nftables)에 포트 공개 규칙을 넣는 일이다.
 
 ### 2. 커널 라우팅 테이블 조회 → docker0 결정
 
@@ -151,12 +150,13 @@ L3(IP)로 어디로 보낼지 정하고, L2(MAC)로 어느 포트에 넣을지 �
 
 ## 컨테이너 간 통신 vs 외부 통신
 
-Docker Network는 **단일 노드에서의 통신만** 정의한다. 이 한계가 뒤에서 중요해진다.
+Docker의 **bridge 네트워크는 단일 호스트 안의 통신**을 정의한다. Swarm의 overlay 네트워크는 여러 Docker 호스트를 잇는다.
 
 | 구분 | 방식 |
 |---|---|
 | **컨테이너 간 통신** | 동일 호스트 내 `docker0`에 접속한 컨테이너끼리 링크 |
-| **컨테이너 ↔ 외부** | `docker0`와 호스트 물리 NIC 사이에서 DNAT (IP + PORT 변환) |
+| **외부 → 공개 포트** | Docker의 Netfilter 규칙에서 DNAT/PAT |
+| **컨테이너 → 외부** | Docker의 Netfilter 규칙에서 SNAT/MASQUERADE |
 
 ```bash
 docker run -d -p 8080:80 nginx
@@ -211,30 +211,32 @@ docker run -d --name db --network mynet --ip 172.28.0.10 postgres:15
 
 ## 쿠버네티스는 어떻게 다른가
 
-Docker Network가 단일 노드용이라는 한계 때문에, 여러 노드에 퍼진 Pod를 잇는 별도 계층이 필요하다. 그것이 CNI(Container Network Interface)이고 대표 구현이 Calico다.
+Kubernetes에서는 여러 노드에 퍼진 Pod를 잇는 계층으로 CNI(Container Network Interface)를 쓰고, 대표 구현이 Calico다. Docker도 Swarm overlay 네트워크로 멀티 호스트를 지원하지만 서로 다른 네트워크 모델이다.
 
 | 항목 | Docker Network | Calico |
 |---|---|---|
 | 대상 | 컨테이너 | Kubernetes Pod |
-| 범위 | **단일 노드 중심** | **멀티 노드 기본** |
+| 범위 | bridge는 단일 호스트, overlay는 멀티 호스트 | **멀티 노드 기본** |
 | 네트워크 생성 주체 | Docker Engine | Kubernetes + CNI |
 | 서비스 디스커버리 | Docker DNS | CoreDNS |
 | 보안 정책 | 제한적 | NetworkPolicy |
 
-경로도 달라진다.
+경로도 달라진다. 다음은 Calico를 IP-in-IP와 BGP 방식으로 구성한 경우의 한 예다.
 
 ```text
 단일 노드 내 통신:   eth0:veth → caliXXX:VR
 외부 노드와 통신:    eth0:veth → caliXXX:VR → tunl0 → eth0
 ```
 
-- **tunl0**: 리눅스 커널이 제공하는 IP-in-IP 터널 인터페이스. 다른 노드로 보낼 때 컨테이너 IP를 캡슐화하고 노드 IP 기반으로 통신한다
-- **Virtual Router (BGP daemon)**: Pod IP CIDR 대역이 어느 노드에 있는지 알려 준다. 예: `10.1.2.0/24 → 192.168.100.20 eth0`
+- **tunl0**: IP-in-IP를 선택했을 때 쓰는 터널 인터페이스. 다른 노드로 보낼 때 Pod IP를 캡슐화하고 노드 IP 기반으로 통신한다
+- **BGP daemon**: BGP 구성을 선택했을 때 Pod IP CIDR 대역이 어느 노드에 있는지 알려 준다. 예: `10.1.2.0/24 → 192.168.100.20 eth0`
 - **BGP(Border Gateway Protocol)**: L3(IP) 기반 경로 정보를 교환하는 라우팅 프로토콜
+
+Calico는 설정에 따라 VXLAN, IP-in-IP, 비캡슐화 BGP, eBPF dataplane 등을 사용할 수 있으므로 모든 설치가 `tunl0`를 거치는 것은 아니다.
 
 AWS는 VPC 네트워크를 쓰며 Calico도 함께 적용할 수 있다.
 
-이 내용은 2주 뒤 쿠버네티스 과정의 예고편에 가깝다. 지금 단계에서는 **"Docker 네트워크는 한 대짜리"**라는 것만 확실히 해 두면 된다.
+이 내용은 2주 뒤 쿠버네티스 과정의 예고편에 가깝다. 지금 단계에서는 **Docker의 기본 bridge는 한 호스트 안에서 동작하고, 여러 호스트에는 overlay 같은 별도 driver가 필요하다**는 것만 확실히 해 두면 된다.
 
 ## 다시, 1일차의 질문으로
 
@@ -259,4 +261,4 @@ url: jdbc:mariadb://mariadb:3306/skala
 - 기본 `bridge`에는 DNS가 없다. **커스텀 브리지에만 있다.** 실무 기본이 커스텀 브리지인 이유다.
 - `-p 8888:8080`은 Netfilter에 DNAT 규칙을 넣는 일이다. 그 뒤로 라우팅 테이블이 `docker0`를, FDB가 veth를 고른다.
 - `--network host`는 네트워크 네임스페이스를 만들지 않는 것이다. 그래서 격리도 없다.
-- Docker Network는 **단일 노드**용이다. 멀티 노드는 CNI(Calico 등)의 영역이다.
+- Docker bridge는 단일 호스트용이고 Swarm overlay는 멀티 호스트를 잇는다. Kubernetes의 멀티 노드 네트워크 계층은 CNI(Calico 등)다.

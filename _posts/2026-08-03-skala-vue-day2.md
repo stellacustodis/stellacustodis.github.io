@@ -30,7 +30,7 @@ permalink: /posts/skala-vue-day2/
 | `submit` | 폼 제출 시 |
 | `keyup` / `keydown` | 키를 뗄 때 / 누를 때 |
 | `input` | 입력 필드가 바뀔 때마다 (실시간) |
-| `change` | 값 변경 후 포커스가 빠질 때 |
+| `change` | 값이 commit될 때. text 입력은 보통 포커스가 빠지거나 Enter를 누를 때, 선택형 control은 선택 직후 |
 | `mouseenter` / `mouseleave` | 마우스가 올라올 때 / 벗어날 때 |
 
 ### 인라인 핸들러와 메서드 핸들러
@@ -167,7 +167,7 @@ const text = ref('')
 
 ### 내부 원리
 
-`v-model`은 마법이 아니라 **`v-bind`와 `v-on`의 조합에 대한 문법 설탕(Syntactic Sugar)**이다.
+text input의 `v-model`은 마법이 아니라 **`v-bind`와 `v-on`의 조합에 대한 문법 설탕(Syntactic Sugar)**이다. checkbox·radio·select와 컴포넌트는 사용하는 property와 event가 다르다.
 
 ```vue
 <!-- v-model 축약 문법 -->
@@ -236,13 +236,13 @@ const selectedCar = ref('')
 | `.trim` | 양끝 공백 제거 | 공백으로 인한 검증 오류 예방 |
 
 ```vue
-<input v-model.lazy="lazyText" />          <!-- 포커스 아웃/Enter 시 반영 -->
+<input v-model.lazy="lazyText" />          <!-- change 이벤트로 값이 commit될 때 반영 -->
 <input v-model.number="age" />             <!-- typeof age === 'number' -->
 <input v-model.trim="userEmail" />         <!-- 앞뒤 공백 제거 -->
 <input v-model.trim.number="price" />      <!-- 체이닝 가능 -->
 ```
 
-`.number`가 필요한 이유는 **HTML 입력값이 항상 문자열이기 때문**이다. `<input type="number">`를 써도 JavaScript로 넘어오는 값은 문자열이다. 이 상태로 계산하면 `"5" + 3`이 `"53"`이 되는 문제가 그대로 재현된다.
+DOM의 `input.value`는 `<input type="number">`에서도 문자열이다. 다만 Vue는 `v-model`을 `type="number"`에 사용할 때 `.number` 변환을 자동 적용한다. `.number`를 직접 붙이는 경우는 숫자로 해석할 텍스트 입력처럼 타입만으로 변환을 알 수 없을 때다. 빈 문자열이나 `parseFloat()`로 변환할 수 없는 값은 원래 문자열로 남을 수 있으므로, 서버 경계의 숫자 검증은 별도로 해야 한다.
 
 `.lazy`는 실무에서 생각보다 유용하다. 검색어를 입력할 때마다 API를 호출하면 글자 수만큼 요청이 나가는데, `.lazy`를 쓰면 확정 시점에만 반영된다.
 
@@ -297,7 +297,7 @@ state = { count: 5 }   // 반응성 연결이 끊어짐
 state.count = 5        // 내부 속성만 변경해야 함
 ```
 
-`reactive`가 반환하는 것은 원본 객체를 감싼 **Proxy**다. 변수에 새 객체를 통째로 할당하면 그 Proxy와의 연결이 끊어지고, 이후 변경은 Vue가 추적하지 못한다. 배열도 마찬가지여서 `items = ['a','b']`처럼 재할당하면 반응성이 깨지고, `push`/`splice`로 조작해야 한다.
+`reactive`가 반환하는 것은 원본 객체를 감싼 **Proxy**다. 변수에 새 객체를 통째로 할당하면 그 Proxy와의 연결이 끊어지고, 이후 변경은 Vue가 추적하지 못한다. 배열도 `items = ['a','b']`처럼 Proxy 자체를 재할당하면 반응성이 깨진다. 기존 Proxy에는 index 할당이나 `push`/`splice`를 사용할 수 있고, 배열 전체를 교체해야 한다면 `ref`에 담는다.
 
 **그래서 현업에서는 객체와 배열도 `ref`로 통일하는 추세가 강하다.** `ref`는 `.value`를 통째로 교체해도 반응성이 유지되기 때문이다.
 
@@ -346,9 +346,9 @@ const doubleCount = computed(() => {
 
 - **일반 함수 로그만 찍힌다.** `computed`는 재연산하지 않고 캐싱된 이전 결과를 재사용한다
 
-이유는 Vue의 리렌더링 동작에 있다. 반응형 데이터가 바뀌면 Vue는 `<template>` 안의 **모든 표현식을 처음부터 끝까지 다시 평가**한다. 따라서 {% raw %}`{{ getMethodResult() }}`{% endraw %}처럼 괄호를 붙여 직접 호출한 함수는 관련 없는 변경에도 매번 실행된다. `computed`는 자신이 실제로 의존하는 데이터를 추적해, 그것이 바뀌었을 때만 다시 계산한다.
+이유는 Vue의 리렌더링 동작에 있다. 컴포넌트의 render가 다시 실행되면 {% raw %}`{{ getMethodResult() }}`{% endraw %}처럼 template에서 직접 호출한 일반 함수도 다시 실행될 수 있다. `computed`는 자신이 실제로 의존하는 데이터를 추적해, 그것이 바뀌었을 때만 다시 계산한다.
 
-**목록 필터링이나 합계 계산처럼 비용이 있는 연산은 반드시 `computed`로 감싸야 한다.** 또한 `computed`는 기본적으로 읽기 전용이라 다른 값으로 재할당할 수 없다.
+**목록 필터링이나 합계 계산처럼 의존하는 반응형 값이 같으면 재사용할 수 있는 연산은 `computed`가 잘 맞는다.** 계산이 아주 싸거나 캐싱이 필요 없다면 일반 함수도 가능하다. 또한 `computed`는 기본적으로 읽기 전용이라 다른 값으로 재할당할 수 없다.
 
 > `<script>` 안에서 `computed` 결과를 읽을 때는 `doubleCount.value`로 접근한다. `ref`와 동일하게 Ref 객체를 반환하기 때문이다.
 {: .prompt-tip }
@@ -387,11 +387,11 @@ watch([city, dateType], ([newCity, newDate], [oldCity, oldDate]) => {
 ```js
 const user = ref({ name: '홍길동', age: 20 })
 
-// 절대 발동하지 않음
-watch(user, () => { console.log('이 로그는 안 찍힌다') })
+// user.value 자체가 다른 객체로 교체될 때 발동
+watch(user, () => { console.log('user 객체가 교체됨') })
 ```
 
-`watch`는 **참조값(주소)만 추적**한다. `user.value.age++`를 해도 객체의 주소는 그대로이므로 변경을 감지하지 못한다. 해결책은 두 가지다.
+기본 `watch(user, ...)`는 `user.value`가 다른 객체로 교체되면 발동하지만 `user.value.age++` 같은 nested mutation은 감지하지 못한다. nested property를 감시하는 해결책은 두 가지다.
 
 ```js
 // 해결책 1: deep 옵션으로 내부 전체 감시
@@ -405,7 +405,7 @@ watch(() => user.value.age, (newAge, oldAge) => {
 })
 ```
 
-**`deep: true`에는 대가가 있다.** `newValue`와 `oldValue`가 **똑같은 최신 값으로 나온다.** 둘 다 같은 객체를 가리키고 있어서 과거 값을 추적할 수 없다.
+**`deep: true`에는 대가가 있다.** 객체 자체를 교체하지 않고 nested property만 바꾼 경우 `newValue`와 `oldValue`가 **똑같은 최신 객체로 나온다.** 둘 다 같은 객체를 가리키고 있어서 과거 값을 추적할 수 없다.
 
 이전 값이 필요하다면 **해결책 2**를 써야 한다. `() => user.value.age`처럼 원시값을 반환하는 getter로 감시하면 이전 값이 정상적으로 보존된다.
 
@@ -525,7 +525,7 @@ const filteredWeatherList = computed(() =>
 
 - `@`(`v-on`)로 이벤트를 연결하고, 괄호 없이 넘기면 함수 **참조**가 등록된다
 - 이벤트 수식어(`.prevent`, `.stop`, `.enter`)는 템플릿만 보고 동작을 파악하게 해준다
-- `v-model`은 `:value` + `@input`의 문법 설탕이다. 이 내부 구조는 3일차 컴포넌트 통신에서 다시 등장한다
+- text input의 `v-model`은 `:value` + `@input`의 문법 설탕이다. 다른 form control과 컴포넌트는 각자 정해진 property·event를 사용한다
 - 폼 요소의 성격에 맞는 초기값 타입을 줘야 한다. 다중 체크박스는 반드시 배열
 - `reactive`는 재할당 시 반응성이 끊어진다. **객체·배열도 `ref`로 통일**하는 편이 안전하다
 - `computed`는 캐싱된다. 템플릿에서 함수를 직접 호출하면 매 리렌더링마다 재실행된다

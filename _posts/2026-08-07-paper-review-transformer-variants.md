@@ -30,7 +30,7 @@ Transformer 논문을 읽고 LLaMA 구현 코드를 열면 그림과 코드가 �
 
 > BatchNorm이 못 쓰이는 자리를 메운 정규화.
 
-**배경** — BatchNorm은 CNN에서 큰 성공을 거뒀지만 RNN·가변 길이 시퀀스에서는 쓰기 어려웠다. 배치 축으로 통계를 내기 때문에 **배치 크기에 의존**하고, 시점마다 통계가 달라야 하는 RNN에서는 시점별로 별도 통계를 유지해야 한다. 추론 시 배치 크기 1이면 통계 자체가 무의미하다.
+**배경** — BatchNorm은 CNN에서 큰 성공을 거뒀지만 RNN·가변 길이 시퀀스에서는 쓰기 어려웠다. 학습 중 배치 축으로 통계를 내기 때문에 **배치 크기와 구성에 의존**하고, 시점마다 통계가 달라야 하는 RNN에서는 시점별로 별도 통계를 유지해야 한다. 일반적인 추론 모드에서는 저장한 running statistics를 사용하므로, 배치 크기 1 자체가 통계를 무의미하게 만드는 것은 아니다.
 
 **핵심 아이디어** — 정규화 축을 바꾼다. 배치가 아니라 **한 샘플의 특징 차원**으로 평균과 분산을 낸다.
 
@@ -51,9 +51,9 @@ LayerNorm : (배치, 특징) 중 특징 축   → 샘플 하나 안의 통계
 ### 2. On Layer Normalization in the Transformer Architecture
 **Xiong, Yang, He 외 (MSRA / Peking University 외) · ICML, 2020**
 
-> 원 논문의 warmup이 왜 필요했는지를 설명하고 제거한 논문.
+> 원 논문의 warmup이 왜 필요했는지를 설명하고, 그 의존을 줄일 수 있음을 보인 논문.
 
-**배경** — Transformer 학습에는 **학습률 warmup이 사실상 필수**였다. 없으면 발산하는데, 왜 그런지에 대한 이론적 설명이 없었다. Warmup 스텝 수는 또 하나의 민감한 하이퍼파라미터였다.
+**배경** — 원 논문의 Post-LN Transformer 설정에서는 **학습률 warmup이 사실상 필수**였다. 없으면 발산하는데, 왜 그런지에 대한 이론적 설명이 없었다. Warmup 스텝 수는 또 하나의 민감한 하이퍼파라미터였다.
 
 **핵심 아이디어** — 원 논문의 구조는 **Post-LN**이다.
 
@@ -67,15 +67,15 @@ $$
 
 Pre-LN에서는 $x_l \to x_{l+1}$의 **순수한 항등 경로**가 유지되고, 기울기 크기가 층 수에 대해 $O(1/\sqrt{L})$로 잘 제어된다.
 
-**결과** — Pre-LN은 **warmup 없이도** 안정적으로 학습되고, 수렴이 더 빠르다.
+**결과** — 논문이 실험한 설정에서는 Pre-LN을 **warmup 없이도** 안정적으로 학습해 baseline과 비슷한 결과에 도달했고, 학습 시간과 하이퍼파라미터 탐색을 줄였다. 이것이 모든 모델과 설정에서 warmup이 불필요하다는 보장은 아니다.
 
 **의의** — GPT-2 이후 사실상 표준이 됐다. LLaMA·PaLM·Mistral 모두 Pre-LN이다. **원 논문 그림대로 구현하면 요즘 기준으로는 학습이 까다로운 모델이 나온다**는 뜻이라, 논문과 코드의 첫 번째 간극이 여기다.
 
 | | Post-LN | Pre-LN |
 |---|---|---|
 | 채택 | Vaswani et al. 2017 | GPT-2 이후 대부분 |
-| Warmup | 필수 | 불필요 |
-| 깊이 확장 | 12층 이상에서 불안정 | 100층 이상 가능 |
+| Warmup | 의존도가 높음 | 의존도가 낮고, 논문 실험에서는 생략 가능 |
+| 깊이 확장 | 깊어질수록 초기화가 까다로움 | 더 깊은 모델의 최적화에 유리 |
 
 ### 3. Root Mean Square Layer Normalization
 **Zhang, Sennrich (U. Edinburgh) · NeurIPS, 2019**
@@ -152,11 +152,11 @@ $$
 \langle R_m q,\ R_n k\rangle = \langle q,\ R_{n-m}k\rangle
 $$
 
-회전행렬의 성질에 의해 **내적이 상대 거리 $n-m$에만 의존**하게 된다. 절대 위치를 넣었는데 상대 위치가 구조적으로 보장되는 것이다.
+회전행렬의 성질에 의해 **위치에 관한 의존성이 상대 거리 $n-m$로만 들어간다.** 내적 자체는 물론 $q$와 $k$의 내용에도 의존한다. 절대 위치로 회전시켰는데 상대 위치 차이가 구조적으로 반영되는 것이다.
 
 흥미로운 점은 이 회전행렬이 원 논문의 사인파 유도에도 이미 등장한다는 것이다. Vaswani et al.은 $PE_{pos+k}$가 $PE_{pos}$의 선형변환이라는 성질을 언급했지만 임베딩에 더하는 데 그쳤고, RoPE는 그 회전을 **attention 내부로 옮겼다.**
 
-**의의** — LLaMA·Qwen·Mistral 등 대부분의 오픈 LLM이 채택했다. 컨텍스트 확장(4K → 128K)이 가능해진 배경이기도 하다. 회전 각도의 base를 조정하면 **위치 보간(position interpolation)** 이 되어, 전체 재학습 없이 파인튜닝만으로 길이를 늘릴 수 있다.
+**의의** — LLaMA·Qwen·Mistral 등 대부분의 오픈 LLM이 채택했다. 컨텍스트 확장(4K → 128K)이 가능해진 배경이기도 하다. **위치 보간(position interpolation)** 은 position index를 선형으로 축소해 학습 범위 안으로 매핑하는 방법이고, RoPE base를 조정하는 것은 별도의 frequency scaling 계열이다. 둘 다 짧은 파인튜닝과 결합해 길이를 늘리는 데 쓰인다.
 
 ### 7. Train Short, Test Long: Attention with Linear Biases (ALiBi)
 **Press, Smith, Lewis (U. Washington / Facebook AI / Allen AI) · ICLR, 2022**

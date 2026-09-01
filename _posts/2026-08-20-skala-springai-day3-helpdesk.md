@@ -80,7 +80,7 @@ spring.ai:
 helpdesk: { rag: { top-k: 5, threshold: 0.62 }, memory: { max: 20 } }
 ```
 
-`top-k`와 `threshold`가 설정으로 나와 있는 것이 중요하다. 2일차 실험표에서 조정해야 했던 값들이므로, 재배포 없이 바꿀 수 있어야 한다.
+`top-k`와 `threshold`가 설정으로 나와 있는 것이 중요하다. 2일차 실험표에서 조정해야 했던 값들이므로, 소스를 다시 빌드하지 않고 환경별 설정으로 바꿀 수 있어야 한다. 다만 일반적인 `@ConfigurationProperties`만으로 실행 중 값이 자동 갱신되지는 않으므로, 별도 refresh 체계가 없다면 설정 반영에는 애플리케이션 재시작이 필요하다.
 
 ```java
 @Bean
@@ -124,7 +124,7 @@ public List<Map<String, Object>> inspect(@RequestParam String q,
 
 교재의 표현이 정확하다. **"인제스트는 성공 메시지가 아니라 결과물로 확인한다."** 여기서 안 잡으면 Phase 3에서 원인을 못 찾는다.
 
-`@PreAuthorize("hasRole('ADMIN')")`가 붙어 있는 점도 짚어 둘 만하다. 이 엔드포인트는 문서 내용을 그대로 노출하므로 운영에서 인가 대상이다.
+`@PreAuthorize("hasRole('ADMIN')")`가 붙어 있는 점도 짚어 둘 만하다. 이 엔드포인트는 문서 내용을 그대로 노출하므로 운영에서 인가 대상이다. 앞 글처럼 `@EnableMethodSecurity`로 메서드 보안을 활성화했다는 전제가 필요하다.
 
 ## Phase 3: 출처를 꺼낸다
 
@@ -169,12 +169,15 @@ String orderStatus(@ToolParam(description = "주문번호") String orderId,
 String createTicket(@ToolParam(description = "주문번호") String orderId,
                     @ToolParam(description = "EXCHANGE|REFUND") String type,
                     @ToolParam(description = "사유") String reason, ToolContext ctx) {
+    if (!"EXCHANGE".equals(type) && !"REFUND".equals(type)) {
+        return "지원하지 않는 티켓 유형입니다.";
+    }
     Ticket t = tickets.request(orderId, type, reason, userOf(ctx));
     return "티켓 %s 를 접수했습니다. 승인 후 처리됩니다.".formatted(t.no());
 }
 ```
 
-`type` 파라미터의 설명이 `"EXCHANGE|REFUND"`인 것이 요령이다. 허용값을 설명에 직접 적어 모델이 임의의 값을 넣지 않게 한다.
+`type` 파라미터의 설명에 `"EXCHANGE|REFUND"`를 적으면 모델을 유도할 수는 있지만 값을 강제하지는 않는다. 위 코드는 서버 측 허용 목록으로 막았고, 실제 구현에서는 Java `enum`이나 JSON Schema의 `enum`으로 타입 경계도 좁히는 편이 낫다.
 
 실습 자료의 버전은 권한 검증을 먼저 하고 티켓을 만든다.
 
@@ -265,7 +268,7 @@ record AnswerDto(String answer, List<Source> sources, boolean toolUsed) {}
 | 대화가 섞인다 | 대화 ID 규칙이 흩어졌다 | 생성 지점을 한 곳으로 |
 | 응답이 3초를 넘는다 | 도구 지연 + 모델 2회 호출 | 구간 측정 후 병렬 호출 검토 |
 
-> "도구가 안 불린다"의 90%는 설명 문제다. 모델은 코드를 보지 않는다 — 설명만 본다. 함수 이름을 바꾸기 전에 설명을 먼저 고쳐라.
+> 도구가 안 불리면 설명부터 확인한다. 모델은 메서드 본문이 아니라 전달된 이름·설명·파라미터 스키마를 본다. 함수 이름을 바꾸기 전에 설명과 스키마를 먼저 고쳐라.
 {: .prompt-warning }
 
 ## 완료 기준

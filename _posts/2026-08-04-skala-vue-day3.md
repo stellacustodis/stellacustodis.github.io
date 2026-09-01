@@ -32,7 +32,7 @@ Vue에서는 HTML·CSS·JavaScript를 하나의 `.vue` 파일에 묶은 SFC가 �
 
 여기서 반드시 기억할 제약이 있다.
 
-**부모와 자식은 철저히 독립되어 있다.** 자식은 부모의 변수를 마음대로 가져다 쓸 수 없고, 부모도 자식의 내부를 들여다볼 수 없다. **형제끼리는 직접 대화하는 통로가 아예 없다.** 형제에게 무언가를 전하려면 반드시 부모를 거쳐 올라갔다가 내려와야 한다.
+**부모와 자식은 철저히 독립되어 있다.** 자식은 부모의 변수를 마음대로 가져다 쓸 수 없고, 부모도 자식의 내부를 들여다볼 수 없다. 지역적인 Props/Emits 패턴에서 형제에게 무언가를 전하려면 공통 부모를 거쳐 올라갔다가 내려온다. 여러 계층이나 화면이 공유하는 상태에는 store, composable, provide/inject 같은 별도 통로를 쓸 수 있다.
 
 이 제약이 불편해 보이지만 의도된 것이다. 아무나 아무 데이터에 접근할 수 있으면 "이 값을 누가 바꿨는지" 추적할 수 없게 된다. 데이터의 흐름을 정해진 통로로만 제한하기 때문에 디버깅이 가능해진다.
 
@@ -71,7 +71,7 @@ app.mount('#app')
 | 단계 | 상태 | 이 시점에 할 일 |
 |---|---|---|
 | **1. 생성 (Creation)** | 메모리에만 존재. 아직 HTML에 안 붙음 | `ref`, `computed`, `watch` 초기화 |
-| **2. 부착 (Mounting)** | 실제 DOM에 부착됨 | **DOM 접근 가능. API 호출의 최적 타이밍** |
+| **2. 부착 (Mounting)** | 실제 DOM에 부착됨 | **DOM 접근이 필요한 초기화 가능** |
 | **3. 갱신 (Updating)** | 반응형 데이터가 바뀌어 리렌더링 | 바뀐 요소의 크기·스크롤 위치 재계산 |
 | **4. 소멸 (Unmounting)** | 컴포넌트가 화면에서 파괴됨 | **타이머·이벤트 리스너 정리** |
 
@@ -81,7 +81,7 @@ app.mount('#app')
 |---|---|
 | `setup()` | 생성 전. `<script setup>` 본문 그 자체 |
 | `onBeforeMount()` | DOM 마운트 직전 |
-| **`onMounted()`** | **DOM 마운트 후. 초기 API 호출** |
+| **`onMounted()`** | **DOM 마운트 후. DOM 의존 초기화** |
 | `onBeforeUpdate()` | DOM 업데이트 직전 |
 | `onUpdated()` | DOM 업데이트 완료 후 |
 | `onBeforeUnmount()` | DOM에서 제거 직전 |
@@ -100,7 +100,7 @@ let timerId = null
 console.log('1. 메모리에 생성됨 (DOM 접근 불가)')
 
 onMounted(() => {
-  console.log('2. 화면에 부착됨 (API 호출 적기)')
+  console.log('2. 화면에 부착됨 (DOM 접근 가능)')
   timerId = setInterval(() => { count.value++ }, 3000)
 })
 
@@ -124,7 +124,7 @@ onUnmounted(() => {
 - 외부 라이브러리 인스턴스 (지도, 차트 등)
 - WebSocket 연결, 진행 중인 API 요청
 
-> `onMounted`가 "API 호출의 최적 타이밍"인 이유는 이 시점에 DOM이 존재하기 때문이다. 다만 데이터를 받아 화면에 뿌리기만 한다면 굳이 `onMounted`를 기다릴 필요는 없다. DOM 요소에 직접 접근해야 하는 경우(지도 초기화, 캔버스 등)에 반드시 필요하다.
+> `onMounted`는 DOM이 필요한 초기화에 적합하다. 데이터를 받아 화면에 뿌리기만 한다면 굳이 기다릴 필요 없이 setup이나 router의 data layer 등에서 더 일찍 시작할 수 있다. DOM 요소에 직접 접근해야 하는 경우(지도 초기화, 캔버스 등)에 필요하다.
 {: .prompt-tip }
 
 ## Props & Emits
@@ -137,11 +137,13 @@ Vue의 컴포넌트 통신은 하나의 원칙을 따른다.
 |---|---|---|
 | 개념 | 부모가 자식에게 주는 데이터 | 자식이 부모에게 보고하는 이벤트 |
 | 방향 | 부모 → 자식 | 자식 → 부모 |
-| 권한 | **읽기 전용. 자식은 수정 불가** | 변경 요청과 값 전달 가능 |
+| 권한 | **prop binding은 읽기 전용** | 변경 요청과 값 전달 가능 |
 | 매크로 | `defineProps({...})` | `defineEmits([...])` |
 | 부모 쪽 문법 | 속성에 `:`로 주입 | 이벤트에 `@`로 청취 |
 
 `defineProps`, `defineEmits`, `defineExpose`는 **컴파일러 매크로**다. 런타임이 아니라 빌드 시점에 Vue 컴파일러가 변환하는 특수 예약어라서, **import 없이** `<script setup>` 안에서 바로 쓸 수 있다.
+
+객체나 배열 prop의 nested 값은 기술적으로 수정할 수 있지만 부모 상태까지 바꾸는 동작이므로 피하고, event로 부모에게 변경을 요청해야 한다.
 
 ### defineProps
 
@@ -187,7 +189,7 @@ defineProps({
 })
 ```
 
-이유는 JavaScript의 참조 타입 특성 때문이다. `default: []`로 쓰면 **모든 인스턴스가 같은 배열 하나를 공유**하게 되어, 한 컴포넌트에서 배열을 수정하면 다른 컴포넌트에도 반영된다. 함수로 감싸면 인스턴스마다 새 배열이 만들어진다. 직전 과정에서 정리한 "원시 타입은 값이, 객체 타입은 주소가 복사된다"가 여기서 그대로 문제가 된다.
+이유는 JavaScript의 참조 타입 특성 때문이다. `default: []`로 쓰면 **모든 인스턴스가 같은 배열 하나를 공유**하게 되어, 한 컴포넌트에서 배열을 수정하면 다른 컴포넌트에도 반영된다. 함수로 감싸면 인스턴스마다 새 배열이 만들어진다. 직전 과정에서 정리한 "객체를 가리키는 참조값이 복사된다"가 여기서 그대로 문제가 된다.
 
 템플릿에서는 그냥 쓰지만, 스크립트에서는 `props.`를 붙여야 한다.
 
@@ -238,7 +240,7 @@ defineProps({
 </script>
 ```
 
-**JavaScript 안에서는 camelCase, HTML 속성으로는 kebab-case**를 쓴다. HTML 표준이 대소문자를 구분하지 않고 전부 소문자로 인식하기 때문이며, Vue 엔진이 둘을 자동으로 매핑해 준다.
+**JavaScript 안에서는 camelCase, in-DOM HTML template의 속성은 kebab-case**를 쓴다. HTML 표준이 대소문자를 구분하지 않기 때문이다. SFC template에서는 camelCase도 사용할 수 있지만 일관성을 위해 kebab-case를 쓸 수 있다.
 
 컴포넌트 파일을 import할 때는 PascalCase(`WeatherCard`)를 쓴다. 이 세 표기법이 각각 어디에 쓰이는지 헷갈리기 쉬운데, 규칙은 단순하다. **파일·컴포넌트는 PascalCase, JS 변수는 camelCase, HTML 속성은 kebab-case.**
 
@@ -271,6 +273,7 @@ const handleCardClick = (name) => {
 ```vue
 <!-- 부모 -->
 <script setup>
+import { ref } from 'vue'
 import WeatherCard from './components/WeatherCard.vue'
 
 const selectedCityInfo = ref('카드를 클릭해 보세요.')
@@ -291,21 +294,21 @@ const receiveCitySignal = (cityName) => {
 
 ### 2일차의 v-model이 여기서 이어진다
 
-2일차에서 `v-model`이 `:value` + `@input`의 문법 설탕이라고 했는데, 컴포넌트 통신에서 이 구조를 직접 쓰게 된다.
+2일차에서 text input의 `v-model`이 `:value` + `@input`의 문법 설탕이라고 했는데, 컴포넌트에서도 정해진 prop과 event를 통해 양방향 binding을 구성한다.
 
 ```vue
 <!-- 자식: SearchBar.vue -->
 <script setup>
 defineProps({ query: String })
-const emit = defineEmits(['update-query'])
+const emit = defineEmits(['update:query'])
 </script>
 
 <template>
-  <input :value="query" @input="emit('update-query', $event.target.value)" />
+  <input :value="query" @input="emit('update:query', $event.target.value)" />
 </template>
 ```
 
-자식은 props를 직접 수정할 수 없으므로 `v-model`을 그대로 쓸 수 없다. **값은 `:value`로 받고, 변경은 이벤트로 알린다.** 과제 요구사항에 "자식 검색 컴포넌트는 props를 직접 변경하지 않고 `update-query` 이벤트를 부모에 전달한다"고 명시된 것이 이 이야기다.
+부모에서 `<SearchBar v-model:query="searchQuery" />`로 쓰면 `query` prop과 `update:query` event로 확장된다. 자식은 props를 직접 수정하지 않고 **값은 `:value`로 받고, 변경은 event로 알린다.** 과제의 `update-query`처럼 colon이 없는 이름은 일반 custom event이며 `v-model:query` protocol과는 다르다. Vue 3.4 이상에서는 자식에서 `const query = defineModel('query')`로 같은 protocol을 간단히 선언할 수도 있다.
 
 ## Provide & Inject
 
@@ -402,6 +405,8 @@ Props가 **데이터**를 주입한다면, Slot은 **HTML 마크업과 레이아
 ```vue
 <!-- 자식 -->
 <script setup>
+import { ref } from 'vue'
+
 const message = ref('현재 서버 상태 정상')
 const userCount = ref(150)
 </script>
@@ -472,7 +477,7 @@ export default router
 | 속성 | 역할 |
 |---|---|
 | `path` | **필수.** 브라우저 URL 경로 |
-| `component` | **필수.** 매핑되는 컴포넌트 |
+| `component` | 화면을 렌더링하는 route record에서 매핑되는 컴포넌트. redirect-only record에는 불필요 |
 | `name` | 고유 식별 이름 |
 | `redirect` | 강제 리다이렉션 경로 |
 
@@ -498,14 +503,14 @@ app.use(router)
 </template>
 ```
 
-### `<a>` 태그를 쓰면 안 되는 이유
+### 내부 경로에 `<a>` 태그를 쓰지 않는 이유
 
 ```vue
-<a href="/about">About</a>       <!-- 쓰면 안 됨 -->
+<a href="/about">About</a>       <!-- 내부 client route에는 권장하지 않음 -->
 <RouterLink to="/about">About</RouterLink>
 ```
 
-`<a>` 태그는 에러를 내지는 않지만 **브라우저의 전체 새로고침을 발생시킨다.** 그 순간 메모리에 있던 모든 반응형 데이터(`ref`, `computed`)와 Pinia 상태가 초기화되고, SPA의 장점인 빠른 화면 전환도 사라진다.
+내부 경로에 `<a>` 태그를 쓰면 에러를 내지는 않지만 **브라우저의 전체 새로고침을 발생시킨다.** 그 순간 메모리에만 있던 반응형 데이터와 Pinia 상태는 재생성되고, SPA의 장점인 빠른 화면 전환도 사라진다. storage나 persistence plugin에 저장한 상태는 복원될 수 있다. 외부 URL이나 download 링크에는 `<a>`가 맞다.
 
 `<RouterLink>`는 최종적으로 `<a>` 태그로 렌더링되지만, 클릭 이벤트를 가로채 기본 동작을 막고(2일차의 `preventDefault`) URL만 바꾼다.
 
@@ -531,14 +536,14 @@ app.use(router)
 | 재사용성 | 낮음 (특정 URL 전용) | 높음 |
 | 예시 | `WeatherHomeView.vue` | `SearchBar.vue`, `WeatherCard.vue` |
 
-`<RouterView>`에 의해 직접 호출되는 최상위 페이지 컴포넌트에는 접미사 **`View`**를 붙이는 것이 공식 스타일 가이드 권장이다.
+이 프로젝트에서는 `<RouterView>`에 의해 직접 호출되는 최상위 페이지 컴포넌트에 접미사 **`View`**를 붙이는 규칙을 사용한다.
 
 ### Lazy Loading
 
 `component` 속성을 지정하는 방식이 둘 있다.
 
 ```js
-// 정적 import: 앱 시작 시점에 전부 메모리에 로드
+// 정적 import: 초기 module graph에 포함되어 eager하게 로드
 import WeatherAboutView from '@/views/WeatherAboutView.vue'
 { path: '/about', component: WeatherAboutView }
 
@@ -626,7 +631,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const goHome = () => router.push('/')
-const loginRedirect = () => router.replace('/')       // 뒤로 가기 불가
+const loginRedirect = () => router.replace('/')       // 교체 전 route로는 뒤로 갈 수 없음
 const goBack = () => router.go(-1)
 
 const goDetail = () => {
@@ -642,7 +647,7 @@ const goDetail = () => {
 | 메서드 | 동작 |
 |---|---|
 | `router.push()` | 히스토리에 **추가**하며 이동 (뒤로 가기 가능) |
-| `router.replace()` | 현재 히스토리를 **대체** (뒤로 가기 불가) |
+| `router.replace()` | 현재 히스토리를 **대체** (교체 전 route는 history에 남지 않음) |
 | `router.go(n)` | n단계 앞/뒤 이동 |
 | `router.back()` / `router.forward()` | 이전 / 다음 |
 
@@ -692,7 +697,7 @@ const routes = [
   { path: '/', name: 'Home', component: HomeView },
   // ... 나머지 라우트 ...
 
-  // 반드시 맨 마지막에 배치
+  // 가독성을 위해 보통 맨 마지막에 배치
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -701,7 +706,7 @@ const routes = [
 ]
 ```
 
-`/:pathMatch(.*)*`는 매칭되지 않은 모든 경로를 잡는 정규식 패턴이다. **반드시 배열의 가장 마지막에 두어야 한다.** 위에 두면 이 라우트가 모든 경로를 먼저 삼켜 버린다.
+`/:pathMatch(.*)*`는 매칭되지 않은 모든 경로를 잡는 정규식 패턴이다. Vue Router 4는 matcher ranking을 사용하므로 배열 마지막이 동작의 필수조건은 아니지만, catch-all이라는 의미를 드러내기 위해 마지막에 두는 편이 읽기 쉽다.
 
 ## 과제
 
@@ -731,14 +736,14 @@ const routes = [
 
 3일차를 한 줄로 요약하면 **"화면을 부품으로 나누고, 부품과 화면을 정해진 통로로 연결한다"**다.
 
-- 부모-자식은 독립적이고, 형제끼리는 직접 통신할 수 없다. 이 제약이 데이터 흐름을 추적 가능하게 만든다
+- 부모-자식은 독립적이고, 지역적인 Props/Emits 통신은 형제의 공통 부모를 거친다. 넓게 공유하는 상태에는 store 등의 통로를 쓸 수 있다
 - **데이터는 Props로 아래로, 이벤트는 Emit으로 위로.** Props는 읽기 전용이다
-- 배열·객체 props의 기본값은 반드시 `() => []` 형태로 쓴다
-- `onMounted`는 API 호출, `onUnmounted`는 타이머·리스너 정리. SPA에서 정리를 빠뜨리면 메모리 누수가 쌓인다
+- 배열·객체 props의 기본값은 instance마다 새 값을 반환하는 factory function으로 쓴다
+- `onMounted`는 DOM 의존 초기화, `onUnmounted`는 타이머·리스너 정리. SPA에서 정리를 빠뜨리면 메모리 누수가 쌓인다
 - Slot은 마크업 자체를 주입하며, **슬롯 콘텐츠는 부모 스코프에서 평가된다**
-- `<a>` 대신 `<RouterLink>`. 전체 새로고침은 SPA의 모든 상태를 날린다
+- 내부 client route는 `<RouterLink>`. 전체 새로고침은 메모리에만 있던 SPA 상태를 재생성한다
 - 동적 세그먼트로 상세 페이지를 하나의 라우트로 처리하고, Lazy Loading으로 초기 번들을 줄인다
-- Catch-all Route는 반드시 맨 마지막에
+- Catch-all Route는 가독성을 위해 보통 맨 마지막에 둔다
 
 이제 화면은 여러 개로 나뉘었지만, 화면을 넘나드는 데이터는 여전히 문제로 남아 있다. 홈 화면에서 추가한 지역을 상세 화면에서도 알아야 하고, 단위 설정(섭씨/화씨)은 모든 화면에서 같아야 한다. 4일차에서 Pinia로 전역 상태를 다루고, Axios로 서버 데이터를 가져온다.
 

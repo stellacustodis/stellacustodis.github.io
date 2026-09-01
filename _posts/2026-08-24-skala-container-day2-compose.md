@@ -57,7 +57,7 @@ services:
 | | 두 번째 실행 |
 |---|---|
 | 셸 스크립트 | 이름 충돌로 실패하거나 두 벌이 뜬다 |
-| `docker compose up -d` | **아무 일도 일어나지 않는다.** 이미 원하는 상태이므로 |
+| `docker compose up -d` | 현재 상태를 선언과 다시 대조한다. 설정·이미지·상태가 같으면 재생성하지 않는다 |
 
 이것을 **멱등(idempotent)**하다고 한다. 셸 스크립트로 같은 성질을 만들려면
 "이미 있으면 건너뛴다"를 전부 손으로 써야 한다.
@@ -206,10 +206,10 @@ docker inspect <container-name> | less
 ```bash
 docker compose rm         # 컨테이너만 제거 (네트워크는 남는다)
 docker compose down       # 컨테이너 + 네트워크
-docker compose down -v    # 컨테이너 + 네트워크 + 볼륨
+docker compose down -v    # 컨테이너 + 네트워크 + 선언된 named·anonymous 볼륨
 ```
 
-**`down`과 `down -v`의 차이가 실습에서 자주 문제가 된다.** `-v`를 붙이면 DB 데이터까지 지워진다. 초기화하고 싶을 때는 붙이고, 데이터를 남기려면 빼야 한다.
+**`down`과 `down -v`의 차이가 실습에서 자주 문제가 된다.** `-v`는 Compose에 선언된 named volume과 컨테이너에 붙은 anonymous volume을 지운다. bind mount의 호스트 디렉터리와 external volume은 지우지 않으므로, DB 데이터의 실제 저장 방식을 먼저 확인해야 한다.
 
 ### 장애 복구와 디버깅
 
@@ -526,7 +526,7 @@ services:
 networks:
   public:
   private:
-    internal: true      # 컨테이너 → 외부로 나가는 것을 차단
+    internal: true      # 이 네트워크에는 외부 연결 경로를 만들지 않음
 ```
 
 결과는 이렇게 된다.
@@ -535,7 +535,7 @@ networks:
 - `frontend`는 `backend`와 통신 가능, **`db`와는 통신 불가**
 - `backend`는 `db`와 통신 가능
 
-`internal: true`는 기본이 `false`이며, 그 네트워크에 속한 컨테이너가 **외부로 나가는 것**을 막는다.
+`internal: true`는 기본이 `false`이며, 그 네트워크 자체에는 외부 연결 경로를 만들지 않는다. 다만 `backend`처럼 public 네트워크에도 함께 연결된 컨테이너는 그 다른 네트워크를 통해 외부로 나갈 수 있다.
 
 구조를 그리면 이렇다.
 
@@ -832,6 +832,6 @@ networks:
 ## 이 장에서 남는 것
 
 - Compose는 **custom bridge를 자동 생성**하고 서비스 이름을 DNS에 등록한다. `docker network create`가 사라진다.
-- `depends_on`은 **healthcheck와 짝으로** 써야 의미가 있다. `condition: service_healthy`가 없으면 "컨테이너 시작"까지만 보장한다.
+- `depends_on`만으로도 시작 순서는 정하지만, **준비 완료까지 기다리려면 healthcheck와 `condition: service_healthy`를 함께 써야 한다.**
 - `internal: true`로 나눈 private 네트워크는 DB를 외부에서 **닿을 경로 자체가 없게** 만든다.
-- healthcheck는 상태 표시일 뿐 복구하지 않는다. 복구는 `restart` 정책이, 그리고 쿠버네티스에서는 probe가 한다.
+- healthcheck는 상태 표시일 뿐 복구하지 않는다. `restart` 정책도 프로세스가 종료될 때 적용될 뿐 `unhealthy` 상태만으로 재시작하지 않는다. 자동 복구가 필요하면 별도 감시·오케스트레이션을 둔다.

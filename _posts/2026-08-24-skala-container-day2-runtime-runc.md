@@ -80,7 +80,7 @@ LXC (LinuX Container) → libcontainer → runc (OCI 표준 Reference 구현체)
 
 이 구조가 도구를 갈아 끼워도 동작하는 이유는 OCI(Open Container Initiative) 표준 때문이다. 세 갈래로 나뉜다.
 
-**1. OCI Image Spec** — 어떤 도구든 이미지를 받아 해석할 수 있는 패키지 규격이다. 이미지 구조, tar 레이어, `manifest.json` 표준. [2일차 ⑥](/posts/skala-container-day2-image-anatomy/)에서 풀어 본 것이 이 규격의 산출물이다.
+**1. OCI Image Spec** — 어떤 도구든 이미지를 받아 해석할 수 있는 패키지 규격이다. OCI Image Layout은 `oci-layout`·`index.json`·`blobs/` 구조를 쓴다. [2일차 ⑥](/posts/skala-container-day2-image-anatomy/)에서 풀어 본 `manifest.json`은 Docker `save` 호환 아카이브의 목차이지 OCI Layout의 필수 파일은 아니다.
 
 **2. OCI Runtime Spec** — 컨테이너 실행을 위한 OCI Bundle을 정의한다.
 
@@ -411,15 +411,15 @@ HOST 프로세스                          Container 내 프로세스
 [ Docker ]                          [ Kubernetes ]
   dockerd                             kubelet          ← 노드마다 하나씩
      ↓                                   ↓  CRI
-  containerd                          containerd (또는 CRI-O)
-     ↓                                   ↓
-  containerd-shim                     containerd-shim
-     ↓                                   ↓
-  runc                                runc
+  containerd                          ├─ containerd → containerd-shim → runc/crun
+     ↓                                └─ CRI-O     → conmon          → runc/crun
+  containerd-shim
+     ↓
+  runc
 ```
 
 kubelet은 각 노드에서 도는 에이전트다. 컨트롤 플레인에서 "이 노드에 이 Pod를 띄워라"를 받아
-**CRI**(Container Runtime Interface)로 containerd에 실행을 요청하고, 상태를 보고하며,
+**CRI**(Container Runtime Interface)로 containerd나 CRI-O에 실행을 요청하고, 상태를 보고하며,
 probe를 찔러 보고 실패하면 재시작하거나 트래픽에서 뺀다.
 
 여기서 **kubelet이 dockerd를 거치지 않는다**는 점이 중요하다.
@@ -427,7 +427,7 @@ probe를 찔러 보고 실패하면 재시작하거나 트래픽에서 뺀다.
 버린 것은 dockerd라는 중간 계층이지 컨테이너나 이미지 형식이 아니다.
 **OCI 표준을 지키므로 `docker build`로 만든 이미지는 그대로 돈다.**
 
-계층 아래쪽(`containerd`, `shim`, `runc`)은 그대로다.
+containerd 경로는 `containerd-shim`을, CRI-O 경로는 `conmon`을 거쳐 `runc`나 `crun` 같은 OCI runtime을 호출한다.
 이 실습에서 손으로 만져 본 `config.json`과 rootfs도 쿠버네티스에서 똑같이 쓰인다.
 
 ### replica — 되살리는 것이 아니라 개수를 맞춘다
@@ -444,12 +444,12 @@ Compose의 `restart` 정책과 대비하면 성격이 분명해진다.
 | | Compose `restart` | Kubernetes `replicas` |
 |---|---|---|
 | 관심사 | **이 컨테이너**가 살아 있는가 | **몇 개**가 살아 있는가 |
-| 하나 죽으면 | 그 컨테이너를 다시 시작한다 | **새 Pod를 만든다** (죽은 것은 버린다) |
+| 컨테이너 하나가 죽으면 | 그 컨테이너를 다시 시작한다 | kubelet이 `restartPolicy`에 따라 **같은 Pod 안의 컨테이너를 재시작**한다 |
 | 노드가 통째로 죽으면 | 방법이 없다 | 다른 노드에 새로 만든다 |
 | 개수 조절 | 없음 | `kubectl scale`, 오토스케일링 |
 
-쿠버네티스는 죽은 컨테이너를 고쳐 쓰지 않는다. **버리고 새로 만든다.**
-그래서 컨테이너에 상태를 두면 안 되고, 상태는 볼륨이나 외부 저장소로 빼야 한다.
+Pod가 삭제되거나 유실되면 Deployment 같은 워크로드 컨트롤러가 replica 수를 맞추려고 **대체 Pod를 새로 만든다.** 컨테이너 프로세스 실패와 Pod 유실을 구분해야 한다.
+어느 경우든 교체 가능한 컨테이너의 로컬 쓰기 계층에 지속 상태를 두지 않고, 상태는 볼륨이나 외부 저장소로 빼야 한다.
 이 장 앞부분에서 확인한 "변경분은 upperdir에만 쌓인다"는 성질과 같은 이야기다.
 
 ## 도구 지형

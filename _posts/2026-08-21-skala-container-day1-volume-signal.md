@@ -23,7 +23,7 @@ description: "Named Volume·Bind Mount·Anonymous Volume의 차이를 inspect로
 |---|---|
 | **Named Volume** | 컨테이너 런타임이 관리하는 **이름 있는** 볼륨 |
 | **Bind Mount** | 호스트의 디렉터리를 컨테이너 내부 디렉터리에 마운트 |
-| **Anonymous Volume** | 이름 없이 임시 생성. Dockerfile의 `VOLUME` 명령으로 생성 |
+| **Anonymous Volume** | 사용자가 이름을 지정하지 않아 Docker가 임의 이름으로 관리. Dockerfile의 `VOLUME`이나 `docker run -v /container/path` 등으로 생성 |
 
 말로는 구분이 잘 안 되므로 `docker inspect`로 실제 차이를 본다.
 
@@ -370,7 +370,7 @@ docker exec -it container /bin/bash
 | `-i` (Keep STDIN open) | 로컬 터미널 셸의 STDIN을 컨테이너 내부 프로세스의 STDIN으로 연결. 없으면 입력이 전달되지 않는다 |
 | `-t` (Allocate a pseudo-TTY) | 컨테이너 내부에 가상 터미널(pty)을 생성 |
 
-터미널을 연다는 것은 결국 **STDIN·STDOUT과 연결된 셸 프로세스를 실행한다**는 뜻이다. 그 셸이 명령을 받으면 `fork` → `exec` → `wait` 순으로 처리한다. 앞에서 본 fork/exec가 여기서도 그대로 나온다.
+`-it`는 선택한 프로세스의 STDIN을 열어 두고 pty를 할당한다. **셸 프로세스는 위 예시처럼 `/bin/bash`를 명시했을 때** 실행되며, 그 셸이 명령을 받으면 `fork` → `exec` → `wait` 순으로 처리한다. 앞에서 본 fork/exec가 여기서도 그대로 나온다.
 
 ## 실습: 볼륨으로 파이썬 웹서버 띄우기
 

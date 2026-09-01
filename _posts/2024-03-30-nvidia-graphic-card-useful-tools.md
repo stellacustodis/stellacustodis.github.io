@@ -13,7 +13,7 @@ _본 게시글은 과거 연구실 노션에 후배들을 위해 정리해놨던
 
 
 **nvidia-smi**
-  1. 해당 명령어를 이용하여 gpu를 '관리'하는 것은 불편하지만 gpu 인식 및 nvidia driver설치, 호환 등을 확인하는 유일한 방법.
+  1. 해당 명령어를 이용하여 gpu를 '관리'하는 것은 불편하지만 gpu 인식 및 nvidia driver설치, 호환 등을 확인하는 대표적인 방법.
   2. 다음의 명령어를 통해 실시간으로 gpu status를 확인할 수 있음.
       
       ```bash
@@ -60,18 +60,18 @@ _본 게시글은 과거 연구실 노션에 후배들을 위해 정리해놨던
       ![image.png](/assets/img/posts/nvidia-graphic-card-useful-tools/cap_nvtop.png)
       
       1. Divice {i}
-          1. 물리적으로 마더보드의 PCIe 슬롯에 연결되어있는 번호
-          2. CUDA의 `cuda:0`과는 별개. cuda의 경우 성능 순으로 재배열
+          1. NVML이 부여한 장치 인덱스. 물리적인 PCIe 슬롯 번호와 같다고 보장되지 않으며 재부팅 뒤 달라질 수도 있음
+          2. CUDA의 `cuda:0`과는 별개일 수 있으므로 정확한 식별에는 GPU UUID나 PCI Bus ID를 사용
       2. 현재 3개의 gpu가 사용되고 있음을 알 수 있음. 첫번째 gpu의 경우 intel 내장 그래픽으로, 식별은 되지만 다른 정보는 업데이트 되지 않는 상태.
           1. 내장 그래픽이 있다면, Nvidia GPU의 성능을 모두 사용할 수 있도록 모니터는 내장그래픽에 사용하는 것이 좋음
           2. 그럼에도 불구하고 기본적으로 `xorg`에서 Nvidia GPU에 메모리를 할당하여 기본적으로 VRAM이 어느정도는 찰 수 있음.
               1. 최하단에 TYPE Graphic으로 할당되는 부분
           3. 해당 부분은 config을 수정하면 되는데 복잡하니 생략.
       3. `GPU 1995MHz` `MEM 10251MHz` 
-          1. gpu에 연결되어 있는 프로세싱 유닛(CUDA/Tensor core를 구분하지 않음)의 클럭 수와 VRAM 클럭 수
+          1. gpu의 graphics/SM 클럭 수와 VRAM 클럭 수
               1. gpu의 세가지 core(CUDA core, Tensor core, Ray-Tracing core)에 대해서는 다른 글에서 다루도록 하겠음.
           2. 유휴상태일 땐 낮은 값을 갖고 있다가 본격 딥러닝 학습을 시작하면 확 올라감
-          3. 만약 메모리도 모두 찼고 gpu 사용률도 거의 맥스인데, 해당 값이 낮을 경우 쓰로틀링이 걸린 상태
+          3. 만약 메모리도 모두 찼고 gpu 사용률도 거의 맥스인데 해당 값이 낮다면 쓰로틀링 가능성이 있으므로 `nvidia-smi -q -d PERFORMANCE`의 원인을 확인
       4. Temp
           1. 현재 gpu 프로세싱 유닛의 온도
           2. 각 gpu마다 견딜 수 있는 온도의 상한선 존재
@@ -102,10 +102,13 @@ _본 게시글은 과거 연구실 노션에 후배들을 위해 정리해놨던
 설치:
 
 ```bash
-sudo apt install python3-pip
-sudo pip3 install pynvml
-sudo python3 gpu_fan_control_new.py
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install nvidia-ml-py
+sudo .venv/bin/python gpu_fan_control_new.py
 ```
+
+팬 속도 변경에는 관리자 권한과 NVML fan control을 지원하는 GPU가 필요하다. 지나치게 낮은 속도를 강제하면 GPU가 손상될 수 있으므로 권한이 있는 장비에서 온도를 계속 확인하며 실행해야 한다. 아래 코드는 종료할 때 기본 정책 복원을 시도하지만 복원이 실패했다는 로그가 나오면 재부팅하거나 제조사 도구로 자동 fan control이 돌아왔는지 확인한다.
 
 <details markdown="1">
 <summary>gpu_fan_control.py 전체 코드</summary>
@@ -138,37 +141,10 @@ def get_target_fan_speed(temp):
 
 def set_fan_speed_nvml(device_handle, speed_percentage):
     """Sets the fan speed for a specific GPU handle using pynvml."""
-    
-    try:
-        num_fans = nvmlDeviceGetNumFans(device_handle)
-    except NVMLError as e:
-        # Some GPUs might fail to report num fans correctly via NVML
-        print(f"Warning: Could not get fan count. Assuming 1 fan. Error: {e}")
-        num_fans = 1
-    
+    num_fans = nvmlDeviceGetNumFans(device_handle)
     for i in range(num_fans):
-        # 1. Set fan control policy to manual
-        # NVML might fail on some consumer cards (GeForce) or locked Workstation cards
-        try:
-            # 0 implies NVML_FAN_POLICY_MANUAL if constant is missing
-            nvmlDeviceSetFanControlPolicy(device_handle, i, 0)
-        except NVMLError as e:
-            if e.value == NVML_ERROR_NOT_SUPPORTED:
-                # Many cards do not support Policy setting via NVML, but allow Speed setting directly.
-                # So we just print a debug message and continue to try setting speed.
-                pass 
-            else:
-                # If it's a permission error or other issue, we might still want to try setting speed
-                pass
-
-        # 2. Set the target fan speed percentage
-        try:
-            nvmlDeviceSetFanSpeed_v2(device_handle, i, speed_percentage)
-        except NVMLError as e:
-            if e.value == NVML_ERROR_NOT_SUPPORTED:
-                print(f"Warning: Setting Fan Speed is NOT supported by NVML on Fan {i}.")
-            else:
-                print(f"Error setting fan speed: {e}")
+        # 이 호출 자체가 fan control policy를 manual로 전환한다.
+        nvmlDeviceSetFanSpeed_v2(device_handle, i, speed_percentage)
 
 # --- Main Logic ---
 try:
@@ -209,7 +185,7 @@ try:
         print("\nScript interrupted. Restoring fan control to automatic...")
         
     finally:
-        # --- Cleanup: ALWAYS restore default fan control on exit ---
+        # --- Cleanup: restore default fan control on exit ---
         print("Restoring default fan settings...")
         for gpu_id in range(device_count):
             handle = gpu_handles[gpu_id]
@@ -218,10 +194,10 @@ try:
                 for i in range(num_fans):
                     try:
                         nvmlDeviceSetDefaultFanSpeed_v2(handle, i)
-                    except NVMLError:
-                        pass
-            except NVMLError:
-                pass
+                    except NVMLError as e:
+                        print(f"[GPU {gpu_id}] Failed to restore fan {i}: {e}")
+            except NVMLError as e:
+                print(f"[GPU {gpu_id}] Failed to get fan count during restore: {e}")
                     
         nvmlShutdown() # Shut down NVML
         print("NVML shut down successfully. Exiting.")
@@ -242,14 +218,16 @@ except NVMLError as e:
 
 **Gpu 사용 주의 사항**
 
-1. nvidia-smi, nvtop에서 나오는 device num은 PCI Bus id 순서로 번호가 매겨짐. (위에 꽂힌 gpu 번호가 더 낮음)
-2. `CUDA_VISIBLE_DEVICES` 는 별도의 세팅을 하지 않으면 성능 순으로 번호를 매김.
-   - ex) dell서버의 4090은 nvidia-smi device id는 3번이지만 CUDA_VISIBLE_DEVICES는 0번임.
-   1. `export CUDA_DEVICE_ORDER=PCI_BUS_ID`를 통해 번호를 일치시킬 수 있음.
-   2. `export CUDA_VISIBLE_DEVICES=0`와 같은 명령어는 gpu인식을 '강제'시키는 역할을 함. → 따라서 torch는 해당 gpu만 gpu로 인식하기 때문에 멀티 gpu환경에서 `cuda:1`와 같이 gpu 번호를 직접 명시했다면 에러가 발생할 수 있음.
+1. nvidia-smi, nvtop에서 나오는 device num은 물리적인 PCIe 슬롯 순서나 CUDA의 ordinal과 일치한다고 보장되지 않음. 정확한 식별에는 GPU UUID나 PCI Bus ID를 사용해야 함.
+2. CUDA Runtime의 기본 장치 순서는 `CUDA_DEVICE_ORDER=FASTEST_FIRST`이며, `export CUDA_DEVICE_ORDER=PCI_BUS_ID`를 사용하면 PCI Bus ID 오름차순으로 열거함.
+   - `CUDA_VISIBLE_DEVICES`는 GPU 인식을 강제하는 변수가 아니라 CUDA에서 보일 장치를 선택하고 순서를 재배열함.
+   1. 예를 들어 `export CUDA_VISIBLE_DEVICES=3`이면 원래 3번 장치만 보이고 그 프로세스 안에서는 `cuda:0`으로 다시 매핑됨.
+   2. 따라서 멀티 gpu환경에서 보이는 장치가 하나뿐인데 `cuda:1`과 같이 번호를 직접 명시했다면 에러가 발생할 수 있음.
 3. gpu의 온도가 지나치게 올라가면 쓰로틀링이 걸리면서 성능저하가 발생. 고온에 gpu가 지속적으로 노출될경우 수명이 단축되고 최고 성능이 하락할 가능성이 있음. 따라서 온도관리가 매우 중요함.
 
-   | **모델명**       | **아키텍처** | **기본/부스트 클럭 (Official)** | **실제 작동 클럭 (Real-world)** | **스로틀링 시작 (Soft Limit)** | **메모리 타입 (이슈 여부)** |
+   아래의 실제 작동 클럭과 온도는 모든 보드에 적용되는 규격이 아니라 제조사, BIOS, 전력 제한, 냉각 환경에 따라 달라지는 참고값이다.
+
+   | **모델명**       | **아키텍처** | **기본/부스트 클럭 (Official)** | **실제 작동 클럭 (참고값)** | **스로틀링 온도 (참고값)** | **메모리 타입 (이슈 여부)** |
    | ---------------- | ------------ | ------------------------------- | ------------------------------- | ------------------------------ | --------------------------- |
    | **RTX 4090**     | **Ada**      | 2235 / **2520 MHz**             | **2700~2850 MHz**               | **84°C** (최대 88°C)           | GDDR6X (**개선됨**)         |
    | **RTX 3090 Ti**  | Ampere       | 1560 / 1860 MHz                 | 1950~2050 MHz                   | 84°C                           | GDDR6X (**매우 뜨거움**)    |

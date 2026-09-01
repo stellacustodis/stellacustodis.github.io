@@ -36,10 +36,10 @@ JavaScript의 표준 규격 이름이 ECMAScript(ES)다. 이름이 둘인 이유
 
 ### 브라우저 지원과 Babel·Polyfill
 
-최신 문법을 쓰면 구형 브라우저에서 깨지지 않을까? 이 걱정은 도구 체인이 이미 해결해 두었다.
+최신 문법을 쓰면 구형 브라우저에서 깨지지 않을까? 지원 여부는 문법·API와 브라우저 버전, build target에 따라 달라진다.
 
-- **ES6(2015)~ES11(2020)**: `let`/`const`, 화살표 함수, Promise, `async/await`, 옵셔널 체이닝(`?.`) 등은 데스크톱·모바일 가리지 않고 **100% 네이티브 지원**
-- **ES12(2021)~ES15(2024)**: `replaceAll()`, 논리 할당(`&&=`, `||=`), `toReversed()` 등도 모던 브라우저 기준 **96% 이상**
+- Vite 개발 서버는 native ESM과 dynamic import 등을 지원하는 modern browser를 전제로 한다
+- production build의 기본 target은 Baseline Widely Available 기준이며, 프로젝트의 지원 browser 범위에 맞춰 `build.target`과 호환성 자료를 확인해야 한다
 
 지원되지 않는 부분은 두 기술이 메운다.
 
@@ -48,9 +48,9 @@ JavaScript의 표준 규격 이름이 ECMAScript(ES)다. 이름이 둘인 이유
 | **Babel** | 최신 **문법(Syntax)** 을 구형 브라우저가 이해하는 ES5 문법으로 **번역**한다. 화살표 함수를 `function`으로 바꾸는 식 |
 | **Polyfill** | 엔진에 **아예 없는 객체·메서드**(`Promise`, `Array.prototype.includes`)를 JavaScript로 직접 구현해 **채워 넣는다** |
 
-문법을 번역하는 것과 없는 기능을 구현해 주는 것은 다른 문제다. 화살표 함수는 `function`으로 바꿔 쓸 수 있지만, `Promise`가 없는 엔진에 `Promise`를 "번역"할 수는 없다. 그래서 둘 다 필요하다.
+문법을 번역하는 것과 없는 기능을 구현해 주는 것은 다른 문제다. 화살표 함수는 `function`으로 바꿔 쓸 수 있지만, `Promise`가 없는 엔진에 `Promise`를 "번역"할 수는 없다. 지원 대상에 두 종류의 차이가 모두 있다면 transpile과 polyfill을 각각 검토해야 한다.
 
-> Vite 내부에 이 변환 엔진이 기본 내장되어 있다. 그래서 이 과정 내내 브라우저 호환성을 한 번도 신경 쓰지 않고 최신 문법으로 코딩할 수 있었던 것이다.
+> Vite는 설정한 target에 맞춰 일부 문법을 변환하지만 모든 JavaScript API의 polyfill을 자동으로 넣지는 않는다. 더 오래된 브라우저를 지원하려면 `@vitejs/plugin-legacy`와 필요한 polyfill을 별도로 검토해야 한다.
 {: .prompt-info }
 
 ### let, const, var
@@ -253,12 +253,12 @@ async function handleData() {
 두 키워드의 규칙은 짧다.
 
 - **`async` 함수는 항상 Promise를 반환한다.** 일반 값을 `return`해도 `Promise.resolve(값)`으로 감싸진다
-- **`await`는 `async` 함수 안에서만 쓸 수 있다**
+- **`await`는 `async` 함수 안에서 쓸 수 있고, module에서는 지원 환경과 build target에 따라 top-level await도 가능하다**
 - `.then/.catch`는 `try/catch`로 대체된다
 
 4일차의 Axios 호출을 `try / catch / finally`로 감쌌던 구조가 바로 이것이다. `.then()` 방식과 실행 순서가 어떻게 갈리는지는 직전 과정의 [Event Loop 정리](/posts/skala-frontend-day2/)와 이어진다.
 
-> `await`가 **연달아** 있으면 순차 실행이라 느리다. 서로 의존하지 않는 요청이라면 `Promise.all([a(), b()])`로 동시에 보내야 한다. 지역 5개의 날씨를 하나씩 `await`하면 5배 느려진다.
+> `await`가 **연달아** 있으면 순차 실행이라 느리다. 서로 의존하지 않는 요청이라면 `Promise.all([a(), b()])`로 동시에 보낼 수 있다. 지역 5개의 날씨를 하나씩 요청하면 대기 시간은 대략 각 요청 시간의 합이 되고, 동시에 보내면 가장 늦은 요청 시간에 가까워진다. 실제 차이는 서버와 브라우저의 동시 요청 제한에도 영향을 받는다.
 {: .prompt-tip }
 
 ### 배열 메서드
@@ -420,7 +420,7 @@ const runTask3 = async () => {
 
 코드를 **실행하지 않고** 소스를 파싱해 추상 구문 트리(AST)로 바꾼 뒤, 등록된 규칙과 대조해 문제를 찾는 **정적 분석 도구**다.
 
-이게 왜 필요한가는 언어의 성질에서 나온다. Java나 C#은 컴파일 단계에서 구문 오류를 강제로 잡아내므로 결함 있는 코드가 배포까지 갈 수 없다. **JavaScript는 인터프리터 언어라 오타가 있어도 배포가 되고, 그 줄이 실행되는 순간 앱이 죽는다.** 게다가 동적 타이핑과 세미콜론 자동 삽입(ASI)처럼 문법 허용 범위가 넓어 예측 못한 부작용이 생기기 쉽다.
+이게 왜 필요한가는 언어와 도구가 잡아내는 오류의 범위에서 나온다. Java나 C# compiler도 구문·정적 type 오류를 잡지만 logic error까지 막지는 못한다. Vite도 import된 JavaScript를 parse·변환하므로 syntax error는 보통 build 단계에서 실패한다. 다만 미정의 이름이나 동적 type·실행 경로 문제는 runtime까지 남을 수 있고, ESLint가 이런 추가 pattern을 정적으로 찾는다.
 
 주요 검출 항목은 셋이다.
 
@@ -710,8 +710,8 @@ Vite는 개발과 프로덕션에서 다르게 동작한다.
 
 | 단계 | 방식 | 이유 |
 |---|---|---|
-| **개발** (`npm run dev`) | ES Modules 기반 **무번들** | 파일 하나 고치면 그 파일만 다시 보내면 되므로 HMR이 즉각적 |
-| **프로덕션** (`npm run build`) | **Rollup** 번들러로 최적화 | 요청 수를 줄이고 Tree Shaking으로 안 쓰는 코드를 제거 |
+| **개발** (`npm run dev`) | source module을 native ESM으로 필요할 때 제공하고 dependency는 사전 최적화할 수 있음 | 파일 하나 고치면 해당 module을 중심으로 갱신하므로 HMR이 빠름 |
+| **프로덕션** (`npm run build`) | **Rolldown** 번들러로 최적화 | 요청 수를 줄이고 Tree Shaking으로 안 쓰는 코드를 제거 |
 
 개발 중에는 속도가, 배포에서는 결과물 크기가 중요하다는 우선순위 차이가 그대로 설계에 들어가 있다. 1일차에서 Vite가 왜 빠른지 이야기했던 부분과 이어진다.
 
@@ -734,18 +734,18 @@ dist/assets/index-hkOuYOvA.js            1,053.24 kB │ gzip: 345.91 kB
 읽는 법이 있다.
 
 - **`index-*` 외에 `WeatherDetailView-*`, `WeatherAboutView-*`가 따로 나온 것**은 3일차의 **Lazy Loading**이 실제로 동작했다는 증거다. 라우터에서 `() => import(...)`로 등록한 컴포넌트가 별도 청크로 분리됐다
-- **`gzip:` 뒤의 숫자가 실제 전송량**이다. 1MB짜리 JS도 gzip 압축하면 346KB로 줄어 전송된다. 서버가 압축해 보내고 브라우저가 풀어 쓴다
+- **`gzip:` 뒤의 숫자는 gzip 압축 크기 추정값**이다. 실제 전송량은 서버와 브라우저의 `Content-Encoding` 협상에 따라 gzip·Brotli·무압축 중 무엇을 쓰는지에 달라진다
 - **`index-*.js`가 1MB를 넘는 것**은 경고 신호다. Element Plus 같은 UI 라이브러리를 전역 등록하면 컴포넌트 전체가 번들에 들어간다. 실제로 쓰는 것만 넣으려면 `unplugin-vue-components` 같은 **자동 임포트 플러그인**으로 On-demand 방식으로 바꿔야 한다
 
 ### dist 폴더
 
 빌드가 끝나면 루트에 `dist/`(Distribution)가 생긴다.
 
-- 내부에는 **`.vue` 파일도, 개발용 모듈도 없다.** 브라우저가 바로 해석하는 순수 HTML/JS/CSS만 남는다
-- 파일명 뒤의 `WeatherDetailView-CIVZfn32.css` 같은 문자열은 **내용 해시**다. 파일이 바뀌면 해시가 바뀌므로 이름이 바뀌고, 브라우저는 이를 새 파일로 인식해 다시 받는다. **배포했는데 사용자 화면이 안 바뀌는 캐싱 문제를 구조적으로 막는 표준 기법**이다
+- 내부에는 **`.vue` 파일도, 개발용 모듈도 없다.** 브라우저가 사용할 HTML/JS/CSS와 이미지·font 같은 static asset이 남는다
+- 파일명 뒤의 `WeatherDetailView-CIVZfn32.css` 같은 문자열은 **내용 해시**다. 파일이 바뀌면 해시가 바뀌므로 이름이 바뀌고, 브라우저는 이를 새 파일로 인식해 다시 받는다. asset의 stale cache를 줄이는 표준 기법이지만 `index.html`, service worker, 배포 순서에는 별도 cache 정책이 필요하다
 - 이 폴더를 AWS S3, Nginx, Netlify, Vercel, GitHub Pages 같은 정적 호스팅에 올리면 배포가 끝난다
 
-`dist`가 정적 파일이라는 사실이 핵심이다. **Node.js 없이도 서비스된다.** 1일차에 CSR을 설명하면서 "빈 HTML을 받고 JS가 화면을 그린다"고 했던 구조가 여기서 완결된다. 서버는 파일만 내려주고, 나머지는 전부 브라우저에서 일어난다.
+`dist`가 정적 파일이라는 사실이 핵심이다. **Node.js 없이도 서비스된다.** 1일차에 CSR을 설명하면서 "application shell HTML을 받고 JS가 화면을 그린다"고 했던 구조가 여기서 완결된다. 서버는 파일만 내려주고, 나머지는 전부 브라우저에서 일어난다.
 
 ## 배포
 
@@ -810,12 +810,13 @@ npm run build     # dist 생성
 npm run preview   # dist를 로컬에서 미리보기
 ```
 
-`npm run preview`가 특히 중요하다. **`npm run dev`에서 잘 되던 것이 빌드 후에 깨지는 경우**가 있기 때문이다. 개발 서버는 무번들 ESM이고 프로덕션은 Rollup 번들이라 동작하는 방식 자체가 다르고, 개발 서버의 프록시 설정은 빌드 결과물에 포함되지 않는다. **배포 전에 반드시 `preview`로 한 번 확인한다.**
+`npm run preview`가 특히 중요하다. **`npm run dev`에서 잘 되던 것이 빌드 후에 깨지는 경우**가 있기 때문이다. 개발 서버는 source module을 ESM으로 제공하고 프로덕션은 Rolldown이 번들링하므로 동작하는 방식이 다르며, 개발 서버의 프록시 설정은 빌드 결과물에 포함되지 않는다. **배포 전에 반드시 `preview`로 한 번 확인한다.**
 
 `.gitignore`도 확인 대상이다.
 
 ```text
 .env*
+!.env.example
 dist
 node_modules
 ```
@@ -840,9 +841,9 @@ KMA_API_KEY=your_kma_api_hub_key
 - **`||`가 아니라 `??`.** `0`과 `''`이 유효한 값인 도메인에서 `||`는 조용히 틀린 값을 만든다
 - **`async` 함수는 항상 Promise를 반환하고, 독립적인 요청은 `Promise.all`로 묶는다**
 - **ESLint는 버그, Prettier는 모양.** 겹치는 영역은 `skipFormatting`으로 Prettier에 넘긴다
-- Vite는 개발에서는 무번들 ESM, 프로덕션에서는 Rollup 번들로 **다르게 동작한다.** 그래서 `npm run preview` 확인이 필요하다
-- **`VITE_` 접두사는 "노출하겠다"는 선언이지 보안 장치가 아니다.** 접두사가 없는 변수만 서버에 남는다
-- `dist`는 Node.js 없이 서비스되는 정적 파일 묶음이고, 파일명 해시가 캐싱 문제를 막는다
+- Vite는 개발에서는 source module 중심 ESM, 프로덕션에서는 Rolldown bundle로 **다르게 동작한다.** 그래서 `npm run preview` 확인이 필요하다
+- **`VITE_` 접두사는 "노출하겠다"는 선언이지 보안 장치가 아니다.** 접두사가 없는 변수는 기본적으로 client에 노출되지 않으며, server code에서만 읽고 client bundle에 직접 주입하지 않아야 server에 남는다
+- `dist`는 Node.js 없이 서비스되는 정적 파일 묶음이고, 파일명 해시가 asset의 stale cache를 줄인다
 - SPA를 정적 호스팅에 올리면 **새로고침 404**를 만난다. 모든 경로를 `index.html`로 보내되 API 경로는 예외로 둔다
 
 4일간의 흐름을 한 줄로 되짚으면 이렇다.

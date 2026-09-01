@@ -70,7 +70,7 @@ public IngestResult ingest(Resource file, String docType, String dept) {
 
 `TikaDocumentReader` 하나가 PDF·DOCX·HTML·TXT를 다 읽는다는 점이 편했다. 형식별 Reader를 고르는 분기가 없다.
 
-`vectorStore.add(enriched)`에 임베딩 호출이 보이지 않는 것도 짚어 둘 만하다. `VectorStore`가 내부적으로 `EmbeddingModel`을 부른다. 그래서 임베딩 모델 설정이 빠지면 이 줄에서 조용히 실패한다.
+`vectorStore.add(enriched)`에 임베딩 호출이 보이지 않는 것도 짚어 둘 만하다. `VectorStore`가 내부적으로 `EmbeddingModel`을 부른다. 임베딩 모델 설정이 빠지면 관련 빈을 만들 때 기동이 실패하거나 이 호출에서 예외가 전파되며, 조용히 넘어가지 않는다.
 
 ## 함정 ①: 재색인 없이 add만 반복
 

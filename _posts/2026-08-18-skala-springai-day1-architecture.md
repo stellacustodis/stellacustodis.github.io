@@ -202,18 +202,17 @@ dependencyManagement {
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
-| 기동은 되는데 호출하면 502 | 환경변수 미설정 — 키는 부를 때 검사한다 | `export OPENAI_API_KEY=...` 후 재시작 |
-| 401 Unauthorized | 키 오류·만료·결제 미등록 | 콘솔에서 키·크레딧 확인 |
-| 429 Too Many Requests | 레이트 리밋 | 동시 호출 축소 후 재시도 |
-| 한글이 깨진다 | 인코딩 불일치 | `files.encoding: utf8`, 터미널도 UTF-8 |
+| 기동 중 OpenAI 빈 생성 실패 | 환경변수 미설정 — 1.1.8 자동 구성은 빈 생성 때 키를 검사한다 | `export OPENAI_API_KEY=...` 후 재시작 |
+| 401 Unauthorized | 키 오류·폐기·권한 또는 조직/프로젝트 불일치 | 키·조직·프로젝트와 권한 확인 |
+| 429 Too Many Requests | 요청 레이트 리밋 또는 크레딧·지출·사용 한도 소진 | 레이트 리밋이면 `Retry-After`에 맞춰 재시도, 한도 오류면 크레딧·한도 조정 |
+| 한글이 깨진다 | 인코딩 불일치 | JVM `-Dfile.encoding=UTF-8`, 컴파일·테스트·터미널도 UTF-8 |
 | 빈 주입 실패 | 메인 클래스 패키지 위치 | 최상위 패키지로 이동 |
 | 임베딩만 실패 | 임베딩 모델 미설정 | `text-embedding-3-small` 설정 확인 |
 
-이 중 첫 줄이 3장 실습의 핵심이었다. 키가 없어도 **기동은 정상적으로 된다.** 문제는 호출 시점에야 드러난다. 그래서 실습은 일부러 고장을 재현하게 한다.
+이 시리즈가 기준으로 삼은 Spring AI 1.1.8에서는 OpenAI 자동 구성이 켜져 있으면 키가 없을 때 **빈 생성 중 기동이 실패한다.** 호출 시점의 401은 키가 잘못됐거나 만료된 경우처럼 자격 증명이 존재하지만 공급자가 거부할 때 드러난다.
 
 ```bash
-unset OPENAI_API_KEY && ./gradlew bootRun     # 기동은 정상. 여기서 속기 쉽다
-curl 'localhost:8080/lab2/name?keyword=AI'    # 502 + traceId  ← 여기서 드러난다
+unset OPENAI_API_KEY && ./gradlew bootRun     # OpenAI 빈 생성 중 기동 실패
 export OPENAI_API_KEY="sk-..." && ./gradlew bootRun   # 되돌리면 정상
 ```
 
@@ -235,7 +234,7 @@ tasks.named('bootRun') { jvmArgs = ['-Dfile.encoding=UTF-8'] }
 - 임베딩은 "뜻이 가까우면 벡터도 가깝다"가 전부다. 단어가 겹치지 않아도 찾는다.
 - 임베딩 테스트는 점수가 아니라 순서를 검증한다.
 - 공급자 교체는 스타터 + `yml`이면 되지만, 고유 옵션을 쓰는 순간 그 코드는 묶인다.
-- 키가 없어도 기동은 된다. 실패는 호출 시점에 드러난다.
+- Spring AI 1.1.8의 OpenAI 자동 구성이 켜져 있으면 키 누락은 기동 시점에 드러난다.
 
 다음 글에서는 `ChatModel` 위에 얹히는 `ChatClient`를 다룬다. 모델을 부르는 창구를 어떻게 만들고, 왜 하나가 아니라 여러 개로 나누는지를 본다.
 

@@ -24,9 +24,8 @@ tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
 
 ## 1. 시드 고정에 대한 Naive한 배경
 
-1. 컴퓨터는 기본적으로 완전한 ‘랜덤’을 구현하지 못하고 ‘의사 랜덤’을 통해 동작하는 것으로 잘 알려져 있음. 즉, 완전한 결정론적인 방식으로 동작함.
-    1. CUDA는 예외적으로 완전 랜덤으로 동작하는 연산들이 있음.
-        1. atomic operation에 대한 배경지식이 있어야함.
+1. 딥러닝 학습에서 사용하는 난수는 대부분 seed로 제어하는 ‘의사 랜덤’임.
+    1. 일부 CUDA 연산은 병렬 실행이나 atomic reduction의 순서가 고정되지 않아 seed와 별개의 비결정성이 생길 수 있음.
 2. 문제는 이 ‘의사 랜덤’에 영향을 주는 요소들이 고정되어 있지 않음.
     1. 당연한 얘기지만 만약 모든게 고정되어 있다면 그때부터 그것은 ‘랜덤’이라고 부르기 어려울 것임.
 3. 컴퓨터의 랜덤성을 제어한다는 것은 ‘의사 랜덤’에 영향을 주는 요소들을 제어한다는 소리임.
@@ -61,15 +60,12 @@ tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
 
 ### gpu에서 일어나는 일
 
-1. 데이터들이 tensor로 변환되어 gpu의 VRAM에 모두 쌓였다고 가정.
-2. gpu가 학습 연산을 한다는 것은 크게 세가지 단계인데
-    1. VRAM의 ‘필요한 tensor’들이 GPU SM(Streaming Multiprocessor)의 L1 Cache로 이동
-    2. L1 Cache에서 연산
-    3. 연산된 결과물이 VRAM에 덮어쓰기됨.
-3. 랜덤성은 이 모든 곳에 존재.
-4. Nvidia에서는 딥러닝 전용 가속 라이브러리로 CuDNN을 제공하는데, 이 안에도 약간의 랜덤성을 통해 속도를 빠르게 하는 라이브러리들이 존재.
+1. 데이터들이 tensor로 변환되어 gpu의 VRAM에 쌓였다고 가정.
+2. gpu 연산은 global memory, cache, shared memory, register 등을 사용하고 CUDA core나 Tensor core에서 실행됨.
+3. 비결정성은 일반적인 메모리 이동 자체가 아니라 난수를 사용하는 연산, backend algorithm 선택, 병렬 실행과 atomic reduction의 순서, 부동소수점 누적 순서 등에서 생김.
+4. Nvidia에서는 딥러닝 전용 가속 라이브러리로 CuDNN을 제공하는데, benchmark 결과에 따라 algorithm을 선택할 수 있고 일부 algorithm은 병렬 연산 순서 때문에 비결정적일 수 있음.
     1. 참고로 CuDNN에는 CNN 전용 가속화 라이브러리들만 있었으나 9.x.x 이후부터는 transformer SDPA가속화가 적용되기 때문에 빠른 속도를 위해서라면 최신 버전을 쓰는 것이 좋습니다.
-5. 즉 ‘완전한 랜덤성 제어’를 위해서는 이 모든 것의 시드를 고정해야 하나 사실상 이것은 불가능에 가까움. 단, 경험상 모든 코드가 이런 엄밀한 제어를 필요로 하는 것은 아니기 때문에 하이레벨부터 순차적으로 적용해보는 것이 좋아 보임.
+5. PyTorch 릴리스, 플랫폼, CPU와 GPU가 달라지면 완전히 같은 결과는 보장되지 않음. 단, 같은 환경에서는 하이레벨부터 순차적으로 비결정성의 원인을 제한해볼 수 있음.
 6. 다행히도 Nvidia에서 제공하는 대부분의 CUDA 파일들은 ‘잘’ 제어되는 것으로 보이나, 일부 필요한 기능들을 .cu, .cpp 코드로 직접 빌드하는 경우 해당 코드에 랜덤성 제어가 잘 이뤄지고 있는지 확인 해야 함.
 
 ### 결론
@@ -91,15 +87,20 @@ tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
 
 ### `set_seed` 함수
 
+`PYTHONHASHSEED`는 python interpreter가 시작될 때 정해지고 `CUBLAS_WORKSPACE_CONFIG`도 CUDA/cuBLAS 초기화 전에 설정해야 한다. 예를 들어 seed를 1234로 사용할 때는 다음처럼 실행하고 `opt.manualSeed`도 1234로 맞춘다.
+
+```bash
+PYTHONHASHSEED=1234 CUBLAS_WORKSPACE_CONFIG=:4096:8 python train.py
+```
+
 ```python
-# main() 최상단에서 제일 먼저 호출할 것.
-# seed 고정이 안되는 거 같으면 train 함수 혹은 해당 코드 상단에 한번 더 호출할 것.
+# main()에서 RNG를 사용하는 객체를 만들기 전에 한 번 호출할 것.
+# 같은 실행 중 반복 호출하면 RNG sequence가 처음으로 되감기므로 반복해서 호출하지 않을 것.
 def set_seed(opt):
 
     if opt.manualSeed is None:
         opt.manualSeed = random.randint(1, 10000)
     print("Random Seed: ", opt.manualSeed)
-    os.environ.setdefault("PYTHONHASHSEED", str(opt.manualSeed))  # 중
     random.seed(opt.manualSeed) # 상
     torch.manual_seed(opt.manualSeed) # 상
     np.random.seed(opt.manualSeed) # 상
@@ -108,12 +109,10 @@ def set_seed(opt):
 
     # Determinism settings (may impact performance)
     if getattr(opt, "deterministic", False):
-        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8") # 상. 안에 숫자를 바꿔도 되는데, 자세한건 gemini에게 물어보자.
-        os.environ.setdefault("CUDNN_DETERMINISTIC", "1") # 중
         torch.backends.cudnn.deterministic = True # 상
         torch.backends.cudnn.benchmark = False # 상
-        torch.backends.cuda.matmul.allow_tf32 = False # 중
-        torch.backends.cudnn.allow_tf32 = False # 중
+        torch.backends.cuda.matmul.allow_tf32 = False # 중. 더 엄격한 수치 일관성을 위한 선택 사항
+        torch.backends.cudnn.allow_tf32 = False # 중. 더 엄격한 수치 일관성을 위한 선택 사항
         try:
             torch.set_num_threads(1) # 하
         except RuntimeError:
@@ -122,10 +121,7 @@ def set_seed(opt):
             torch.set_num_interop_threads(1) # 하
         except RuntimeError:
             pass
-        try:
-            torch.use_deterministic_algorithms(True) # 상
-        except Exception:
-            pass
+        torch.use_deterministic_algorithms(True) # 상. 비결정적 연산은 오류로 알려야 함
 ```
 
 ### `seed_worker`
@@ -160,14 +156,13 @@ def get_dataloader(opt, train_dataset, test_dataset=None):
         train_sampler = None
         test_sampler = None
 
-    # RNG를 위해서 Generator를 만들어 놓는게 안전함.
-    # Generator가 없다면, 코드를 수정했을 때 dataset 분할이 다르게 이루어지고
-    # num_workers를 수정하면서 더 많은 workers를 할당했을 때 worker마다 모든 데이터 증강이
-    # 똑같아지는 문제(같은 시드를 넣었으니 당연)가 발생할 수 있음.
-    # 따라서 전역 RNG는 seed로 먼저 통제하고 Generator로 세세한 부분까지 통제하는 것이 안전함.
-    # 그래서 위의 seed_worker가 같이 필요함.
-    g = torch.Generator()
-    g.manual_seed(opt.manualSeed)
+    # DataLoader 전용 Generator는 RandomSampler의 순서와 worker의 base seed를 통제함.
+    # worker_init_fn은 그 base seed에서 NumPy와 random의 worker별 seed를 설정함.
+    # dataset 분할을 재현하려면 분할 연산에도 별도의 고정 Generator를 전달해야 함.
+    train_generator = torch.Generator()
+    train_generator.manual_seed(opt.manualSeed)
+    test_generator = torch.Generator()
+    test_generator.manual_seed(opt.manualSeed + 1)
 
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
@@ -177,24 +172,31 @@ def get_dataloader(opt, train_dataset, test_dataset=None):
         num_workers=int(opt.workers),
         drop_last=True,
         worker_init_fn=seed_worker,
-        generator=g,
+        generator=train_generator,
     )
 
     if test_dataset is not None:
         test_dataloader = torch.utils.data.DataLoader(
-            train_dataset,
+            test_dataset,
             batch_size=opt.bs,
             sampler=test_sampler,
             shuffle=False,
             num_workers=int(opt.workers),
             drop_last=False,
             worker_init_fn=seed_worker,
-            generator=g,
+            generator=test_generator,
         )
     else:
         test_dataloader = None
 
     return train_dataloader, test_dataloader, train_sampler, test_sampler
+```
+
+분산 학습에서 `DistributedSampler`를 사용한다면 epoch마다 다음처럼 호출해야 같은 seed에서 재현 가능하면서도 매 epoch의 shuffle 순서가 달라진다.
+
+```python
+if train_sampler is not None:
+    train_sampler.set_epoch(epoch)
 ```
 
 ---

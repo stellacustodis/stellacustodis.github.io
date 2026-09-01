@@ -929,7 +929,7 @@ $$
 $$
 L(x,v) =
 \sqrt{
-\sum_{i,j}v_iv_j
+\sum_{i,j}v_i^2v_j^2
 \left(
 2L_1^2(x)+\frac12L_2^2(x)
 \right)
@@ -1437,4 +1437,3 @@ DKEF에서는 $M=1$이 기본값이지만 15 seeds, validation patience 200, AIS
 또한 일반 신경망 score estimator가 curl-free가 아닐 수 있다는 각주는 중요하다. 추정된 벡터장이 downstream 엔트로피 그래디언트에 유용할 수는 있어도, 항상 어떤 정규화 가능한 밀도의 로그 gradient로 적분된다고 볼 수는 없다. 밀도 복원까지 요구하는 응용이라면 자유로운 $h$ 대신 energy parameterization이나 integrability 제약이 필요하고, 그 대가로 미분 깊이와 계산량이 늘어난다.
 
 실험 범위에 관한 유보는 한 번만 두는 것이 적절하다. 이 논문은 UCI 표형 데이터, MNIST, CelebA와 fully connected·convolutional 구조에서 가능성을 보였지만, 더 높은 해상도·다른 모달리티·더 큰 score network에서 같은 $M$과 projection 분포가 충분한지는 별도의 검증 문제다. 특히 차원이 커질수록 한 투영이 싸다는 사실과, 원하는 통계적 효율을 위해 작은 $M$이 충분하다는 사실은 서로 다른 주장이다.
-

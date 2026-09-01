@@ -21,7 +21,7 @@ permalink: /posts/skala-vue-day4/
 
 ### 왜 필요한가
 
-3일차에서 정리한 제약을 다시 보자. 형제 컴포넌트끼리는 직접 통신할 수 없고, 계층이 깊어지면 Props Drilling이 발생한다. 여기에 라우터가 더해지면 문제가 더 커진다. **서로 다른 라우트의 화면끼리는 부모-자식 관계조차 아니기 때문에** Props로 데이터를 넘길 방법이 아예 없다.
+3일차에서 정리한 지역적인 Props/Emits 패턴을 다시 보자. 형제 컴포넌트는 공통 부모를 거쳐 통신하고, 계층이 깊어지면 Props Drilling이 발생한다. 여기에 라우터가 더해지면 문제가 더 커진다. **서로 다른 라우트의 화면끼리는 보통 직접적인 부모-자식 관계가 아니기 때문에** 공통 상태를 Props로만 공유하기 어렵다.
 
 Pinia는 컴포넌트 계층 구조와 **무관하게** 별도의 전역 저장소(Store)를 열어 반응형 데이터를 관리한다.
 
@@ -171,6 +171,8 @@ export const useAuthStore = defineStore('auth', () => {
 
 **첫째, `localStorage`와의 동기화.** Pinia의 상태는 메모리에만 있으므로 새로고침하면 사라진다. 1일차에서 SPA의 단점으로 "새로고침 시 상태가 초기화된다"고 했던 그 문제다. 유지되어야 하는 데이터는 `localStorage`에 함께 저장하고, store 초기화 시점에 복원한다.
 
+단, access token을 `localStorage`에 저장하면 같은 origin에서 실행된 XSS가 읽을 수 있다. 이 예제는 동기화 구조를 보여주는 것이며 보편적인 인증 저장 방식은 아니다. 백엔드가 cookie session을 지원한다면 `HttpOnly`, `Secure`, `SameSite` 속성을 적용한 cookie처럼 JavaScript가 읽지 못하는 방식도 검토해야 한다.
+
 **둘째, Navigation Guard와의 연동.** 3일차의 `beforeEach`가 여기서 실제 용도를 갖는다.
 
 ```js
@@ -191,23 +193,23 @@ router.beforeEach((to, from) => {
 
 ### JWT
 
-인증 사례와 함께 나온 내용이다. JWT(JSON Web Token)는 정보를 JSON 객체 형태로 안전하게 주고받기 위한 표준 규격이며, 백엔드가 발급한다.
+인증 사례와 함께 나온 내용이다. JWT(JSON Web Token)는 claim을 JSON 객체 형태로 전달하기 위한 표준 규격이며, 이 인증 예제에서는 백엔드가 발급한다.
 
 ```text
 eyJhbGci... . eyJzdWIi... . d3g4eT...
   Header      Payload      Signature
 ```
 
-점 두 개로 구분된 세 부분으로 구성된다. **중요한 점은 Payload가 Base64로 인코딩되어 있을 뿐 암호화된 것이 아니라는 것이다.** 누구나 디코딩해서 내용을 읽을 수 있으므로 **민감 정보를 넣으면 안 된다.** 서명(Signature)은 내용을 숨기는 게 아니라 **위조되지 않았음을 검증**하는 용도다.
+위 예시는 점 두 개로 구분된 세 부분의 서명된 compact JWT(JWS)다. **중요한 점은 Header와 Payload가 Base64url로 인코딩되어 있을 뿐 암호화된 것이 아니라는 것이다.** 누구나 디코딩해서 내용을 읽을 수 있으므로 **민감 정보를 넣으면 안 된다.** 서명(Signature)은 내용을 숨기는 게 아니라 올바른 key로 서명됐고 이후 변조되지 않았는지 검증하는 용도다. `iss`, `aud`, `exp` 같은 claim의 유효성은 별도로 검증해야 한다. 암호화된 JWT(JWE)의 compact serialization은 다섯 부분으로 구성될 수 있다.
 
-| 구분 | 세션 방식 | JWT 방식 |
+| 구분 | 서버 측 세션 방식 | 자체 포함 서명 토큰 방식 |
 |---|---|---|
-| 저장소 | 서버 메모리/DB | 클라이언트 (State / localStorage) |
-| 서버 부하 | 동시 접속자가 많으면 부담 | 서버에 저장하지 않아 부하가 적음 (Stateless) |
-| 확장성 | 서버 증설 시 세션 공유 설정 필요 (Redis 등) | 서명만 검증하면 되므로 확장 용이 |
-| 적합한 구조 | 전통적 SSR | **SPA + REST API** |
+| 서버 상태 | 서버 메모리/DB 등에 session 상태 보관 | signature와 claim만 검증하면 session 상태 없이도 가능. 단, revoke 목록 등을 두면 상태가 생김 |
+| 클라이언트가 보관하는 값 | 보통 session ID cookie | cookie, 메모리 등 architecture에 맞게 선택 |
+| 확장 | 서버 증설 시 session 공유 설정 필요 (Redis 등) | 무상태 검증 구성이면 수평 확장이 단순할 수 있음 |
+| 렌더링 구조 | SSR·SPA 모두 사용 가능 | SSR·SPA 모두 사용 가능 |
 
-토큰은 HTTP 요청의 `Authorization` 헤더에 `Bearer` 타입으로 실어 보낸다.
+Bearer access token을 사용하는 경우에는 보통 HTTP 요청의 `Authorization` 헤더에 실어 보낸다.
 
 ```text
 GET /api/user/profile HTTP/1.1
@@ -263,7 +265,7 @@ Composable은 "반응형 상태와 로직을 묶어 재사용 가능하게 만�
 
 ### REST API 복습
 
-HTTP 메서드는 데이터베이스의 CRUD와 대응된다.
+REST API에서는 HTTP 메서드를 데이터베이스의 CRUD와 흔히 다음처럼 대응시킨다. 이는 HTTP protocol 자체가 강제하는 규칙은 아니다.
 
 | HTTP 메서드 | CRUD | 의미 |
 |---|---|---|
@@ -282,7 +284,7 @@ URI는 오직 명사(자원)로만 구성한다.
 행위(동사)는 HTTP Method로 대체한다.
 ```
 
-> HTTP 요청·응답 구조와 상태 코드는 [프론트엔드 1일차 글](/posts/skala-frontend-day1/)에서 정리했다. 4xx는 클라이언트, 5xx는 서버 책임이라는 구분이 여기서 에러 처리의 기준이 된다.
+> HTTP 요청·응답 구조와 상태 코드는 [프론트엔드 1일차 글](/posts/skala-frontend-day1/)에서 정리했다. 4xx는 요청·인증·권한·대상 자원을, 5xx는 서버의 요청 처리 실패를 먼저 확인하는 것이 에러 처리의 기준이 된다.
 {: .prompt-info }
 
 ### Fetch API vs Axios
@@ -294,8 +296,8 @@ URI는 오직 명사(자원)로만 구성한다.
 | 설치 | 불필요 (브라우저 내장) | 필요 (`npm install axios`) |
 | JSON 변환 | 수동 (`res.json()`) | **자동** |
 | 에러 핸들링 | 수동 | **자동 (4xx·5xx가 reject됨)** |
-| BaseURL 설정 | 지원 안 함 | **`axios.create`** |
-| 인터셉터 | 지원 안 함 | **지원** |
+| BaseURL 설정 | Axios식 내장 설정 없음. wrapper로 구현 가능 | **`axios.create`** |
+| 인터셉터 | Axios식 내장 기능 없음. wrapper로 구현 가능 | **지원** |
 | 실무 선호도 | 중간 | **매우 높음** |
 
 에러 핸들링 차이가 특히 중요하다. `fetch`는 **404나 500 응답도 "정상적으로 응답을 받았다"고 보고 resolve**되기 때문에 `response.ok`를 직접 확인해야 했다. Axios는 4xx·5xx를 자동으로 reject하므로 `catch`에서 한꺼번에 처리할 수 있다.
@@ -421,10 +423,10 @@ const URL = `https://api.openweathermap.org/data/2.5/weather?...&appid=${API_KEY
 UI 라이브러리는 Button, Input, Dialog, Table 같은 공통 컴포넌트를 Vue 3 컴포넌트로 모듈화해 제공하는 패키지다. 얻는 것은 셋이다.
 
 1. **개발 리소스 절감**: CSS와 마크업을 직접 작성하지 않고 완성된 태그를 호출
-2. **크로스 브라우징·반응형**: 브라우저별·해상도별 대응이 내부적으로 처리됨
-3. **웹 접근성(WAI-ARIA) 준수**: 스크린 리더 인식, 키보드 포커스 제어가 컴포넌트 레벨에서 이미 구현됨
+2. **크로스 브라우징·반응형 지원**: 라이브러리가 지원하는 브라우저와 layout pattern을 활용
+3. **접근성 구현 지원**: 여러 컴포넌트에 ARIA와 키보드 조작 pattern이 구현되어 있음
 
-세 번째가 특히 크다. 직전 과정에서 접근성을 다루면서 "모든 것을 `<div>`로 만들고 CSS로 모양만 흉내 내면 접근성 작업이 별도로 필요해진다"고 했는데, 잘 만들어진 UI 라이브러리는 그 작업을 대신해 준다. 직접 만든 드롭다운이 키보드로 조작되지 않는 것은 흔한 일이다.
+세 번째가 특히 크다. 직전 과정에서 접근성을 다루면서 "모든 것을 `<div>`로 만들고 CSS로 모양만 흉내 내면 접근성 작업이 별도로 필요해진다"고 했는데, 잘 만들어진 UI 라이브러리는 그 작업을 줄여 준다. 다만 지원 정도는 component와 version마다 다르므로 target browser, keyboard, screen reader로 직접 검증해야 한다.
 
 ### 라이브러리 비교
 
@@ -436,7 +438,7 @@ UI 라이브러리는 Button, Input, Dialog, Table 같은 공통 컴포넌트를
 | 특화 컴포넌트 | Mobile Layout | **Data Table, Form Validation** | Advanced Chart, Tree Table |
 | 태그 예시 | `<v-btn>` | `<el-button>` | `<Button>` |
 
-글로벌 시장에서는 PrimeVue와 Vuetify의 점유율이 높지만, **국내에서는 Element Plus의 점유율이 높고 학습 난이도가 가장 낮다.**
+이 과정에서는 Enterprise Desktop UI에 필요한 Data Table과 Form component를 빠르게 적용하기 위해 Element Plus를 선택했다.
 
 ### 설치와 전역 등록
 
@@ -518,7 +520,7 @@ ElMessage.success('가입이 완료되었습니다.')
 ElMessageBox.confirm('파일을 영구히 삭제하시겠습니까?', '최종 경고', {
   confirmButtonText: '삭제',
   cancelButtonText: '취소',
-  type: 'danger',
+  type: 'warning',
 })
   .then(() => ElMessage.success('삭제되었습니다.'))
   .catch(() => ElMessage.info('취소되었습니다.'))
@@ -566,7 +568,7 @@ import ko from 'element-plus/es/locale/lang/ko'
 - Axios는 JSON 자동 변환, 자동 에러 reject, BaseURL, **인터셉터**를 제공한다. 인터셉터가 Axios를 쓰는 핵심 이유다
 - `try / catch / finally`에서 `finally`로 로딩을 해제한다
 - **API 키는 소스에 넣지 않는다.** 환경 변수도 `VITE_` 접두사를 쓰면 번들에 노출된다
-- UI 라이브러리는 개발 속도뿐 아니라 **접근성**을 함께 가져다준다
+- UI 라이브러리는 개발 속도를 높이고 접근성 구현을 도와주지만 component별 검증은 필요하다
 - 통신이 들어오면 로딩·성공·빈 결과·실패 네 가지 상태를 모두 처리해야 한다
 
 이제 기능은 대부분 갖춰졌다. 남은 것은 **완성된 것을 실제로 배포하는 일**이다. 이어지는 빌드·배포 파트에서 Modern JavaScript 문법을 정리하고, Vite 빌드와 환경 변수, ESLint·Prettier, 그리고 배포까지 다룬다.

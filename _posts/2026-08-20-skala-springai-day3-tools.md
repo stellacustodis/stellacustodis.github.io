@@ -121,7 +121,7 @@ curl 'localhost:8080/lab10/ask?q=더운데 점심 뭐 먹지'  # 날씨 + 점심
 
 그다음이 실습의 핵심이다. **설명을 `"점심 추천"` 네 글자로 줄이면 도구를 잘 안 부른다.** 코드는 한 줄도 바꾸지 않았는데 동작이 달라진다. 설명을 되돌리면 다시 불린다.
 
-교재의 진단표에도 같은 항목이 첫 줄에 있다. **"도구가 안 불린다"의 90%는 설명 문제다.** 함수 이름을 바꾸기 전에 설명을 먼저 고치라는 것이다.
+교재의 진단표에도 같은 항목이 첫 줄에 있다. **도구가 안 불리면 설명을 가장 먼저 확인한다.** 함수 이름을 바꾸기 전에 설명을 먼저 고치라는 것이다.
 
 설명에 무엇을 쓸지도 구체적이다. "무엇을 하는가"가 아니라 **"언제 쓰는가"**를 쓴다. 사용자가 할 법한 표현을 예시로 넣는 것이 효과적이다.
 
@@ -157,17 +157,18 @@ private Optional<Order> findOwned(String orderId, String userId) {
 /** 사용자 ID 는 프롬프트가 아니라 ToolContext 로 온다 — 모델이 바꿔 부를 수 없는 경로다. */
 private String currentUser(ToolContext context) {
     Object userId = context == null ? null : context.getContext().get("userId");
-    if (userId == null) {
+    if (!(userId instanceof String value) || value.isBlank()) {
         throw new IllegalStateException("toolContext 에 userId 가 없다 — 호출부 설정을 확인하라");
     }
-    return userId.toString();
+    return value;
 }
 ```
 
 호출부에서 `toolContext`로 주입한다.
 
 ```java
-public String ask(String question, String userId) {
+public String ask(String question, Principal principal) {
+    String userId = principal.getName();
     return chat.prompt()
             .user(question)
             .tools(weatherTools, orderTools)
@@ -179,6 +180,8 @@ public String ask(String question, String userId) {
 ```
 
 `userId`를 `@ToolParam`으로 받으면 모델이 그 값을 정하게 된다. 사용자가 `"user2의 99999를 조회해줘"`라고 말하면 모델은 순순히 `userId="user2"`로 부를 수 있다. `ToolContext`는 스키마에 포함되지 않으므로 모델은 그런 파라미터가 있다는 사실조차 모른다.
+
+여기서도 `ToolContext`에 넣을 값은 요청 body나 query parameter가 아니라 인증된 `Principal`·SecurityContext에서 꺼내야 한다. 모델이 바꾸지 못하는 통로라는 사실과, 호출자가 신뢰할 수 있는 값을 넣었다는 사실이 함께 성립해야 경계가 닫힌다.
 
 `currentUser()`가 `userId`가 없을 때 예외를 던지는 것도 의도적이다. 조용히 `null`로 진행하면 소유자 비교가 통과해 버릴 수 있다. **설정 실수를 실행 시점에 드러낸다.**
 
@@ -223,7 +226,7 @@ class OrderToolsTest {
 
 두 번째 테스트가 첫 번째와 같은 문구를 단언한다는 점이 중요하다. **두 경우의 응답이 같아야 한다는 것 자체가 검증 대상**이다.
 
-교재는 도구 테스트의 90%가 모델 없이 된다고 정리한다.
+도구 자체의 계약은 대부분 모델 없이 직접 테스트할 수 있다.
 
 | 무엇을 | 어떻게 | 모델 호출 |
 |---|---|---|
@@ -288,6 +291,7 @@ DB 엔티티를 그대로 반환하면 토큰만 먹고 정확도는 떨어진�
 ```java
 @Tool(description = "사용자의 최근 주문 목록을 조회한다. 최대 5건까지 반환한다.")
 public String recentOrders(ToolContext context) {
+    String userId = currentUser(context);
     List<Order> mine = ORDERS.values().stream()
             .filter(o -> o.ownerId().equals(userId))
             .sorted((a, b) -> b.eta().compareTo(a.eta()))
@@ -330,9 +334,9 @@ public Map<String, Object> askVerbose(String question, String userId) {
 logging.level.org.springframework.ai.tool: DEBUG
 ```
 
-## 병렬 도구 호출
+## 한 응답의 다중 도구 호출
 
-모델은 한 번에 여러 도구를 동시에 부르겠다고 응답할 수 있다. `"서울이랑 부산 날씨 둘 다 알려줘"`면 `currentWeather`를 두 번 부른다.
+모델은 한 응답에 여러 도구 호출을 함께 반환할 수 있다. `"서울이랑 부산 날씨 둘 다 알려줘"`면 `currentWeather` 호출 두 건이 한 번에 온다.
 
 ```text
 모델 응답(1차) — tool_calls 두 건이 한 번에 온다
@@ -340,9 +344,9 @@ logging.level.org.springframework.ai.tool: DEBUG
     {name: currentWeather, args: {city: "부산"}} ]
 ```
 
-우리 코드는 그냥 `@Tool` 메서드일 뿐이라 별도 처리가 필요 없다. 다만 조건이 있다.
+우리 코드는 그냥 `@Tool` 메서드일 뿐이라 별도 처리가 필요 없다. Spring AI 1.1.8의 기본 `DefaultToolCallingManager`는 이 호출들을 `for` 루프로 순서대로 실행한다.
 
-> 도구가 상태를 바꾸면 병렬 호출이 위험하다. 조회 도구는 안전하지만, 쓰기 도구는 같은 자원에 동시에 닿을 수 있다 — 멱등성을 확보하거나 순차 실행을 강제하라.
+> 별도 실행기를 붙여 병렬화한다면 상태 변경 도구가 같은 자원에 동시에 닿을 수 있다. 그 경우 멱등성을 확보하거나 순차 실행을 강제한다.
 {: .prompt-warning }
 
 ## ReAct: 도구 호출을 여러 스텝 잇는다
@@ -389,12 +393,12 @@ public String runAgent(String goal, String userId) {
 
 | 구성 | 형태 | 적합 | 주의 |
 |---|---|---|---|
-| 단일 에이전트 | 도구 5~7개 | **대부분의 경우** | 도구가 늘면 정확도 하락 |
+| 단일 에이전트 | 교재에서는 도구 5~7개로 시작 | **작은 도구 집합** | 실제 한계는 모델·schema·도구 유사도에 따라 달라짐 |
 | 감독자형 | 라우터가 전문가에게 위임 | 업무 영역이 뚜렷이 갈릴 때 | 라우팅 오류가 전체를 망친다 |
 | 순차 파이프라인 | 역할을 순서대로 통과 | 단계가 정해진 업무 | 단계마다 지연이 누적 |
 | 병렬 + 통합 | 여러 관점을 동시에 낸 뒤 합침 | 리뷰 · 다면 분석 | 비용이 배수로 는다 |
 
-**도구 5~7개를 넘어가면** 단일 에이전트의 선택 정확도가 떨어지기 시작한다. 그때가 나눌 시점이지, 처음부터 멀티 에이전트로 시작할 이유는 없다는 것이다.
+도구가 늘면 비슷한 설명 사이에서 선택이 어려워질 수 있다. **5~7개는 교재의 시작 기준이지 보편 임계값은 아니다.** 실제 질문으로 tool-selection 정확도와 schema token 비용을 측정해 떨어지기 시작할 때 나누면 된다.
 
 ## MCP: 도구를 붙이는 표준
 
@@ -448,13 +452,13 @@ MCP는 이름·설명·스키마로 도구를 기술하는 방식을 표준화�
 ## 정리
 
 - 모델은 함수를 실행하지 않는다. 무엇을 부를지 알려 줄 뿐이고 실행은 우리 코드다.
-- 모델이 보는 것은 이름·설명·파라미터 스키마뿐이다. "도구가 안 불린다"의 90%는 설명 문제다.
+- 모델이 보는 것은 이름·설명·파라미터 스키마뿐이다. 도구가 안 불리면 설명과 schema를 먼저 확인한다.
 - 설명에는 "무엇을 하는가"가 아니라 "언제 쓰는가"를 쓴다.
-- 사용자 ID는 `@ToolParam`이 아니라 `ToolContext`로 넘긴다. 스키마에 없으므로 모델이 바꿔 부를 수 없다.
+- 사용자 ID는 `@ToolParam`이 아니라 인증된 `Principal`에서 꺼내 `ToolContext`로 넘긴다. 스키마에 없으므로 모델이 바꿔 부를 수 없다.
 - 없는 주문과 남의 주문은 같은 문구로 응답한다. 구분하면 존재 여부가 새어 나간다.
 - 예외를 던지지 말고 메시지를 돌려준다. 단, "다시 시도해 보세요"는 모델의 재호출을 유도한다.
 - 반환값은 모델이 읽을 문장으로. 엔티티 통째로는 토큰만 먹는다.
-- 도구 테스트의 90%는 모델 없이 된다. 특히 권한 검증은 직접 호출로 확인한다.
+- 도구의 입력 검증·권한·반환 형식은 모델 없이 직접 테스트할 수 있다. 도구 선택만 별도의 모델 호출로 확인한다.
 - 에이전트 루프에는 반복·토큰·시간 세 종류의 상한을 건다.
 
 다음 글에서는 이 힘을 통제하는 장치들, 감사 로깅과 인가와 승인 게이트를 다룬다.

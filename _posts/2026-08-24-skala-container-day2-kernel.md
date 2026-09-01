@@ -36,9 +36,9 @@ description: "namespace·cgroup·OverlayFS·Capabilities가 각각 무엇을 격
 |---|---|
 | **PID** | 컨테이너마다 별도의 프로세스 테이블. 컨테이너 안에서 PID 1부터 시작하고, 다른 컨테이너의 프로세스에 접근할 수 없다 |
 | **Network** | veth, IP 주소, 포트 번호, 라우팅 테이블, 필터링 테이블 |
-| **UID/GID (USER)** | User ID와 Group ID 공간. 외부의 user·group이 내부를 보거나 건드릴 수 없다 |
+| **UID/GID (USER, 사용 시)** | 컨테이너 UID/GID를 호스트의 다른 UID/GID 범위에 매핑한다. Docker에서는 `userns-remap`이나 rootless 모드 등으로 사용한다 |
 | **Mount** | 파일시스템 트리. 컨테이너마다 특정 디렉터리를 루트(rootfs)로 보이게 한다 |
-| **UTS** | hostname과 domain name. `/etc/hosts`, `/etc/resolv.conf`, `/etc/hostname` 분리 |
+| **UTS** | hostname과 NIS domain name. `/etc/hosts`, `/etc/resolv.conf`, `/etc/hostname`은 Docker가 별도 마운트·설정으로 제공한다 |
 | **IPC** | 공유 메모리, 큐, 세마포어 등 프로세스 간 통신 자원 |
 
 **PID 네임스페이스가 [1일차 ④](/posts/skala-container-day1-volume-signal/)의 PID 1 이야기와 이어진다.** 컨테이너 안에서 `ps -ef`를 쳤을 때 PID 1이 보이는 것은 그 컨테이너만의 프로세스 테이블이 따로 있기 때문이다. 호스트에서 보면 같은 프로세스가 전혀 다른 PID를 갖는다.
@@ -49,7 +49,7 @@ description: "namespace·cgroup·OverlayFS·Capabilities가 각각 무엇을 격
 
 ## cgroups — 쓸 수 있는 양을 나눈다
 
-namespace가 "무엇이 보이는가"라면 cgroups는 "얼마나 쓸 수 있는가"다. 동일 그룹에 속한 프로세스 집합에 대해 CPU, Memory, I/O 사용량을 제한·격리·모니터링한다.
+namespace가 "무엇이 보이는가"라면 cgroups는 "얼마나 쓸 수 있는가"다. 동일 그룹에 속한 프로세스 집합에 대해 CPU, Memory, I/O 사용량을 제한·격리·모니터링한다. 아래 컨트롤러 이름은 cgroup v1 기준이고, v2는 단일 계층에서 `cpu.*`·`memory.*`·`io.*` 같은 인터페이스를 쓴다.
 
 | 항목 | 기능 |
 |---|---|
@@ -192,7 +192,7 @@ spec:
 
 동일한 파일이 양쪽에 있으면 **upperdir이 우선**한다. 사용자에게는 하나의 디렉터리처럼 보이고, 실제로는 여러 레이어를 OverlayFS가 조합한다.
 
-이것이 **여러 컨테이너가 같은 이미지를 공유하면서도 서로 간섭하지 않는 이유**다. lowerdir은 공유하고 upperdir만 각자 갖는다. 그래서 컨테이너 하나 더 띄우는 비용이 거의 없다.
+이것이 **여러 컨테이너가 같은 이미지를 공유하면서도 서로 간섭하지 않는 이유**다. lowerdir은 공유하고 upperdir만 각자 갖는다. 그래서 이미지를 통째로 복제하는 것보다 추가 저장 비용이 작다. 컨테이너를 실행하면 프로세스의 메모리·CPU와 namespace·cgroup 같은 런타임 비용은 별도로 든다.
 
 ### 파이썬 venv와는 무엇이 다른가
 
@@ -235,7 +235,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 ## 실습: OverlayFS를 직접 마운트해 보기
 
-말로 들으면 추상적이므로 직접 마운트한다. 커널 기능을 만져야 하므로 `--privileged`가 필요하다.
+말로 들으면 추상적이므로 직접 마운트한다. OverlayFS 마운트에 필요한 핵심 권한은 `CAP_SYS_ADMIN`이고, 아래 실습은 편의상 그보다 훨씬 넓은 `--privileged`를 쓴다.
 
 ```bash
 docker run --rm -it --privileged ubuntu:24.04 /bin/bash
@@ -304,17 +304,15 @@ cat /mnt/ovtest/merged/a.txt  # upper 쪽 내용이 보인다
 `b.txt`는 건드리지 않았으므로 upper에 나타나지 않는다. 필요할 때만 복사된다.
 
 {: .prompt-info }
-> 실제 컨테이너에서는 이 구조가 다음 경로에 만들어진다.
+> containerd overlayfs snapshotter에서는 이 구조가 다음처럼 나뉜다.
 > ```text
-> /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/<id>/fs/
-> ├── lowerdir/   ← 읽기 전용 레이어들 (이미지)
-> ├── upperdir/   ← 컨테이너 실행 중 변경사항
-> ├── workdir/    ← OverlayFS 내부 작업 공간
-> └── merged/     ← 병합 결과 → 이것이 컨테이너의 rootfs
+> /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/<id>/
+> ├── fs/         ← 해당 snapshot의 파일시스템 (active snapshot이면 upperdir)
+> └── work/       ← active snapshot의 OverlayFS 작업 공간
 > ```
-> `runc`는 `pivot_root`로 이 `merged` 디렉터리를 컨테이너의 루트(`/`)로 전환한다.
+> 부모 snapshot들의 `fs/`는 lowerdir로, active snapshot의 `fs/`와 `work/`는 upperdir·workdir로 지정된다. 병합 결과는 runtime의 task rootfs 경로에 마운트되고, `runc`는 그 마운트 지점을 컨테이너의 루트(`/`)로 전환한다.
 
-이 대목에서 **컨테이너를 지우면 데이터가 사라지는 이유**가 분명해진다. 변경분은 전부 upperdir에 있고, 컨테이너를 지우면 upperdir이 사라진다. lowerdir(이미지)은 남는다. [1일차 ④](/posts/skala-container-day1-volume-signal/)에서 볼륨이 필요했던 이유가 이것이다. **볼륨은 이 오버레이 바깥에 붙는다.**
+이 대목에서 **컨테이너를 지우면 데이터가 사라지는 이유**가 분명해진다. 변경분은 active snapshot의 `fs/`, 즉 upperdir에 있고 컨테이너를 지우면 이 snapshot이 사라진다. lowerdir(이미지)은 남는다. [1일차 ④](/posts/skala-container-day1-volume-signal/)에서 볼륨이 필요했던 이유가 이것이다. **볼륨은 이 오버레이 바깥에 붙는다.**
 
 ## 정리: 두 축
 

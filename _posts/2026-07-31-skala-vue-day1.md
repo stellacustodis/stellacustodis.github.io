@@ -19,16 +19,16 @@ permalink: /posts/skala-vue-day1/
 
 **MPA(Multi Page Application)**는 전통적인 방식이다. 사용자가 메뉴를 클릭할 때마다 서버에 새 HTML 파일을 요청하고, 브라우저는 페이지 전체를 새로 그린다.
 
-**SPA(Single Page Application)**는 서버로부터 **오직 하나의 `index.html`만** 받아온다. 이후의 화면 전환은 JavaScript가 처리한다.
+**SPA(Single Page Application)**는 보통 하나의 application shell HTML을 받아온 뒤 이후의 화면 전환을 JavaScript가 처리한다.
 
 | 구분 | MPA | SPA |
 |---|---|---|
-| 페이지 구성 | 요청마다 새 HTML을 서버에서 전송 | 초기에 하나의 HTML + 대용량 JS 로딩 |
+| 페이지 구성 | 이동할 때 새 문서를 요청 | 초기에 application shell HTML + JS 로딩 |
 | 페이지 전환 | 서버 요청 → 전체 새로고침 | 클라이언트에서 필요한 부분만 변경 |
-| 렌더링 주체 | 서버 (SSR) | 브라우저 (CSR) |
-| 속도 | 초기 로딩 빠름, 전환 느림 | 초기 로딩 느림, **전환 매우 빠름** |
+| 렌더링 방식 | SSR·정적 HTML·CSR 모두 가능 | CSR뿐 아니라 SSR 후 hydration도 가능 |
+| 속도 | 문서 이동마다 로딩 발생 | 첫 로딩과 전환 속도는 bundle·cache·SSR 구성에 따라 달라짐 |
 | 새로고침(F5) | 자연스럽게 동작 | 앱이 다시 로딩되어 상태가 초기화될 수 있음 |
-| SEO | 유리 | 불리 (보완 가능) |
+| SEO | 문서별 HTML을 제공하기 쉬움 | CSR만 쓰면 보완이 필요할 수 있으며 SSR·SSG 사용 가능 |
 | 기술 스택 | JSP, PHP, Spring MVC | Vue, React, Angular + REST API |
 
 ### CSR과 SSR
@@ -41,12 +41,12 @@ permalink: /posts/skala-vue-day1/
 | 비교 항목 | CSR (기본 Vue / SPA) | SSR (Vue + Nuxt.js) |
 |---|---|---|
 | HTML 완성 주체 | 브라우저 | 웹 서버 |
-| 초기 전송 데이터 | 빈 HTML + 대용량 JS | 데이터가 결합된 완성 HTML |
-| 초기 화면 표시 | 느림 (JS 다운로드·실행 대기) | 매우 빠름 |
-| 페이지 이동 | 매우 빠름 | 다소 느림 |
-| SEO | 불리 (봇이 빈 화면으로 인식 가능) | 강력함 |
+| 초기 전송 데이터 | application shell 또는 미리 렌더링된 HTML + JS | 데이터가 결합된 HTML + hydration용 JS |
+| 초기 화면 표시 | JS와 bundle 크기에 영향을 받음 | 서버 응답과 hydration 비용에 영향을 받음 |
+| 페이지 이동 | client router 구성에 따라 빠르게 전환 가능 | hydration 뒤에는 client router로 빠르게 전환 가능 |
+| SEO | 순수 CSR이면 crawler 처리에 의존 | 내용이 담긴 HTML을 바로 제공 가능 |
 
-SPA의 SEO 취약점은 구조에서 나온다. 검색 로봇이 접속했을 때 서버가 내려주는 것은 `<div id="app"></div>`뿐인 빈 껍데기이기 때문이다. 내용은 JS가 실행된 뒤에야 채워진다.
+순수 CSR SPA의 SEO 취약점은 구조에서 나온다. 서버가 `<div id="app"></div>` 같은 application shell만 내려주면 내용은 JS가 실행된 뒤에야 채워진다. SPA도 SSR·SSG·prerendering을 사용하면 내용이 담긴 HTML을 먼저 제공할 수 있다.
 
 ### SPA를 구성하는 도구들
 
@@ -67,18 +67,18 @@ SPA는 Vue 하나로 완성되지 않는다. 이번 과정에서 배울 네 가�
 
 브라우저의 **실제 DOM 조작은 비싸다.** DOM이 수정되면 브라우저는 레이아웃을 다시 계산하고(Reflow) 화면을 다시 칠한다(Repaint).
 
-문제는 이 비용이 조작 횟수에 비례한다는 점이다. 직접 DOM을 조작하는 방식에서는 데이터가 10번 바뀌면 렌더링 연산도 10번 발생한다. 노드가 수천 개인 화면에서 이런 조작이 반복되면 눈에 띄게 느려진다.
+이 비용은 변경 종류와 layout·paint 발생 여부에 따라 달라진다. 직접 DOM을 조작하는 방식에서 불필요한 변경을 반복하면 노드가 많은 화면일수록 눈에 띄게 느려질 수 있다.
 
 Vue는 **Virtual DOM**을 사이에 둔다. 메모리상에 존재하는 가벼운 가짜 DOM이다.
 
 ```text
-데이터 변경 → Virtual DOM에서 변경점 계산 → 최소한의 실제 DOM만 수정
+데이터 변경 → Virtual DOM에서 변경점 계산 → 필요한 실제 DOM을 patch
 ```
 
 여기서 얻는 것은 두 가지다.
 
 1. **최소 조작 지점 자동 추적**: 개발자가 "무엇이 바뀌었으니 어디를 고쳐라"를 지정하지 않아도 된다. 상태만 선언하면 Vue가 차이를 계산한다
-2. **배치(Batch) 처리**: 한 이벤트 안에서 데이터가 여러 번 바뀌어도, 모두 끝난 시점에 **단 한 번만** 실제 DOM에 반영한다
+2. **배치(Batch) 처리**: 같은 tick에서 일어난 여러 상태 변경을 모아 다음 update cycle에 반영한다
 
 ### 양방향 데이터 바인딩
 
@@ -94,7 +94,7 @@ Vue는 **Virtual DOM**을 사이에 둔다. 메모리상에 존재하는 가벼�
 
 ### MVVM 패턴
 
-Vue는 MVVM(Model-View-ViewModel) 아키텍처 패턴을 따른다.
+Vue의 동작은 MVVM(Model-View-ViewModel) 관점으로 설명할 수 있다.
 
 | 구성 | Vue에서의 실체 |
 |---|---|
@@ -102,7 +102,7 @@ Vue는 MVVM(Model-View-ViewModel) 아키텍처 패턴을 따른다.
 | **View** | 사용자에게 보이는 화면. `<template>`과 `<style>` 영역 |
 | **ViewModel** | 둘 사이의 중재자. Vue 엔진과 `<script>`가 담당하며, DOM 이벤트 감지와 데이터 바인딩을 수행 |
 
-핵심은 **UI를 그리는 부분과 데이터 처리 로직이 완전히 분리된다**는 것이다. 앞선 과정에서 "구조·표현·동작의 분리"를 반복해서 강조했는데, MVVM은 그 원칙을 프레임워크 차원에서 강제하는 구조라고 볼 수 있다.
+핵심은 **UI와 데이터 처리 로직의 역할을 구분한다**는 것이다. Vue가 엄격한 MVVM 구조를 강제하는 것은 아니며, SFC는 서로 관련된 template·logic·style을 한 파일에 모은다.
 
 ## 개발 환경
 
@@ -141,11 +141,11 @@ brew install node
 
 **Vite**는 이 중 Bundler와 Build Tool 역할을 하며, 구체적으로는 세 가지를 한다.
 
-- **Compile**: `.vue`나 TypeScript를 순수 HTML/JS/CSS로 변환
+- **Compile**: `.vue` template을 JavaScript render function으로 변환하고 style을 추출하거나 주입
 - **개발 서버**: HMR로 코드 변경을 실시간 반영
 - **Bundling**: 수백 개의 파일을 배포용으로 압축해 묶음
 
-> Vue-CLI + Webpack 조합은 Vite 이전 기술이며 현재는 사용하지 않는다.
+> Vue CLI는 maintenance mode이며 새 프로젝트에는 `create-vue`와 Vite가 권장된다. 기존 Vue CLI + Webpack 프로젝트는 여전히 유지보수될 수 있다.
 {: .prompt-info }
 
 ### 프로젝트 생성
@@ -333,7 +333,7 @@ const vueCount = ref(0)    // 반응성 변수
 - `ref`로 감싼 변수는 누르는 즉시 화면이 갱신된다
 - 반응성 변수를 눌러 화면이 다시 그려지는 순간, 그동안 누적된 일반 변수의 값도 함께 반영된다
 
-세 번째 현상이 중요하다. 일반 변수의 값이 안 바뀐 게 아니라 **화면을 다시 그릴 이유가 없었을 뿐**이다. Vue는 `ref`로 감싼 데이터만 추적하고, 그 데이터가 바뀔 때만 렌더링을 다시 수행한다. 이것이 "데이터를 바꾸면 화면이 따라온다"의 실제 동작이다.
+세 번째 현상이 중요하다. 일반 변수의 값이 안 바뀐 게 아니라 **화면을 다시 그릴 이유가 없었을 뿐**이다. Vue는 `ref`, `reactive`, computed, props 같은 반응형 의존성을 추적하지만 이 예제의 일반 변수는 추적하지 않는다. 이것이 "데이터를 바꾸면 화면이 따라온다"의 실제 동작이다.
 
 > `<script>` 안에서는 `count.value`로 접근하지만, `<template>` 안에서는 `.value` 없이 {% raw %}`{{ count }}`{% endraw %}로 쓴다. Vue가 템플릿에서 자동으로 언래핑하기 때문이다. 처음에는 이 비대칭이 헷갈린다.
 {: .prompt-warning }
@@ -412,7 +412,7 @@ const rawHtmlData = '이 글자는 <span style="color:red;">빨간 글자</span>
 > **사용자 입력을 `v-html`에 넣지 않는다.** 직전 과정에서 `innerHTML` 대신 `textContent`를 쓰라고 한 것과 정확히 같은 이야기다. Vue를 쓴다고 XSS가 사라지지 않는다.
 {: .prompt-danger }
 
-`v-text`는 `element.innerText`와 동일하며, 보간법 {% raw %}`{{ }}`{% endraw %}과 결과가 같아서 실무에서는 보간법을 쓴다.
+`v-text`는 `element.textContent`를 설정하며, 보간법 {% raw %}`{{ }}`{% endraw %}과 결과가 같아서 실무에서는 보간법을 쓴다.
 
 ### v-bind
 
@@ -547,7 +547,7 @@ const user = ref({ name: '홍길동', age: 25, role: '개발자' })
 
 #### :key에 무엇을 넣을 것인가
 
-`v-for`에는 반드시 `:key`를 바인딩해야 한다. Vue가 각 요소를 고유하게 식별해 Virtual DOM 비교 시 어떤 항목이 추가·삭제·이동됐는지 판단하는 근거이기 때문이다.
+`v-for`에는 가능하면 `:key`를 바인딩하는 것이 권장된다. Vue가 각 요소를 고유하게 식별해 Virtual DOM 비교 시 어떤 항목이 추가·삭제·이동됐는지 판단하는 근거이기 때문이다. 상태를 가진 자식 컴포넌트나 DOM을 재정렬하는 목록에서는 안정적인 key가 특히 중요하다.
 
 여기서 흔한 함정이 **배열 인덱스를 key로 쓰는 것**이다.
 
@@ -561,7 +561,7 @@ const user = ref({ name: '홍길동', age: 25, role: '개발자' })
 ```
 {% endraw %}
 
-인덱스를 key로 쓰면 목록 중간에 항목을 삽입하거나 삭제할 때 뒤쪽 항목들의 key가 전부 밀린다. Vue 입장에서는 "3번 항목이 삭제됐다"가 아니라 "3번부터 끝까지 내용이 전부 바뀌었다"로 보이므로, 불필요한 DOM 갱신이 일어나고 입력 중이던 폼 값이 엉뚱한 행으로 옮겨가는 버그가 생긴다.
+인덱스를 key로 쓰면 목록 중간에 항목을 삽입하거나 삭제할 때 뒤쪽 항목들의 key가 전부 밀린다. 항목의 identity와 위치가 분리되지 않아 입력 중이던 폼 값이나 자식 컴포넌트 상태가 엉뚱한 행과 연결되는 버그가 생길 수 있다.
 
 **목록이 정렬되거나 필터링되거나 중간이 삭제될 수 있다면 반드시 고유 ID를 써야 한다.** 과제 요구사항에도 `:key`에 `id`를 바인딩하라고 명시되어 있다.
 
@@ -581,15 +581,13 @@ const user = ref({ name: '홍길동', age: 25, role: '개발자' })
 - **`v-once`**: 약관이나 소개글처럼 절대 바뀌지 않는 데이터에 붙이면, Vue가 더 이상 감시하지 않아 메모리 부담이 준다
 - **`v-memo`**: 지정한 변수가 바뀔 때만 내부를 갱신하고, 아니면 이전 렌더 결과를 재사용한다
 
-`v-cloak`은 조금 성격이 다르다. 네트워크가 느린 환경에서 Vue가 로딩되기 전에 {% raw %}`{{ message }}`{% endraw %} 같은 원본 문자열이 잠깐 노출되는 현상을 막는다. **CSS 속성 선택자와 함께 써야만** 동작한다.
+`v-cloak`은 build step 없는 in-DOM template에서 Vue가 mount되기 전에 {% raw %}`{{ message }}`{% endraw %} 같은 원본 문자열이 잠깐 노출되는 현상을 막는다. **CSS 속성 선택자와 함께 써야만** 동작한다. SFC는 template을 미리 compile하므로 일반적으로 필요하지 않다.
 
 {% raw %}
-```vue
-<template>
-  <div v-cloak>{{ message }}</div>
-</template>
+```html
+<div id="app" v-cloak>{{ message }}</div>
 
-<style scoped>
+<style>
 [v-cloak] { display: none !important; }
 </style>
 ```
@@ -613,9 +611,9 @@ const user = ref({ name: '홍길동', age: 25, role: '개발자' })
 
 1일차를 한 줄로 요약하면 **"화면을 조작하는 대신 화면을 선언한다"**다.
 
-- SPA는 하나의 `index.html` 위에서 JavaScript가 화면을 그리는 구조이고, Vue의 기본은 CSR이다
-- Virtual DOM은 데이터 변경을 모아 **최소한의 실제 DOM 조작**으로 변환한다
-- `ref`로 감싼 데이터만 Vue가 추적한다. 일반 변수는 값이 바뀌어도 화면이 갱신되지 않는다
+- SPA는 보통 하나의 application shell 위에서 JavaScript가 화면을 전환하며, Vue SPA의 기본은 CSR이다
+- Virtual DOM은 데이터 변경을 모아 필요한 실제 DOM patch로 변환한다
+- Vue는 반응형 의존성을 추적한다. 일반 변수는 값이 바뀌어도 그 자체로 화면 갱신을 예약하지 않는다
 - `<script setup>` 기반 Composition API가 Vue 3 표준이며, 기능 단위로 코드가 모인다
 - 디렉티브는 조건(`v-if`/`v-show`), 반복(`v-for`), 속성(`v-bind`)을 템플릿에서 선언적으로 처리한다
 - `v-if`와 `v-show`, 그리고 `:key`에 인덱스를 쓸지 ID를 쓸지는 성능과 버그에 직결되는 선택이다

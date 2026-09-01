@@ -83,6 +83,10 @@ private String mask(String raw) {
 ## 인가: 모델이 시켜도 권한 밖이면 실행하지 않는다
 
 ```java
+@Configuration
+@EnableMethodSecurity
+class MethodSecurityConfig {}
+
 @Component
 class OrderTools {
 
@@ -95,7 +99,7 @@ class OrderTools {
 }
 ```
 
-`@PreAuthorize`는 Spring Security의 기능이고 도구에 그대로 붙는다. 모델의 '판단'과 실제 '실행 권한'을 분리하는 것이 안전의 핵심이다.
+`@PreAuthorize`는 Spring Security의 기능이고 도구에 그대로 붙는다. 다만 `@EnableMethodSecurity`로 메서드 보안을 활성화하고 Spring이 관리하는 프록시를 통해 호출해야 검사된다. 모델의 '판단'과 실제 '실행 권한'을 분리하는 것이 안전의 핵심이다.
 
 권한 부여의 기준도 명확하다. **읽기 도구는 넓게, 쓰기·삭제·환불 같은 위험 도구는 좁게.**
 
@@ -121,14 +125,17 @@ public class ApprovalTools {
             @ToolParam(description = "환불 사유(사용자가 말한 그대로)") String reason,
             ToolContext context) {
 
-        String userId = String.valueOf(context.getContext().get("userId"));
+        Object rawUserId = context == null ? null : context.getContext().get("userId");
+        if (!(rawUserId instanceof String userId) || userId.isBlank()) {
+            throw new AccessDeniedException("인증된 사용자 정보가 없습니다.");
+        }
         String id = "AP-" + sequence.incrementAndGet();
 
         approvals.put(id, new Approval(id, "REFUND", orderId, reason,
                 userId, Instant.now(), "PENDING"));
 
         // 감사 로그 — 누가·언제·무엇을 요청했는지가 남아야 되돌아볼 수 있다
-        log.warn("[APPROVAL] REFUND 요청 id={} order={} by={} reason={}", id, orderId, userId, reason);
+        log.warn("[APPROVAL] REFUND 요청 id={} order={} by={}", id, orderId, userId);
 
         return "환불 요청 %s 번으로 접수했습니다. 담당자 승인 후 1~3영업일 내 처리됩니다.".formatted(id);
     }
@@ -151,9 +158,11 @@ public class ApprovalTools {
 
 **`approve()`에 `@Tool`이 붙어 있지 않다.** 이것이 이 패턴의 핵심이다. `pending()`과 `approve()`는 평범한 메서드이고, 컨트롤러에서 사람이 쓰는 API로만 노출된다. 모델의 도구 목록에 없으므로 **모델은 그런 기능이 존재한다는 사실조차 모른다.**
 
+이 `ConcurrentHashMap`과 process-local sequence는 실습용이다. 재시작하면 승인 내역과 번호 상태가 사라지고 여러 인스턴스에서 번호가 충돌할 수 있다. 운영에서는 transaction·고유 ID·idempotency를 갖춘 영속 저장소에 둬야 한다.
+
 **설명에 처리 방식을 명시한다.** `"이 도구는 요청을 접수만 하며 실제 환불은 담당자 승인 후 처리된다"`가 도구 설명에 들어 있다. 모델이 그 사실을 알고 사용자에게 정확히 안내한다.
 
-**`log.warn` 레벨을 썼다.** INFO가 아니다. 승인 대기 항목은 사람이 봐야 하는 이벤트다.
+**`log.warn` 레벨을 썼다.** INFO가 아니다. 다만 로그 레벨만 높인다고 사람에게 자동 통보되는 것은 아니다. 승인 대기 항목이 실제 담당자에게 전달되도록 alert·queue·관리 화면을 연결해야 한다. 사용자가 쓴 환불 사유는 개인정보가 될 수 있어 위 로그에는 그대로 남기지 않았다.
 
 **반환 문구가 다음 행동을 유도하지 않는다.** 접수 번호와 예상 처리 기간을 알려 주고 끝난다. 앞 글에서 본 "다시 시도해 보세요" 문제를 피한다.
 
@@ -190,7 +199,7 @@ curl -u user1:pass 'localhost:8080/lab11/ask?q=승인까지 네가 해줘'   # �
 curl -u user1:pass -X POST 'localhost:8080/lab11/approve?no=T-0007'  # 403
 ```
 
-첫 줄은 프롬프트로 승인을 유도하는 시도이고, 둘째 줄은 API를 직접 치는 시도다. **두 경로 모두 막혀야 한다.** 첫 줄이 막히는 이유는 도구 목록에 승인이 없기 때문이고, 둘째 줄이 막히는 이유는 `@PreAuthorize`가 있기 때문이다. 방어가 한 겹이 아니다.
+첫 줄은 프롬프트로 승인을 유도하는 시도이고, 둘째 줄은 API를 직접 치는 시도다. **두 경로 모두 막혀야 한다.** 첫 줄이 막히는 이유는 도구 목록에 승인이 없기 때문이고, 둘째 줄이 막히는 이유는 활성화된 메서드 보안이 `@PreAuthorize`를 검사하기 때문이다. 방어가 한 겹이 아니다.
 
 테스트는 상태를 확인한다.
 
@@ -255,7 +264,7 @@ curl -u user1:pass -X POST 'localhost:8080/lab11/approve?no=T-0007'  # 403
 | 부작용을 명시·최소화 | 위험 작업은 눈에 띄게, 되도록 읽기 위주로 |
 | 실패를 명확한 메시지로 | 모델이 인지하고 대안·안내로 이어가게 |
 
-개수 제한도 안전 항목에 들어간다. 도구가 많으면 프롬프트가 길어지고 모델이 고르기 어려워진다. 권장은 **한 번에 5~7개 이내**다. 잘못된 도구를 고르는 것도 일종의 사고이므로 이 제한은 정확도 문제이자 안전 문제다.
+개수 제한도 안전 항목에 들어간다. 도구가 많으면 프롬프트가 길어지고 모델이 고르기 어려워질 수 있다. **5~7개는 이 교재의 시작점일 뿐 보편 상한은 아니다.** 모델, 도구 설명의 유사도, schema 복잡도, 실제 질문 분포로 선택 정확도를 측정해 나눌 시점을 정한다. 잘못된 도구를 고르는 것도 일종의 사고이므로 이 제한은 정확도 문제이자 안전 문제다.
 
 ## 정리표
 
@@ -265,10 +274,10 @@ curl -u user1:pass -X POST 'localhost:8080/lab11/approve?no=T-0007'  # 403
 |---|---|---|
 | 감사 로깅 | 무슨 일이 있었는지 모르는 상황 | AOP 또는 가장 바깥 Advisor |
 | 마스킹 | 로그에 쌓이는 개인정보 | 보존 기간과 함께 먼저 정한다 |
-| 권한 제어 | 도구를 통한 권한 우회 | `ToolContext` + 쿼리 조건 |
+| 권한 제어 | 도구를 통한 권한 우회 | 인증된 `Principal` → `ToolContext` + 쿼리 조건 |
 | 승인 게이트 | 되돌릴 수 없는 자동 실행 | 도구는 접수만, 처리는 사람이 |
 | 입력 검증 | 모델이 넘긴 이상한 값 | 허용 목록으로 좁힌다 |
-| 도구 수 제한 | 선택 정확도 저하·토큰 낭비 | 한 번에 5~7개 이내 |
+| 도구 수 제한 | 선택 정확도 저하·토큰 낭비 | 5~7개에서 시작하되 실제 선택 정확도로 조정 |
 
 > 환불·삭제·발송 도구가 즉시 실행된다면 그것은 기능이 아니라 사고 대기 상태다.
 {: .prompt-warning }

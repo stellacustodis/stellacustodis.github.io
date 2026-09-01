@@ -158,7 +158,8 @@ Self-Attention을 중심으로 한 범용 구조의 진화.
 - **DETR (2020)**
   - Transformer 기반 Object Detection
 - **SAM (2023)**
-  - ViT + CLIP 기반 prompt-driven segmentation foundation model
+  - MAE 사전학습 ViT image encoder + prompt encoder + lightweight mask decoder
+  - point·box·mask prompt 기반 promptable segmentation foundation model
 
 ---
 

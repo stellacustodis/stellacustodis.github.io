@@ -169,11 +169,12 @@ aae59993f049...: gzip compressed data, original size modulo 2^32 3584
 c56b5750cb2b...: JSON data
 ```
 
-**두 종류밖에 없다.** `gzip compressed data`가 파일시스템 레이어이고, `JSON data`가 메타데이터다. 원본이 `.tar`였다는 것도 `file` 출력에 남아 있다.
+**이 `docker save` 출력에는 두 종류가 보인다.** `gzip compressed data`가 파일시스템 레이어이고, `JSON data`가 메타데이터다. 원본이 `.tar`였다는 것도 `file` 출력에 남아 있다.
 
-앞에서 본 구분이 여기서 확인된다. **이미지 레이어는 gzip으로 압축된 tar**이고,
+앞에서 본 구분이 여기서 확인된다. **이 아카이브의 이미지 레이어는 gzip으로 압축된 tar**이고,
 `file` 출력의 `was "bf05b927....tar"` 가 원본이 tar였다는 흔적이다.
 묶는 일(tar)과 줄이는 일(gzip)이 나뉘어 있다는 것이 파일 헤더에 그대로 남아 있다.
+OCI 규격 자체는 압축하지 않은 tar와 zstd로 압축한 tar 레이어도 허용한다.
 
 이름이 전부 sha256 해시인 것도 의미가 있다. **내용이 같으면 이름이 같다.** 그래서 서로 다른 이미지가 같은 베이스를 쓰면 그 레이어는 디스크에 한 번만 저장되고, 레지스트리에서도 한 번만 전송된다. [1일차 ②](/posts/skala-container-day1-image-registry/)에서 본 "중복 다운로드 불필요"가 이 이름 규칙에서 나온다.
 
@@ -230,7 +231,7 @@ cat manifest.json | jq
 ```json
 {
   "Config": "blobs/sha256/b5898e2f8654...",
-  "RepoTags": ["mariadb:latest"],
+  "RepoTags": ["mariadb:10.11"],
   "Layers": [
     "blobs/sha256/69c262fc30fc...",
     "blobs/sha256/4a585ea2a801...",
@@ -282,7 +283,7 @@ drwxr-xr-x 0/0  usr/local/bin/
 
 ## 이 장에서 남는 것
 
-- 이미지는 `manifest.json`(목차) + `blobs/sha256/`(gzip 레이어 + JSON 설정)의 조합이다.
+- 이 `docker save` 아카이브는 `manifest.json`(목차) + `blobs/sha256/`(레이어 + JSON 설정)의 조합이다. OCI Image Layout 자체는 `oci-layout` + `index.json` + `blobs/` 구조다.
 - `Layers`는 파일시스템을, `Config`는 실행 설정을 담는다. Dockerfile 명령어의 두 분류가 그대로 대응한다.
 - 레이어 이름은 내용의 해시다. 그래서 중복 저장과 중복 전송이 자동으로 사라진다.
 - `docker save` + `tar` + `jq`만으로 남의 이미지 구성도 확인할 수 있다.

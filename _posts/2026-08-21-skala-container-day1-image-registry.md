@@ -55,13 +55,13 @@ cat /etc/containers/registries.conf
 
 ## 레이어가 있는 이유
 
-이미지는 하나의 덩어리가 아니라 **여러 개의 읽기 전용 레이어**로 구성된다. Dockerfile의 각 줄이 레이어 하나에 대응한다.
+이미지는 하나의 덩어리가 아니라 **여러 개의 읽기 전용 레이어**로 구성된다. `RUN`·`COPY`·`ADD`처럼 파일시스템을 바꾸는 명령이 레이어를 만들고, `CMD`·`LABEL` 같은 명령은 메타데이터만 바꾼다.
 
 ```dockerfile
-FROM ubuntu:22.04                                       # 레이어 1
+FROM ubuntu:22.04                                       # 베이스 이미지의 레이어들
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx    # 레이어 2
-COPY ./src /var/www/html                                # 레이어 3
+    apt-get install -y --no-install-recommends nginx    # 새 파일시스템 레이어
+COPY ./src /var/www/html                                # 새 파일시스템 레이어
 CMD ["nginx", "-g", "daemon off;"]                      # 레이어 아님 (설정)
 ```
 
@@ -180,7 +180,7 @@ docker rm hello          # 삭제 (정지 상태여야 함)
 docker rmi ubuntu:latest # 이미지 삭제
 ```
 
-`docker rmi ubuntu`처럼 태그 없이 이름만 주면 **그 이름을 가진 모든 태그가 삭제**된다.
+`docker rmi ubuntu`처럼 태그를 생략하면 `ubuntu:latest`가 대상이 된다. 같은 이름의 다른 태그는 남는다.
 
 ### 밖에서 안의 명령 실행하기
 
@@ -199,7 +199,7 @@ docker exec -it hello /bin/bash           # 셸로 접속
 |---|---|
 | `docker container prune` | 중지된 모든 컨테이너 제거 |
 | `docker image prune` | 태그 없는 이미지 제거. `-a`는 미사용 이미지 전부 |
-| `docker system prune -a` | 이미지·컨테이너·볼륨·네트워크 중 미사용분 전부 |
+| `docker system prune -a` | 미사용 이미지·컨테이너·네트워크·빌드 캐시 제거. 볼륨은 기본 제외되며, 익명 볼륨까지 지우려면 `--volumes`를 함께 지정 |
 | `docker stats` | 컨테이너 자원 사용 현황 |
 | `docker network ls` | 네트워크 목록 |
 | `docker inspect <ID>` | 메타데이터 전체를 JSON으로 |
