@@ -211,12 +211,15 @@ exclude:
   - purgecss.js
   - "*.config.js"
   - "package*.json"
-  # 에이전트용 규칙 문서 — 실물은 볼트에 있고 여기엔 심링크만 있다.
-  # 로컬 빌드에서 사이트로 새어 나가지 않도록 계속 제외한다.
   - AGENTS.md
+  - AGENTS.MD
   - CLAUDE.md
   - CLAUDE.MD
+  - POST-RULES.md
+  - .agents
+  - .codex
   - .claude
+  - claude
 
 jekyll-archives:
   enabled: [categories, tags]

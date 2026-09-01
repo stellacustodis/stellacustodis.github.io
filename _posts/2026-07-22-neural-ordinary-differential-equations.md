@@ -42,7 +42,7 @@ h(t_1) = h(t_0) + \int_{t_0}^{t_1} f(h(t), t, \theta)\,dt
 $$
 
 ![Residual Network와 ODE Network의 비교](/assets/img/posts/neural-ode/resnet-vs-ode-network.png)
-_Residual Network는 정해진 지점에서 상태를 갱신하지만, ODE Network는 연속적인 변화율을 모델링한다. 그림 출처: Neural ODE 논문._
+_원문 Figure 1. Residual Network는 정해진 지점에서 상태를 갱신하지만, ODE Network는 연속적인 변화율을 모델링한다._
 
 ## ODE solver가 네트워크의 실행을 결정한다
 

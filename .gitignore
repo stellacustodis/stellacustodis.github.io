@@ -26,21 +26,14 @@ package-lock.json
 _sass/vendors
 assets/js/dist
 
-# 에이전트 규칙 문서는 이 저장소에 두지 않는다.
-#
-# 여긴 공개 저장소다. 규칙 문서가 루트에 있으면 저장소를 여는 사람에게
-# 글이 어떻게 만들어지는지부터 보인다. 실물은 비공개 볼트에 두고,
-# 여기에는 심링크만 건다 (~/vault/_tools/blog/). 심링크는 아래 규칙으로 빠진다.
-#
-# 새 컴퓨터에서는 `~/vault/_tools/bin/setup-machine.sh --restore` 가 다시 걸어 준다.
-#
-# 대소문자 주의: 예전에 `CLAUDE.md` 규칙만 두었는데 실제 파일이 `CLAUDE.MD` 라
-# 규칙이 안 먹고 그대로 커밋됐다. 리눅스는 파일명 대소문자를 구분한다.
 CLAUDE.md
 CLAUDE.MD
 AGENTS.md
+AGENTS.MD
 claude/*
 .claude/
+.agents/
+.codex/
 
 # Jekyll 빌드 산출물. 예전에 이름이 깨진 `_site\r` 디렉토리가 커밋된 적이 있어
 # 접두사로 막는다.
@@ -49,5 +42,4 @@ _site*
 # VSCode 워크스페이스 (로컬 설정)
 *.code-workspace
 
-# 에이전트 규칙 문서 — 실물은 볼트에 있고 여기엔 심링크만 둔다
 POST-RULES.md
