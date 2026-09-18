@@ -575,7 +575,8 @@ e^{(i)}
 $$
 
 $$
-=
+\begin{aligned}
+&=
 \sum_{i=1}^{d_{key}}
 \left[
 w^{(i)}
@@ -584,6 +585,7 @@ k_i(v-\bar{v})
 \right]
 \otimes
 e^{(i)}.
+\end{aligned}
 \tag{47}
 $$
 
@@ -632,13 +634,15 @@ k_jw^{(j)}
 $$
 
 $$
-=
+\begin{aligned}
+&=
 w^{(i)}
 +
 k_iv
 -
 \sum_{j=1}^{d_{key}}
 k_ik_jw^{(j)}.
+\end{aligned}
 \tag{51}
 $$
 
@@ -694,13 +698,15 @@ v_{new}^{(i)}
 $$
 
 $$
-=
+\begin{aligned}
+&=
 \beta^{(i)}
 \left(
 v^{(i)}
 -
 \bar{v}^{(i)}
 \right).
+\end{aligned}
 \tag{40}
 $$
 
