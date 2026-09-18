@@ -27,7 +27,11 @@
       </li>
       <!-- the real tabs -->
       {% for tab in site.tabs %}
-        <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
+        {% assign is_library_tab = false %}
+        {% if tab.url == '/library/' %}
+          {% assign is_library_tab = true %}
+        {% endif %}
+        <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}{% if is_library_tab %} library-nav-item{% endif %}">
           <a href="{{ tab.url | relative_url }}" class="nav-link">
             <i class="fa-fw {{ tab.icon }}"></i>
             {% capture tab_name %}{{ tab.url | split: '/' }}{% endcapture %}
