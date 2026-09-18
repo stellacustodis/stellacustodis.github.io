@@ -7,6 +7,7 @@ categories:
   - Programming
   - Python
 tags: [python, mutability, object-model, shallow-copy, deep-copy, 코딩테스트]
+description: "Python에서 mutable·immutable 객체가 어떻게 다르게 동작하는지, 얕은 복사와 깊은 복사 및 함수 인자 전달을 코드로 설명한다."
 ---
 
 <!-- 이미지 경로: /assets/img/posts/python-mutable-immutable/<파일명> -->

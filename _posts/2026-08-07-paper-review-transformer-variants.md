@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, transformer, layernorm, rope, flashattention, gqa, swiglu]
+description: "LayerNorm·RMSNorm·SwiGLU·RoPE·FlashAttention·GQA 등 Transformer 구현이 원 논문과 달라진 이유를 9편의 연구 흐름으로 설명한다."
 math: true
 related: [paper-review-transformer, paper-review-efficiency-eval, skala-transformer-day1]
 ---

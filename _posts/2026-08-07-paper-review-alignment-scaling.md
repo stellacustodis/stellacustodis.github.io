@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, rlhf, dpo, alignment, scaling-law, chinchilla, llama, emergence]
+description: "RLHF·DPO가 언어 모델의 행동을 어떻게 정렬하는지와 Scaling Law·Chinchilla가 모델 크기·데이터·학습 토큰의 관계를 어떻게 바꿨는지 9편의 논문으로 정리한다."
 math: true
 related: [paper-review-transformer, paper-review-efficiency-eval, skala-transformer-day2]
 ---

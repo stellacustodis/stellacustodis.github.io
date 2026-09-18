@@ -7,6 +7,7 @@ categories:
   - AI
   - Engineering
 tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
+description: "PyTorch와 CUDA 환경에서 random seed를 고정하는 이유와 재현성이 완벽하지 않은 원인을 설명하고, 실험 재현을 위한 설정과 점검 방법을 정리한다."
 ---
 
 <!-- 이미지 경로: /assets/img/posts/seed-fixing-1/<파일명> -->

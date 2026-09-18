@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, knowledge-distillation, moe, mixture-of-experts, deepseek, benchmark, helm]
+description: "Knowledge distillation과 Mixture-of-Experts로 대형 모델의 비용을 줄이는 방법을 살펴보고, 벤치마크를 믿기 전에 확인할 평가 설계까지 10편의 논문으로 정리한다."
 math: true
 related: [paper-review-alignment-scaling, paper-review-transformer-variants, skala-transformer-day2]
 ---

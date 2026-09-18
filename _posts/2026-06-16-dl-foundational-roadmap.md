@@ -7,6 +7,7 @@ categories:
   - AI
   - Learning
 tags: [deep-learning, computer-vision, learning-roadmap, generative-model, self-supervised-learning, transformer]
+description: "딥러닝을 처음 공부하는 사람을 위해 컴퓨터 비전·생성 모델·Transformer·self-supervised learning의 핵심 논문과 모델을 계보 순서로 정리한 학습 로드맵이다."
 ---
 
 <!-- 이미지 경로: /assets/img/posts/dl-foundational-roadmap/<파일명> -->

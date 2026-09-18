@@ -1,10 +1,11 @@
 ---
-title: "nvidia graphic card useful tools"
+title: "NVIDIA GPU 상태 확인과 관리에 유용한 Linux 도구"
 date: 2024-03-30 21:00:00 +0900
 categories:
   - AI
   - Engineering
 tags: [nvidia, gpu, monitoring, linux, nvidia-smi, nvtop]
+description: "nvidia-smi와 nvtop을 사용해 Linux에서 NVIDIA GPU 인식·드라이버 상태·메모리 사용량·프로세스를 확인하는 방법을 정리한다."
 ---
 
 <!-- 이미지 경로: /assets/img/posts/nvidia-graphic-card-useful-tools/<파일명> -->

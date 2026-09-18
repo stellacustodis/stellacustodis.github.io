@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, transformer, self-attention, bert, gpt, elmo, pretraining]
+description: "Attention Is All You Need에서 ELMo·GPT·BERT까지 2017~2020년 Transformer와 사전학습 패러다임을 바꾼 6편의 논문을 연결해 설명한다."
 math: true
 related: [paper-review-nlp-foundations, paper-review-transformer-variants, skala-transformer-day1]
 ---

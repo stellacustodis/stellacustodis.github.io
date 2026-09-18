@@ -7,6 +7,7 @@ categories:
   - AI
   - Engineering
 tags: [pytorch, state-dict, checkpoint, model-serialization, gpu-memory]
+description: "PyTorch state_dict에 parameter와 buffer가 어떻게 저장되는지, optimizer 상태와 checkpoint를 어떻게 복원하는지 실전 코드로 정리한다."
 related: [seed-fixing-1, python-mutable-immutable]
 ---
 

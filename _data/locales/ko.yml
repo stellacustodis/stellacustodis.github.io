@@ -1,0 +1,89 @@
+# 한국어 사이트 UI 문구
+
+layout:
+  post: 글
+  category: 카테고리
+  tag: 태그
+
+tabs:
+  home: 홈
+  categories: 카테고리
+  tags: 태그
+  archives: 아카이브
+  about: 소개
+  library: 라이브러리
+  learn: 학습 로드맵
+  "학습 로드맵": 학습 로드맵
+  forme: Forme
+  graph: 그래프
+  ask: 질문
+  "의미 검색": 의미 검색
+
+search:
+  hint: 검색
+  cancel: 취소
+  no_results: 검색 결과가 없습니다.
+
+panel:
+  lastmod: 최근 수정
+  trending_tags: 인기 태그
+  toc: 목차
+
+copyright:
+  license:
+    template: 이 글은 작성자가 지정한 :LICENSE_NAME 라이선스로 배포됩니다.
+    name: CC BY 4.0
+    link: https://creativecommons.org/licenses/by/4.0/deed.ko
+  brief: 일부 권리 보유
+  verbose: 별도 표기가 없는 한 이 블로그의 글은 CC BY 4.0 라이선스로 배포됩니다.
+
+meta: :THEME 테마와 :PLATFORM으로 만든 블로그입니다.
+
+not_found:
+  statement: 요청한 페이지를 찾을 수 없습니다.
+
+notification:
+  update_found: 새 콘텐츠를 사용할 수 있습니다.
+  update: 업데이트
+
+theme:
+  light: 밝게
+  dark: 어둡게
+  system: 시스템 설정
+
+post:
+  written_by: 작성자
+  posted: 게시일
+  updated: 수정일
+  words: 단어
+  pageview_measure: 조회
+  read_time:
+    unit: 분
+    prompt: 읽기
+  edit: 이 글 수정하기
+  relate_posts: 관련 글
+  share: 공유
+  button:
+    next: 최신 글
+    previous: 이전 글
+    copy_code:
+      succeed: 복사했습니다!
+    share_link:
+      title: 링크 복사
+      succeed: 링크를 복사했습니다!
+
+df:
+  post:
+    strftime: "%Y년 %-m월 %-d일"
+    dayjs: "YYYY년 M월 D일"
+  archives:
+    strftime: "%Y년 %-m월"
+    dayjs: "YYYY년 M월"
+
+categories:
+  category_measure:
+    singular: 카테고리
+    plural: 카테고리
+  post_measure:
+    singular: 글
+    plural: 글

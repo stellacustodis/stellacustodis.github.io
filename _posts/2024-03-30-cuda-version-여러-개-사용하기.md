@@ -5,6 +5,7 @@ categories:
   - AI
   - Engineering
 tags: [cuda, gpu, nvidia, linux, deep-learning-environment]
+description: "한 대의 Linux 개발 환경에서 여러 CUDA 버전을 함께 관리하는 방법을 정리한다. NVIDIA 드라이버·CUDA·cuDNN의 관계와 프로젝트별 버전 확인 절차를 다룬다."
 ---
 <!-- 이미지 경로: /assets/img/posts/cuda-version-여러-개-사용하기/<파일명> -->
 <!-- 예시: ![fig1](/assets/img/posts/cuda-version-여러-개-사용하기/fig1.png) -->

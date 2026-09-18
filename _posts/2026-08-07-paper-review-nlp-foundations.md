@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, nlp, word-embedding, word2vec, glove, lstm, seq2seq, attention]
+description: "Word2Vec·GloVe에서 LSTM·Seq2Seq·Attention까지 NLP 표현학습의 발전을 각 논문이 해결한 문제와 함께 12편의 계보로 정리한다."
 math: true
 related: [paper-review-transformer, skala-transformer-day1]
 ---

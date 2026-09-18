@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, neural-ode, continuous-depth, normalizing-flow, differential-equation, generative-model]
+description: "Neural ODE가 신경망의 층을 연속적인 미분방정식으로 해석하는 방법과 adjoint sensitivity를 이용한 메모리 효율적 학습을 설명한다."
 math: true
 related: [self-flow, dl-foundational-roadmap]
 paper:
