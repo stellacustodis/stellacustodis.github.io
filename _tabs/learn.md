@@ -16,9 +16,9 @@ permalink: /learn/
 - [NLP 표현학습의 계보 — Word2Vec에서 Attention까지](/posts/paper-review-nlp-foundations/)
 - [Transformer 계열 논문 리뷰 모음](/categories/)
 
-## Transformer·선형 어텐션 논문 읽기
+## Transformer·linear attention 논문 읽기
 
-Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 선형 어텐션으로 이어지는 경로입니다.
+Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linear attention으로 이어지는 경로입니다.
 
 - [Attention과 Transformer 기본기](/posts/paper-review-transformer/)
 - [Transformer 변형 논문 모음](/posts/paper-review-transformer-variants/)
