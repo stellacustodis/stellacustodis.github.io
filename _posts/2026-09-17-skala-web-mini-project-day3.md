@@ -15,6 +15,9 @@ description: "줄쟁이 톤레시피의 문제 정의, 레시피·장비 데이�
 
 이 글은 SKALA AI 웹 서비스 설계 Mini-project의 최종 프로젝트 산출물 하나를 기준으로 정리했다. 확인한 자료는 요구사항정의서, 화면설계서, DBML, OpenAPI 명세, 프론트엔드 데모와 5분 발표 자료다.
 
+![줄쟁이 톤레시피 웹 데모 홈 화면](/assets/img/posts/skala-web-mini-project-day3/home.png){: w="850" }
+_그림 1. 실행 중인 웹 데모의 홈. 곡 검색, 레시피 비교, 내 장비 대체로 이어지는 진입점을 보여준다._
+
 ## 곡을 찾은 뒤 설정까지 비교하기
 
 기타 톤 정보에는 ‘어떤 페달을 썼다’만으로 빠지는 부분이 많다. 같은 곡도 파트에 따라 필요한 소리가 다르고, 같은 장비라도 신호 체인에서의 위치와 Gain·Tone 값에 따라 결과가 달라진다. 그래서 서비스의 비교 단위를 자유 형식 게시글 대신 **곡·파트에 연결된 레시피**로 정했다.
@@ -23,6 +26,12 @@ description: "줄쟁이 톤레시피의 문제 정의, 레시피·장비 데이�
 아티스트·곡 검색 → 같은 곡의 레시피 비교 → 기타·이펙터·앰프 설정 확인
 → 내 장비 등록 → 대체 설정과 근거 확인
 ```
+
+![Comfortably Numb를 고른 곡 탐색 화면](/assets/img/posts/skala-web-mini-project-day3/song-search.png){: w="850" }
+_그림 2. `Comfortably Numb`를 고르면 같은 곡의 커뮤니티 레시피 두 건을 나란히 볼 수 있다._
+
+![Comfortably Numb 두 번째 솔로 레시피 상세 화면](/assets/img/posts/skala-web-mini-project-day3/recipe-detail.png){: w="850" }
+_그림 3. 원본 레시피의 기타·앰프 조건과 이펙터 순서, 장비별 제어값을 보여주는 데모 화면._
 
 비회원은 곡과 공개 레시피를 탐색한다. 회원은 레시피를 작성하고 좋아요·댓글을 남기며 보유 장비를 등록한다. 운영자는 신고, 중복 기준정보와 외부 상품 링크를 관리한다. 화면설계서는 이 역할을 홈·곡·레시피 상세·작성·내 장비·내 활동·운영·인증의 8개 도메인 화면에 연결한다.
 
@@ -39,9 +48,21 @@ songs → tone_recipes → recipe_gear_items → gear_control_values
 
 사용자가 가진 장비는 `user_rigs`와 `user_rig_items`로 모델링했다. 추천 설계의 `recommendation_runs`는 입력 스냅샷·로직 버전·신뢰도를, `recommendation_items`는 장비별 대체안·점수·근거·한계를 저장한다. 결과를 나중에 다시 읽을 때 ‘왜 이 장비를 골랐는가’를 확인할 수 있게 하려는 구조다.
 
+![장비 순서와 노브 값을 입력하는 레시피 작성 화면](/assets/img/posts/skala-web-mini-project-day3/recipe-editor.png){: w="850" }
+_그림 4. 웹 데모의 레시피 작성 폼. 곡·연주 조건과 시그널 체인의 각 장비를 따로 입력한다._
+
+![기타와 페달을 등록한 내 장비 보드 화면](/assets/img/posts/skala-web-mini-project-day3/my-rig.png){: w="850" }
+_그림 5. 체험 계정의 장비 보드. 추천 입력으로 사용할 기타·앰프·페달 목록을 보여준다._
+
 ## 화면·API·DB를 같은 식별자로 연결하기
 
 곡 화면에서 고른 `songId`는 `GET /api/songs/{songId}/recipes`에 전달한다. 레시피 카드를 고르면 그 카드의 `recipeId`로 `GET /api/recipes/{recipeId}`를 호출하도록 명세했다. 곡 식별자와 상세 식별자가 어긋나면 다른 곡의 설정이 보일 수 있으므로, 요구사항·화면·API·DB 문서에서 이 연결을 대조했다.
+
+![곡 탐색 화면설계서의 화면 ID와 주요 요소](/assets/img/posts/skala-web-mini-project-day3/wireframe-song.png){: w="850" }
+_그림 6. 화면설계서의 `SCR-SONG-001`. 빨간 번호는 설계 문서의 요소 주석이며 실행 화면의 표시는 아니다._
+
+![레시피 상세 화면설계서의 상단 요소](/assets/img/posts/skala-web-mini-project-day3/wireframe-recipe.png){: w="850" }
+_그림 7. 화면설계서에 담긴 레시피 상세 상단. 헤더와 원본 레시피 탭의 배치를 보여준다._
 
 작성 계약은 `POST /api/songs/{songId}/recipes`, 수정 계약은 `PUT /api/recipes/{recipeId}`다. 수정할 때는 `expected_version`으로 동시 변경을 확인하고, 버전이 다르면 409 충돌 응답을 보내도록 정의했다. 비회원·타인 데이터·잘못된 입력도 각각 인증, 권한, 검증 오류로 나눴다.
 
@@ -51,8 +72,13 @@ songs → tone_recipes → recipe_gear_items → gear_control_values
 
 `demo-web`에는 React·TypeScript 기반 화면이 있다. 홈에서 곡과 레시피를 찾고, 레시피 상세에서 원본 신호 체인을 보다가 ‘내 장비 대체 추천’ 탭으로 옮겨 갈 수 있다. 최종 발표 자료는 문제, 이 화면 흐름, 대체 결과, 화면과 설계 계약의 연결을 순서대로 보여준다.
 
+대체 추천 탭은 로그인 후 열린다. 데모에는 체험 계정 진입 경로가 준비돼 있다.
+
+![내 장비 대체 추천을 열 때 나타나는 로그인 화면](/assets/img/posts/skala-web-mini-project-day3/login.png){: w="850" }
+_그림 8. 데모의 로그인 화면. 체험 계정으로 들어가면 레시피 작성·장비 보드·대체 추천을 살펴볼 수 있다._
+
 ![줄쟁이 톤레시피 데모의 내 장비 대체 추천 화면](/assets/img/posts/skala-web-mini-project-day3/gear-match.jpg){: w="800" }
-_그림 1. 원본 레시피와 내 장비 대체 결과를 같은 상세 화면에서 비교하는 데모._
+_그림 9. 체험 계정의 대체 추천 화면. 장비별 예시 대체안과 점수, 추천 한계를 함께 보여준다._
 
 데모에는 `Comfortably Numb`의 **커뮤니티 작성 예시 레시피**가 들어 있다. 대체 탭은 원본 장비와 예시 대체 장비, 백분율 점수, 이유와 추천 한계를 표시한다. 화면의 점수와 ‘신뢰도’는 코드에 준비된 예시 값이다. 실제 사용자의 장비를 대상으로 알고리즘을 실행해 측정한 정확도나 모델 성능으로 읽으면 안 된다. 데모의 인증과 상태 변경도 프론트엔드 동작이며, 서버 권한 검사나 영구 저장을 입증하지 않는다.
 
