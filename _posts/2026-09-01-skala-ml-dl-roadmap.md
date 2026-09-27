@@ -24,8 +24,8 @@ related: [skala-ml-dl-day1, skala-ml-dl-day2, skala-ml-dl-day3]
 문제 정의와 머신러닝 평가 → 손실·최적화와 신경망 구조 → Fashion-MNIST CNN 가설 검증
 ```
 
-## 사용한 자료
+## 실험 결과를 읽는 기준
 
-머신러닝·딥러닝 Part A/B/C 교안과 Fashion-MNIST CNN 실습 보고서를 참고했다. 실험 결과를 설명할 때는 분할·seed·학습 예산을 함께 본다.
+Fashion-MNIST CNN 실험은 최고 점수 하나로 설명하지 않는다. 데이터 분할, seed, 학습 예산과 변경한 설정을 함께 봐야 각 결과의 의미를 판단할 수 있다.
 
 다음 글: [1일차 — 문제 정의와 머신러닝 평가](/posts/skala-ml-dl-day1/)

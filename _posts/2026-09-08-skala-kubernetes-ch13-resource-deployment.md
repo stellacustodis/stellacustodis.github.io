@@ -31,7 +31,7 @@ resources:
 
 CPU `1000m`은 vCPU 하나에 해당하고, memory는 `Mi`, `Gi`처럼 binary unit을 명시한다. node 전체 memory와 Pod에 실제 할당 가능한 `Allocatable`은 system reservation 때문에 다르다.
 
-강의자료의 percentile 배수는 초기 추정 기준일 뿐 보편적인 정답은 아니다. production 값은 representative load에서 측정한 usage, latency SLO, JVM off-heap과 peak, node overcommit 정책을 함께 보고 정한다.
+percentile에 일정 배수를 곱해 잡는 리소스 요청값은 초기 추정일 뿐 보편적인 정답은 아니다. production 값은 representative load에서 측정한 usage, latency SLO, JVM off-heap과 peak, node overcommit 정책을 함께 보고 정한다.
 
 ## QoS는 직접 고르는 값이 아니다
 
