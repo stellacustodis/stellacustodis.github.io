@@ -32,7 +32,7 @@ JavaScript의 표준 규격 이름이 ECMAScript(ES)다. 이름이 둘인 이유
 | 3세대 | 2009~2014 | Chrome의 **V8 엔진**과 **Node.js** 등장으로 서버에서도 실행 가능해짐. **ES5** 표준 정착 (`'use strict'`, `forEach`/`map`/`filter`) |
 | 4세대 | 2015~ | **ES6(ES2015)** 대규모 개편. 이후 매년 소규모 업데이트. 이 시기 이후를 통칭 **Modern JavaScript** |
 
-핵심은 **ES6가 분기점**이라는 것이다. Vue 3의 Composition API, Pinia, Axios는 전부 ES6 이후 문법을 전제로 쓰여 있다. 지난 4일 동안 쓴 코드를 다시 보면 화살표 함수, 구조 분해, 템플릿 리터럴, `async/await`가 빠짐없이 들어 있다.
+**ES6가 분기점**이다. Vue 3의 Composition API, Pinia, Axios는 전부 ES6 이후 문법을 전제로 쓰여 있다. 지난 4일 동안 쓴 코드를 다시 보면 화살표 함수, 구조 분해, 템플릿 리터럴, `async/await`가 빠짐없이 들어 있다.
 
 ### 브라우저 지원과 Babel·Polyfill
 

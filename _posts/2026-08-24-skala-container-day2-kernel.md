@@ -49,7 +49,7 @@ description: "namespace·cgroup·OverlayFS·Capabilities가 각각 무엇을 격
 
 ## cgroups — 쓸 수 있는 양을 나눈다
 
-namespace가 "무엇이 보이는가"라면 cgroups는 "얼마나 쓸 수 있는가"다. 동일 그룹에 속한 프로세스 집합에 대해 CPU, Memory, I/O 사용량을 제한·격리·모니터링한다. 아래 컨트롤러 이름은 cgroup v1 기준이고, v2는 단일 계층에서 `cpu.*`·`memory.*`·`io.*` 같은 인터페이스를 쓴다.
+namespace가 "무엇이 보이는가"라면 cgroups는 "얼마나 쓸 수 있는가"다. 동일 그룹에 속한 프로세스 집합의 CPU, Memory, I/O 사용량을 제한·격리·모니터링한다. 아래 컨트롤러 이름은 cgroup v1 기준이고, v2는 단일 계층에서 `cpu.*`·`memory.*`·`io.*` 같은 인터페이스를 쓴다.
 
 | 항목 | 기능 |
 |---|---|
@@ -138,7 +138,7 @@ spec:
 
 ### SELinux — 대상 접근의 강제 통제
 
-Capabilities가 "무엇을 할 수 있는가"라면 SELinux는 **"어떤 대상에 접근할 수 있는가"**를 강제한다. 프로세스가 파일, 디렉터리, 포트에 대해 수행할 수 있는 작업을 정책으로 못박는다.
+Capabilities가 "무엇을 할 수 있는가"라면 SELinux는 **"어떤 대상에 접근할 수 있는가"**를 강제한다. 프로세스가 파일, 디렉터리, 포트에서 수행할 수 있는 작업을 정책으로 못박는다.
 
 > 프로세스가 root(UID 0)이고 모든 Capability를 가지고 있더라도, **SELinux 정책에 명시적으로 allow가 정의되어 있지 않으면 커널 단에서 접근을 차단**한다.
 

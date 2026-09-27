@@ -74,7 +74,7 @@ const key = import.meta.env.VITE_OPENWEATHER_API_KEY
 const key = 'a1b2c3d4...'   // 그대로 들어 있다
 ```
 
-즉 `.env`를 `.gitignore`에 넣어 **저장소**에서 감춰도, 배포된 JS 파일을 내려받는 것만으로 키가 나온다. 저장소 노출과 번들 노출은 별개의 문제다.
+`.env`를 `.gitignore`에 넣어 **저장소**에서 감춰도, 배포된 JS 파일을 내려받는 것만으로 키가 나온다. 저장소 노출과 번들 노출은 별개의 문제다.
 
 ### 접두사를 떼고 서버로 옮기기
 

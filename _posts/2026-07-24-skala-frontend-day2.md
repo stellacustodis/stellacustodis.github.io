@@ -1706,7 +1706,7 @@ CSS 속성명은 자바스크립트에서 **카멜케이스**로 바뀐다. `bac
 
 스타일 변경은 `style` 속성을 직접 건드리기보다 **`classList`로 클래스를 토글하는 방식**이 낫다. 스타일 정의는 CSS에 남고 자바스크립트는 상태만 바꾸므로, 관심사 분리 원칙에 부합한다.
 
-> 사용자 입력을 그대로 `innerHTML`에 넣으면 XSS(Cross-Site Scripting) 취약점이 된다. `innerHTML`로 삽입한 `<script>` 요소는 일반적으로 실행되지 않지만 event handler 속성이나 SVG 등 실행 가능한 markup을 통해 공격할 수 있다. 텍스트만 넣을 때는 반드시 `textContent`를 쓴다.
+> 사용자 입력을 그대로 `innerHTML`에 넣으면 XSS(Cross-Site Scripting) 취약점이 된다. `innerHTML`로 삽입한 `<script>` 요소는 일반적으로 실행되지 않지만 event handler 속성이나 SVG 등 실행 가능한 markup으로 공격할 수 있다. 텍스트만 넣을 때는 반드시 `textContent`를 쓴다.
 {: .prompt-danger }
 
 ## 이벤트
@@ -2044,7 +2044,7 @@ async function loadData() {
 1. 첫 번째 `await fetch(...)`: 서버 **응답 헤더**가 도착할 때까지 기다려 `Response` 객체를 얻는다
 2. 두 번째 `await response.json()`: 응답 **본문**을 모두 읽고 JSON으로 파싱할 때까지 기다린다
 
-즉 `fetch`가 끝났다고 데이터가 손에 들어온 것이 아니다. 본문을 읽는 것도 시간이 걸리는 비동기 작업이다.
+`fetch`가 끝났다고 데이터가 손에 들어온 것은 아니다. 본문을 읽는 것도 시간이 걸리는 비동기 작업이다.
 
 실전에서는 에러 처리를 함께 쓴다.
 
@@ -2121,7 +2121,7 @@ External JS가 코드를 **파일로 나눈 것**뿐이라면, 모듈은 각 파
 
 ## 정리
 
-2일차를 관통하는 두 축을 정리하면 다음과 같다.
+2일차를 관통하는 두 축은 다음과 같다.
 
 **CSS — 브라우저가 스타일을 결정하는 규칙**
 

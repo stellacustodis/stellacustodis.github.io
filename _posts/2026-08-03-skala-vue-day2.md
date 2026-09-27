@@ -423,7 +423,7 @@ watch(() => state.price, (newPrice, oldPrice) => {
 })
 ```
 
-정리하면 **"이전 값이 필요하면 getter로 좁혀서 감시한다"**가 규칙이다.
+**"이전 값이 필요하면 getter로 좁혀서 감시한다"**가 규칙이다.
 
 ### watchEffect
 

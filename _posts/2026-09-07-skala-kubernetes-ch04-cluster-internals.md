@@ -58,9 +58,9 @@ kubectl describe pod <pod>
 
 ## Kubelet, runtime, CNI와 CSI
 
-scheduler가 `nodeName`을 정하면 해당 노드의 kubelet이 Pod를 실제 상태로 만든다. kubelet은 이미지를 직접 실행하지 않고 CRI를 통해 container runtime에 요청한다. 네트워크 namespace와 Pod IP는 CNI, 영속 볼륨 연결은 CSI가 담당한다. kubelet은 세 probe도 직접 호출하고 결과를 API server에 보고한다.
+scheduler가 `nodeName`을 정하면 해당 노드의 kubelet이 Pod를 실제 상태로 만든다. kubelet은 이미지를 직접 실행하지 않고 CRI로 container runtime에 요청한다. 네트워크 namespace와 Pod IP는 CNI, 영속 볼륨 연결은 CSI가 담당한다. kubelet은 세 probe도 직접 호출하고 결과를 API server에 보고한다.
 
-따라서 probe 실패는 Service나 Ingress가 probe 요청을 중계한 결과가 아니다. kubelet에서 Pod IP와 지정 포트로 직접 확인한다. 외부 트래픽은 정상인데 probe만 실패하거나 그 반대인 상황이 가능한 이유다.
+Probe 실패는 Service나 Ingress가 probe 요청을 중계한 결과가 아니다. kubelet에서 Pod IP와 지정 포트로 직접 확인한다. 외부 트래픽은 정상인데 probe만 실패하거나 그 반대인 상황이 가능한 이유다.
 
 ## Service의 실체는 커널 규칙이다
 

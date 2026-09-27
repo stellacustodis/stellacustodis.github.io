@@ -15,7 +15,7 @@ REST API를 만드는 일은 컨트롤러에 URL과 메서드를 연결하는 �
 
 이 과정은 그래서 Spring Boot 사용법부터 시작하지 않는다. 먼저 IP와 Port, 프로세스와 스레드, 동기와 비동기 같은 시스템 기초를 확인하고, Java 코드가 바이트코드로 컴파일되어 JVM에서 실행되는 과정을 살펴본다. 그 위에 클래스와 객체, 다형성, 인터페이스, 컬렉션과 제네릭을 쌓은 뒤, 리플렉션(reflection)과 애노테이션(annotation)이 프레임워크의 자동화를 어떻게 가능하게 하는지 연결한다.
 
-객체지향 문법을 배운 다음에는 SOLID와 디자인 패턴을 통해 변경에 견디는 구조를 고민한다. 이어서 소켓으로 HTTP 요청과 응답을 직접 다뤄 보고, REST의 자원·행위·표현을 Spring MVC의 Controller-Service-Repository 계층으로 옮긴다. 마지막에는 JPA 영속성, 트랜잭션, 동시성 제어, API 문서화와 운영 모니터링까지 확장한다. 전체 흐름은 다음 질문으로 요약할 수 있다.
+객체지향 문법을 배운 다음에는 SOLID와 디자인 패턴으로 변경에 견디는 구조를 고민한다. 이어서 소켓으로 HTTP 요청과 응답을 직접 다뤄 보고, REST의 자원·행위·표현을 Spring MVC의 Controller-Service-Repository 계층으로 옮긴다. 마지막에는 JPA 영속성, 트랜잭션, 동시성 제어, API 문서화와 운영 모니터링까지 확장한다. 전체 흐름은 다음 질문으로 요약할 수 있다.
 
 > JVM에서 실행되는 객체를 어떻게 설계하고 조합하여, HTTP 요청을 안전하게 처리하고 데이터베이스에 일관된 상태로 저장할 것인가?
 {: .prompt-info }
@@ -58,7 +58,7 @@ REST API를 만드는 일은 컨트롤러에 URL과 메서드를 연결하는 �
 
 실습은 Java와 JVM을 기반으로 순수 Java 코드에서 시작해 Spring Boot 애플리케이션으로 확장한다. 초기에는 콘솔 프로그램, 컬렉션, 람다, Stream API, 리플렉션과 커스텀 애노테이션을 작은 코드 단위로 확인한다. 이어 `ServerSocket`과 `Socket`으로 Echo 통신 및 단순 HTTP 서버의 요청·응답 구조를 다룬다.
 
-Spring Boot 구간에서는 내장 톰캣을 통해 REST API를 실행하고, H2 인메모리 데이터베이스로 Controller-Service-Repository 계층과 CRUD 흐름을 구성한다. 설정은 `application.yml`과 환경별 프로파일로 분리하며, Lombok은 Getter와 생성자, 로거 같은 반복 코드를 줄이는 범위에서 사용한다.
+Spring Boot 구간에서는 내장 톰캣에서 REST API를 실행하고, H2 인메모리 데이터베이스로 Controller-Service-Repository 계층과 CRUD 흐름을 구성한다. 설정은 `application.yml`과 환경별 프로파일로 분리하며, Lombok은 Getter와 생성자, 로거 같은 반복 코드를 줄이는 범위에서 사용한다.
 
 후반부에는 Spring Data JPA로 엔티티와 연관관계를 매핑하고, Bean Validation으로 잘못된 요청이 서비스 계층까지 들어오는 것을 막는다. `ThreadPoolTaskExecutor`를 통한 비동기 처리, Swagger UI를 통한 API 명세 확인, Actuator를 통한 헬스·메트릭 확인과 동적 로그 레벨 제어도 실습 범위에 포함된다.
 

@@ -91,7 +91,7 @@ db-2.db-headless.default.svc.cluster.local
 
 여기서 고정되는 것은 **IP가 아니라 네트워크 정체성(hostname/DNS)** 이다. `db-0` Pod가 다른 노드에 재생성되어 IP가 달라져도 같은 DNS 이름이 새 IP를 가리킨다. 리더·팔로워, shard 번호, 복제 순서처럼 “몇 번째 인스턴스인가”가 중요한 DB와 메시지 큐에서 이 특성이 필요하다.
 
-또한 순서가 고정된다는 말은 기본 정책에서 생성·확장 시 낮은 ordinal부터 Ready가 된 뒤 다음 Pod를 만들고, 축소 시 높은 ordinal부터 제거한다는 뜻이다. 모든 DB를 StatefulSet에 올리라는 의미는 아니며, 운영 부담 때문에 관리형 DB를 선택하는 경우도 많다.
+순서가 고정된다는 말은 기본 정책에서 생성·확장 시 낮은 ordinal부터 Ready가 된 뒤 다음 Pod를 만들고, 축소 시 높은 ordinal부터 제거한다는 뜻이다. 모든 DB를 StatefulSet에 올리라는 의미는 아니며, 운영 부담 때문에 관리형 DB를 선택하는 경우도 많다.
 
 ## 핵심 리소스를 요청 흐름으로 연결하기
 
@@ -109,7 +109,7 @@ Pod ── Container ── Process
   └─ PVC ── PV ── StorageClass
 ```
 
-수업 메모의 `Ingress → Service → Pod`는 이 논리적 흐름을 압축한 표현이다. Ingress가 Service 이름과 포트를 backend로 참조하고, Service는 라벨 셀렉터와 readiness 결과로 만든 EndpointSlice를 통해 Pod를 찾는다. 따라서 Ingress가 정상이어도 Service selector가 틀리거나 Pod가 Ready가 아니면 요청은 목적지에 도달하지 못한다.
+수업 메모의 `Ingress → Service → Pod`는 이 논리적 흐름을 압축한 표현이다. Ingress가 Service 이름과 포트를 backend로 참조하고, Service는 라벨 셀렉터와 readiness 결과로 만든 EndpointSlice에 기록된 Pod를 찾는다. 따라서 Ingress가 정상이어도 Service selector가 틀리거나 Pod가 Ready가 아니면 요청은 목적지에 도달하지 못한다.
 
 ## EKS와 “3중화”, 그리고 SPOF
 
@@ -120,7 +120,7 @@ EKS에서는 control plane을 AWS가 관리하고, 최소 두 개의 API 서버 
 - control plane/etcd: 서비스 제공자가 여러 AZ와 복제본으로 관리한다. EKS 사용자가 정확히 세 대를 직접 만드는 구조가 아니다.
 - data plane/workload: 워커 노드와 Pod 복제본을 여러 노드와 AZ에 분산해야 한다. `replicas: 3`만 적고 세 Pod가 한 AZ에 몰리면 AZ 장애는 견디지 못한다.
 
-즉, **복제본 수와 장애 도메인 분산이 함께 있어야 고가용성**이다. 한 노드에 Pod 세 개를 올리면 프로세스 장애에는 강해질 수 있어도 노드 장애에는 약하다. 한 AZ의 노드 여러 대에 분산해도 AZ 전체 장애는 막지 못한다. 실습 환경이 단일 AZ라면 교육 비용과 단순화를 위한 구성이며, 그대로 운영 HA 설계라고 보면 안 된다.
+**복제본 수와 장애 도메인 분산이 함께 있어야 고가용성**이다. 한 노드에 Pod 세 개를 올리면 프로세스 장애에는 강해질 수 있어도 노드 장애에는 약하다. 한 AZ의 노드 여러 대에 분산해도 AZ 전체 장애는 막지 못한다. 실습 환경이 단일 AZ라면 교육 비용과 단순화를 위한 구성이며, 그대로 운영 HA 설계라고 보면 안 된다.
 
 ## 강의 실습 환경을 일반적인 EKS와 구분하기
 

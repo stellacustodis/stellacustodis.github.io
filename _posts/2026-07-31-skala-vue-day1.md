@@ -102,7 +102,7 @@ Vue의 동작은 MVVM(Model-View-ViewModel) 관점으로 설명할 수 있다.
 | **View** | 사용자에게 보이는 화면. `<template>`과 `<style>` 영역 |
 | **ViewModel** | 둘 사이의 중재자. Vue 엔진과 `<script>`가 담당하며, DOM 이벤트 감지와 데이터 바인딩을 수행 |
 
-핵심은 **UI와 데이터 처리 로직의 역할을 구분한다**는 것이다. Vue가 엄격한 MVVM 구조를 강제하는 것은 아니며, SFC는 서로 관련된 template·logic·style을 한 파일에 모은다.
+Vue를 볼 때는 **UI와 데이터 처리 로직의 역할**을 구분한다. Vue가 엄격한 MVVM 구조를 강제하는 것은 아니며, SFC는 서로 관련된 template·logic·style을 한 파일에 모은다.
 
 ## 개발 환경
 
@@ -393,7 +393,7 @@ const rawHtmlData = '이 글자는 <span style="color:red;">빨간 글자</span>
 ```
 {% endraw %}
 
-문제는 `innerHTML`과 동일하게 동작한다는 점이 **취약점까지 동일하다**는 뜻이라는 것이다.
+`innerHTML`과 동작이 같아 **취약점도 같다.**
 
 ```vue
 <input v-model="inputValue" />

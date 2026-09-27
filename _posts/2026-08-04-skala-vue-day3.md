@@ -294,7 +294,7 @@ const receiveCitySignal = (cityName) => {
 
 ### 2일차의 v-model이 여기서 이어진다
 
-2일차에서 text input의 `v-model`이 `:value` + `@input`의 문법 설탕이라고 했는데, 컴포넌트에서도 정해진 prop과 event를 통해 양방향 binding을 구성한다.
+2일차에서 text input의 `v-model`이 `:value` + `@input`의 문법 설탕이라고 했는데, 컴포넌트에서도 정해진 prop과 event로 양방향 binding을 구성한다.
 
 ```vue
 <!-- 자식: SearchBar.vue -->

@@ -71,7 +71,7 @@ Service network
 
 그러나 **EKS의 기본 Amazon VPC CNI는 전형적인 overlay가 아니다.** Pod가 VPC subnet의 실제 주소를 ENI에서 할당받아 VPC 네트워크에 직접 나타난다. 이 방식은 경로가 단순하고 AWS 네트워크 기능과 잘 연결되지만, subnet IP와 인스턴스별 ENI/IP 한도가 Pod 밀도의 제약이 된다.
 
-따라서 “쿠버네티스 Pod 네트워크는 overlay”는 흔한 구현을 설명하는 문장이지 Kubernetes의 필수 조건이 아니다. 정확한 표현은 **CNI가 Pod 네트워크를 구현하며, 구현 방식은 overlay일 수도 native routing일 수도 있다**이다.
+“쿠버네티스 Pod 네트워크는 overlay”는 흔한 구현을 설명하는 문장이지 Kubernetes의 필수 조건이 아니다. 정확한 표현은 **CNI가 Pod 네트워크를 구현하며, 구현 방식은 overlay일 수도 native routing일 수도 있다**이다.
 
 ## `kubectl apply` 이후의 여덟 단계
 

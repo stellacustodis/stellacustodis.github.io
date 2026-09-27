@@ -189,7 +189,7 @@ Ticket ticket = tickets.create(orderId, userId, reason);      // 상태: PENDING
 audit.log("REFUND_REQUESTED", userId, orderId, ticket.no());
 ```
 
-남의 주문에 대해 티켓을 만들 수 없다. 그리고 실제 처리는 모델이 닿을 수 없는 경로에 둔다.
+남의 주문으로 티켓을 만들 수 없다. 그리고 실제 처리는 모델이 닿을 수 없는 경로에 둔다.
 
 ```java
 @PostMapping("/lab3/admin/tickets/{no}/approve")
@@ -299,7 +299,7 @@ record AnswerDto(String answer, List<Source> sources, boolean toolUsed) {}
 
 3일차는 행동이었다. 도구를 쥐여 주되 실행 권한은 코드가 쥐고, 되돌릴 수 없는 일에는 사람을 세우고, 공통 관심사를 Advisor 체인에 모았다.
 
-Phase별로 정리하면 각 단계의 핵심 판단이 드러난다.
+Phase별 핵심 판단은 다음과 같다.
 
 | Phase | 무엇을 만들었나 | 핵심 판단 |
 |---|---|---|

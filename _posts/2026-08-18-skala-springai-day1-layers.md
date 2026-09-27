@@ -151,7 +151,7 @@ public class SnackRepository {
 
 `SnackService`의 주석에는 이 실습의 의도가 한 줄로 적혀 있다. "AI는 한 줄도 없다. 계층을 먼저 몸에 익히는 것이 이 실습의 전부다. 뒤 장에서 AI 호출이 들어올 자리도 정확히 이 자리다."
 
-즉 이 실습은 빈칸 채우기다. `repo.findByMood(mood)` 자리에 나중에 `chatClient.prompt()...call()`이 들어온다. 계층을 먼저 세워 두면 AI가 들어올 자리가 이미 정해져 있다는 것이 1장의 논지다.
+이 실습은 빈칸 채우기다. `repo.findByMood(mood)` 자리에 나중에 `chatClient.prompt()...call()`이 들어온다. 계층을 먼저 세워 두면 AI가 들어올 자리가 이미 정해져 있다는 것이 1장의 논지다.
 
 ## AI는 어느 계층에 두나
 
