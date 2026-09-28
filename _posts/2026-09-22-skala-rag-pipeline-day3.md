@@ -8,6 +8,7 @@ categories:
 tags: [skala, agentic-rag, langgraph, multi-agent, kv-cache]
 description: "Advanced·Self·Modular·Agentic RAG를 정리하고, KV cache 다중 관점 평가 프로젝트의 전체 코드와 담당한 기술 조사 에이전트를 살펴본다."
 related: [skala-rag-pipeline-roadmap, skala-rag-pipeline-day1, skala-rag-pipeline-day2]
+mermaid: true
 ---
 
 ## 기본 RAG에서 Agentic RAG로
