@@ -33,6 +33,21 @@ Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linea
 - [Flow Matching과 Rectified Flow](/posts/flow-matching/)
 - [Classifier-Free Diffusion Guidance](/posts/cfg/)
 
+## Image Editing
+
+확산 모델의 역변환과 편집 제어에서 출발해, 텍스트·마스크·포인트 조건으로 실제 이미지를 수정하는 방법을 따라가는 경로입니다.
+
+- [DiffusionCLIP: Text-Guided Diffusion Models for Robust Image Manipulation](/posts/diffusionclip/)
+- [Null-text Inversion for Editing Real Images using Guided Diffusion Models](/posts/null-text-inversion/)
+- [EDICT: Exact Diffusion Inversion via Coupled Transformations](/posts/edict/)
+- [DIFFEDIT: DIFFUSION-BASED SEMANTIC IMAGE EDITING WITH MASK GUIDANCE](/posts/diffedit/)
+- [InstructPix2Pix: Learning to Follow Image Editing Instructions](/posts/instructpix2pix/)
+- [Plug-and-Play Diffusion Features for Text-Driven Image-to-Image Translation](/posts/plug-and-play-diffusion-features/)
+- [MasaCtrl: Tuning-Free Mutual Self-Attention Control for Consistent Image Synthesis and Editing](/posts/masactrl/)
+- [LEDITS++: Limitless Image Editing using Text-to-Image Models](/posts/ledits-plus-plus/)
+- [Inversion-Free Image Editing with Language-Guided Diffusion Models](/posts/inversion-free-image-editing/)
+- [Drag Your Noise: Interactive Point-based Editing via Diffusion Semantic Propagation](/posts/drag-your-noise/)
+
 ## SKALA 백엔드·AI 애플리케이션
 
 - [Java·Spring Boot·REST API 5일 로드맵](/posts/skala-java-springboot-roadmap/)
