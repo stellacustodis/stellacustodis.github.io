@@ -44,7 +44,7 @@ $$
 
 처럼 분산을 고정했다. 샘플 품질에 초점을 둔 $L_{\text{simple}}$은 노이즈 예측만 학습하므로 분산에는 학습 신호를 주지 않는다. 반대로 분산의 로그값을 신경망이 직접 예측하게 하면 학습이 불안정했다. 따라서 단순히 “분산도 출력한다”로는 부족하고, 분산의 표현 범위와 손실이 함께 설계되어야 한다.
 
-노이즈 스케줄에도 낭비가 있었다. 기존 선형 스케줄은 $32\times32$와 $64\times64$ 이미지에서 후반부 정보를 지나치게 빠르게 파괴했다. 실제로 선형 스케줄의 역과정 마지막 20%를 건너뛰어도 FID 변화가 크지 않았다. 이는 많은 확산 단계가 유효한 정보 변화를 담당하지 못한다는 뜻이다.
+노이즈 스케줄에도 낭비가 있었다. 기존 선형 스케줄은 $32\times32$와 $64\times64$ 이미지에서 후반부 정보를 지나치게 빠르게 파괴했다. 실제로 선형 스케줄에서는 큰 $t$에서 시작하는 역확산의 앞부분을 최대 20%까지 건너뛰어도 FID 변화가 크지 않았다. 순방향 노이징의 후반부가 역방향 생성에서는 앞부분이라는 점을 구분해야 한다. 이는 많은 확산 단계가 유효한 정보 변화를 담당하지 못한다는 뜻이다.
 
 오디오 영역에서는 Chen et al. (2020b)이 적은 스텝의 확산 생성을 보였지만, mel-spectrogram이라는 강한 조건 신호가 없는 무조건부 이미지 생성에서도 같은 접근이 통하는지는 입증되지 않았다. 이 논문은 이러한 배경 위에서 품질, 가능도, 샘플링 속도를 하나의 설계 안에서 조정한다.
 
@@ -308,7 +308,7 @@ $\beta_t$는 순방향 한 단계에서 넣은 노이즈 분산이고, $\tilde{\
 
 로그 공간을 사용하는 이유는 분산이 양수여야 하고 그 크기가 곱셈적 척도에서 움직이기 때문이다. $v=1$이면 $\Sigma_\theta=\beta_t$, $v=0$이면 $\Sigma_\theta=\tilde{\beta}_t$가 된다. 중간값에서는 두 분산의 기하학적 보간이 된다.
 
-논문은 $v$에 별도의 인위적 제약을 두지 않는다. 따라서 Eq. 14는 두 값을 기준점으로 제공하지만, 수학적으로 반드시 그 사이에만 머물게 하는 hard constraint는 아니다. 구현할 때 $v$를 임의로 sigmoid에 통과시켜 $[0,1]$로 제한하면 추출본에 제시된 설계와 달라진다는 점을 주의해야 한다.
+논문은 $v$에 별도의 인위적 제약을 두지 않는다. 따라서 Eq. 14는 두 값을 기준점으로 제공하지만, 수학적으로 반드시 그 사이에만 머물게 하는 hard constraint는 아니다. 구현할 때 $v$를 임의로 sigmoid에 통과시켜 $[0,1]$로 제한하면 Eq. 14의 설계와 달라진다는 점을 주의해야 한다.
 
 분산을 학습시키기 위해 다음 하이브리드 손실을 사용한다.
 
@@ -437,9 +437,11 @@ eps_pred, v = model(xt, t)                   # 각각 (B, C, H, W)
 loss_simple = mean(square(eps - eps_pred))
 
 b = gather(beta, t)                          # (B, 1, 1, 1)
-b_tilde = gather(beta_tilde, t)              # (B, 1, 1, 1)
-
-log_var = v * log(b) + (1.0 - v) * log(b_tilde)
+# T >= 2. 첫 posterior variance는 0이므로 그대로 log를 취하지 않는다.
+# 저자 코드는 첫 log-variance에 두 번째 posterior variance의 log를 사용한다.
+log_beta_tilde_safe = log(concat([beta_tilde[1:2], beta_tilde[1:]]))
+min_log = gather(log_beta_tilde_safe, t)       # (B, 1, 1, 1)
+log_var = v * log(b) + (1.0 - v) * min_log
 var = exp(log_var)                           # (B, C, H, W)
 
 mu = mean_from_predicted_noise(
@@ -505,49 +507,32 @@ append_recent(loss_history[t], Lt, limit=10)
 학습 루프와 달리 샘플링은 시간 순서를 거꾸로 따라야 한다. 전체 시간축을 사용할 수도 있고, $K$개의 부분 수열을 만들 수도 있다.
 
 ```python
-# x: (B, C, H, W), initially N(0, I)
-# S: 길이 K인 단축 시간 인덱스, 오름차순 저장
-# sampling에서는 S를 역순으로 순회
-
+# 설명용 의사코드. S는 선택한 K개의 noisy 시점 인덱스이며 엄밀히 오름차순이다.
 x = standard_normal((B, C, H, W))
-
-for j in reversed(range(1, len(S))):
+for j in reversed(range(len(S))):
     s_now = S[j]
-    s_prev = S[j - 1]
-
-    alpha_bar_now = alpha_bar[s_now]
-    alpha_bar_prev = alpha_bar[s_prev]
-
-    beta_skip = 1.0 - alpha_bar_now / alpha_bar_prev
-    beta_tilde_skip = (
-        (1.0 - alpha_bar_prev)
-        / (1.0 - alpha_bar_now)
-        * beta_skip
+    a_now = alpha_bar[s_now]
+    eps_pred, v = model(x, s_now)
+    x0_pred = (x - sqrt(1.0 - a_now) * eps_pred) / sqrt(a_now)
+    x0_pred = clip(x0_pred, -1.0, 1.0)  # 저자 코드의 기본 clip_denoised 설정
+    if j == 0:
+        x = x0_pred  # 마지막 clean endpoint에는 노이즈를 더하지 않는다.
+        continue
+    a_prev = alpha_bar[S[j - 1]]
+    alpha_skip = a_now / a_prev
+    beta_skip = 1.0 - alpha_skip
+    beta_tilde_skip = (1.0 - a_prev) / (1.0 - a_now) * beta_skip
+    mean = (
+        sqrt(a_prev) * beta_skip / (1.0 - a_now) * x0_pred
+        + sqrt(alpha_skip) * (1.0 - a_prev) / (1.0 - a_now) * x
     )
-
-    eps_pred, v = model(x, s_now)             # 각각 (B, C, H, W)
-
-    log_var = (
-        v * log(beta_skip)
-        + (1.0 - v) * log(beta_tilde_skip)
-    )
-    var = exp(log_var)                        # (B, C, H, W)
-
-    mean = reverse_mean_from_noise(
-        x=x,
-        eps_pred=eps_pred,
-        timestep=s_now,
-        alpha_bar_now=alpha_bar_now,
-        alpha_bar_prev=alpha_bar_prev,
-    )                                         # (B, C, H, W)
-
-    noise = standard_normal_like(x)           # (B, C, H, W)
-    x = mean + sqrt(var) * noise              # (B, C, H, W)
+    log_var = v * log(beta_skip) + (1.0 - v) * log(beta_tilde_skip)
+    x = mean + exp(0.5 * log_var) * standard_normal_like(x)
 ```
 
 부분 수열을 만들 때는 균등 간격의 실수를 반올림하므로 중복 인덱스나 경계 처리를 확인해야 한다. 또한 $S_t$와 $S_{t-1}$의 순서를 뒤집으면 $\bar{\alpha}$의 비율이 잘못되어 $\beta_{S_t}$가 의도한 전이 분산이 되지 않는다.
 
-마지막 복원 단계의 노이즈 처리도 일반 중간 단계와 동일하다고 가정해서는 안 된다. 추출본은 구체적인 API나 최종 단계 코드까지 제시하지 않으므로, 실제 구현에서는 Eq. 5의 $x_0$ 복원 경계와 사용 코드의 정의를 대조해야 한다.
+위 의사코드는 선택한 noisy 시점 모두에서 총 $K$번 모델을 평가하고 마지막 clean endpoint까지 복원한다. 저자 코드처럼 최종 단계에는 노이즈를 추가하지 않고, `log(0)` 계산 전에 분기한다. `v`는 본문의 분산 보간 계수이며 공식 API의 원 출력과 변환 규약을 맞춰야 한다. 완전한 실행 검증된 sampler는 아니므로 Eq. 5의 경계와 실제 모델 API를 별도로 대조해야 한다.
 
 학습과 샘플링의 비대칭은 이 논문의 핵심이다. 학습은 임의의 한 시점을 직접 구성하므로 순차 비용이 없지만, 생성은 역시간 순서에 묶인다. 따라서 학습 단계 수 $T$를 1000에서 4000으로 늘리는 것은 학습 표본 하나당 순전파를 4배로 만드는 변화는 아니지만, 전체 시간축 그대로 생성한다면 샘플링 순전파 횟수에는 직접 영향을 준다. Eq. 18이 필요한 이유가 여기에 있다.
 

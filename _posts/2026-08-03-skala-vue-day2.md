@@ -457,7 +457,8 @@ watchEffect(() => {
 
 ```js
 watchEffect((onCleanup) => {
-  const timer = setTimeout(() => fetchSuggestions(query.value), 300)
+  const currentQuery = query.value  // 동기 실행 중 읽어 의존성을 추적
+  const timer = setTimeout(() => fetchSuggestions(currentQuery), 300)
   onCleanup(() => clearTimeout(timer))
 })
 ```

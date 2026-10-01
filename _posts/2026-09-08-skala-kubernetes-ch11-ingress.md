@@ -29,6 +29,8 @@ Controller가 설치되지 않았거나 `ingressClassName`이 맞지 않으면 I
 
 ## Controller 선택은 구현 종속성을 만든다
 
+2026년 9월 기준 주의: Kubernetes 커뮤니티의 `ingress-nginx`는 2026년 3월 유지보수가 종료되어 보안 패치와 버그 수정이 더 이상 제공되지 않는다. 아래 nginx 예시는 강의 환경을 기록한 것이며 신규 운영 배포의 권장 선택이 아니다. 운영에서는 유지보수되는 Ingress Controller 또는 Gateway API 구현으로 이전을 검토한다. Ingress API 자체의 종료를 뜻하지는 않는다.
+
 | Controller | Data plane | 특징 |
 |---|---|---|
 | AWS Load Balancer Controller | ALB/NLB | ACM·WAF·AWS IAM 연동 |

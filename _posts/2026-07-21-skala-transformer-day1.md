@@ -21,7 +21,7 @@ math: true
 ③ Transformer         Attention Is All You Need 정독
 ```
 
-전공 영역이라 요약보다는 원문 확인에 무게를 뒀다. 슬라이드가 압축한 서술을 논문 원문·직접 계산과 대조했고, 어긋난 곳은 근거와 함께 바로잡아 적었다. 또 원 논문(2017)과 현재 프로덕션 LLM이 갈라지는 지점(Post-LN → Pre-LN, 절대 위치 인코딩 → RoPE 등)은 강의 범위를 넘더라도 함께 표시했다.
+원 논문(2017)과 현재 프로덕션 LLM이 갈라지는 지점(Post-LN → Pre-LN, 절대 위치 인코딩 → RoPE 등)도 함께 살펴본다.
 
 ## Software 3.0이라는 문제의식
 
@@ -635,15 +635,15 @@ CNN 쪽 한계가 특히 정량적으로 드러난다. 커널 크기 $k$인 합�
 
 WMT 2014 기준 성능이다.
 
-| 모델 | EN-DE BLEU | EN-FR BLEU | 학습 비용 (FLOPs) |
-|---|---|---|---|
-| GNMT + RL | 24.6 | 39.92 | $1.4\times10^{20}$ |
-| ConvS2S | 25.16 | 40.46 | $1.5\times10^{20}$ |
-| ConvS2S (Ensemble) | 26.36 | 41.29 | $1.2\times10^{21}$ |
-| **Transformer (base)** | 27.3 | 38.1 | $\mathbf{3.3\times10^{18}}$ |
-| **Transformer (big)** | **28.4** | **41.8** | $2.3\times10^{19}$ |
+| 모델 | EN-DE BLEU | EN-FR BLEU | EN-DE 학습 FLOPs | EN-FR 학습 FLOPs |
+|---|---|---|---|---|
+| GNMT + RL | 24.6 | 39.92 | $2.3\times10^{19}$ | $1.4\times10^{20}$ |
+| ConvS2S | 25.16 | 40.46 | $9.6\times10^{18}$ | $1.5\times10^{20}$ |
+| ConvS2S (Ensemble) | 26.36 | 41.29 | $7.7\times10^{19}$ | $1.2\times10^{21}$ |
+| **Transformer (base)** | 27.3 | 38.1 | $\mathbf{3.3\times10^{18}}$ | $\mathbf{3.3\times10^{18}}$ |
+| **Transformer (big)** | **28.4** | **41.8** | $2.3\times10^{19}$ | $2.3\times10^{19}$ |
 
-주목할 것은 BLEU가 아니라 오른쪽 열이다. base 모델은 **기존 최고 모델보다 두 자릿수 적은 연산량**으로 SOTA를 넘겼다. big 모델도 앙상블 대비 1/50 수준이다. 성능 향상보다 **효율 개선의 폭**이 이 논문의 진짜 충격이었고, 이것이 곧 "더 키울 수 있다"는 신호가 되어 LLM 시대를 열었다.
+학습 비용은 언어쌍별로 비교해야 한다. [원문 Table 2](https://arxiv.org/html/1706.03762)에서 EN-DE base는 GNMT+RL보다 약 7배, ConvS2S 앙상블보다 약 23배 적은 FLOPs로 더 높은 BLEU를 기록했다. EN-DE big의 비용은 같은 앙상블의 약 1/3.3이며, EN-FR big은 EN-FR 앙상블의 약 1/52다. base의 27.3 BLEU가 기존 결과를 넘는 것은 EN-DE이며, EN-FR base 38.1은 기존 40~41 수준보다 낮다.
 
 ### 파라미터 구성 확인
 
@@ -1031,7 +1031,7 @@ $$
 \text{KV Cache 크기} = 2 \times n_{\text{layers}} \times n_{\text{heads}} \times d_{\text{head}} \times n_{\text{tokens}} \times \text{bytes}
 $$
 
-긴 컨텍스트에서 이 값이 모델 가중치보다 커지는 일이 흔하고, **MQA / GQA**가 등장한 이유가 이것이다. 여러 query head가 key/value head를 공유해 캐시 크기를 $h$배 줄인다.
+긴 컨텍스트에서 이 값이 모델 가중치보다 커지는 일이 흔하고, **MQA / GQA**가 등장한 이유가 이것이다. 같은 head dimension·층 수·시퀀스 길이에서 query head 수가 $h$, KV head 수가 $h_{kv}$이면 MHA 대비 KV cache는 $h/h_{kv}$배 줄어든다. $h$배 감소는 $h_{kv}=1$인 MQA의 경우이고, GQA의 감소 비율은 그룹 수에 따라 달라진다.
 
 ## 계산 복잡도와 그 이후
 

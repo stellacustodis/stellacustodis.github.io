@@ -90,7 +90,7 @@ LAION을 선택한 이유는 규모뿐 아니라 사진, 회화, 디지털 아�
 
 ### Prompt-to-Prompt의 cross-attention 공유
 
-논문은 Stable Diffusion과 Prompt-to-Prompt를 결합해 이 대응성을 만든다. 서로 다른 캡션으로 이미지를 생성하되, 디노이징 과정에서 cross-attention 가중치를 공유한다. 그러면 인물의 외형과 배경 구도는 비교적 유지하면서 말만 용으로 바꾸는 형태의 이미지 쌍을 만들 수 있다.
+논문은 Stable Diffusion과 Prompt-to-Prompt 기반의 attention 공유로 이 대응성을 만든다. 본문은 Prompt-to-Prompt를 cross-attention 공유로 소개하지만, CVPR 부록 C.2(arXiv v2 A.2)의 실제 데이터 생성 구현은 두 이미지에 같은 노이즈를 사용하고 첫 $p$ 비율의 디노이징 스텝에서 두 번째 이미지의 self-attention 가중치를 교체한다고 명시한다. 그러면 인물의 외형과 배경 구도는 비교적 유지하면서 말만 용으로 바꾸는 형태의 이미지 쌍을 만들 수 있다.
 
 두 이미지가 항상 같은 정도로 유사해야 하는 것은 아니다. 색상이나 스타일처럼 작은 편집은 높은 유사도가 자연스럽지만, 객체를 교체하거나 위치를 바꾸는 큰 편집은 더 큰 이미지 변화가 필요할 수 있다. Prompt-to-Prompt에서는 cross-attention을 공유하는 디노이징 스텝의 비율 $p$가 이 대응성에 영향을 준다.
 
@@ -108,7 +108,7 @@ $$
 
 두 이미지가 단지 비슷하다고 해서 좋은 편집 쌍은 아니다. 반대로 이미지가 크게 달라졌더라도 그 변화가 텍스트 편집 관계와 맞지 않으면 학습에 부적합하다. 방향성 유사도는 “변화했는가”가 아니라 “텍스트가 요구한 방향으로 변화했는가”를 확인하는 데 쓰인다.
 
-논문은 구체적인 필터 임계치를 제시하지 않는다. 따라서 실제 구현에서 임계값을 정할 수는 있어도, 이를 논문이 사용한 값이라고 단정할 수는 없다.
+CVPR 부록 C.2(arXiv v2 A.2)는 image-image CLIP 0.75, image-caption CLIP 0.2, directional CLIP 0.2의 임계치를 제시한다. 세 필터를 모두 통과한 후보를 directional similarity 순으로 정렬하고 캡션 쌍마다 최대 4개를 남긴다.
 
 ## 방법 — InstructPix2Pix 확산 모델
 
@@ -263,31 +263,28 @@ for input_caption in unique_laion_captions:
         (input_caption, instruction, edited_caption)
     )
 
-image_pairs = []
+training_pairs = []
 for input_caption, instruction, edited_caption in text_triplets:
-    p_values = sample_uniform(
-        low=0.1,
-        high=0.9,
-        count=100,
-    )
-
-    for p in p_values:
-        input_image, edited_image = prompt_to_prompt(
-            input_caption=input_caption,
-            edited_caption=edited_caption,
-            attention_share_ratio=p,
+    candidates = []
+    for p in sample_uniform(low=0.1, high=0.9, count=100):
+        input_image, edited_image = generate_shared_noise_self_attention_pair(
+            input_caption, edited_caption, attention_share_ratio=p,
         )
-        image_pairs.append(
-            (input_image, instruction, edited_image)
+        # 동일 latent noise를 공유하고 처음 p 비율의 스텝에서 self-attention 교체
+        image_sim = clip_image_similarity(input_image, edited_image)
+        caption_sim = minimum_image_caption_similarity(
+            input_image, input_caption, edited_image, edited_caption,
         )
-
-training_pairs = [
-    pair for pair in image_pairs
-    if clip_directional_similarity(pair) passes
-]
+        directional_sim = clip_directional_similarity(
+            input_image, edited_image, input_caption, edited_caption,
+        )
+        if image_sim >= 0.75 and caption_sim >= 0.2 and directional_sim >= 0.2:
+            candidates.append((directional_sim, input_image, instruction, edited_image))
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    training_pairs.extend(item[1:] for item in candidates[:4])
 ```
 
-`passes`에 해당하는 정확한 기준값은 추출본에 없다. 구현에서는 기준을 정해야 하지만, 그 값은 재현 구현의 선택이지 논문에서 확인된 하이퍼파라미터가 아니다.
+위 코드는 세 CLIP 필터와 캡션 쌍별 최대 4개 선택을 반영한 설명용 의사코드다. 이미지·캡션 유사도는 각 이미지가 해당 캡션과 맞는지 확인하고, directional similarity는 두 이미지와 두 캡션의 변화 방향을 비교해야 한다. 추상 helper의 CLIP 임베딩·정규화 계약은 실제 구현에서 명시해야 한다.
 
 또한 캡션 쌍마다 100개의 후보를 만든다는 점은 비용 구조를 보여준다. 최종적으로 남는 데이터 수만 봐서는 데이터 생성 비용을 알 수 없다. 많은 후보를 생성하고 필터링하는 과정은 추론을 빠르게 만들기 위해 미리 지불한 비용이다.
 
@@ -388,7 +385,7 @@ edited_image = D(z)
 - 첫 번째 컨볼루션 레이어는 노이즈 잠재 벡터와 입력 이미지 잠재 벡터를 함께 받도록 확장되어야 하며, 추가 채널의 가중치는 0으로 초기화된다.
 - 조건 드롭아웃은 이미지 전용, 텍스트 전용, 둘 다 비조건부 상태를 정확한 확률로 만들어야 한다.
 - $p$는 데이터 생성 단계의 Prompt-to-Prompt attention 공유 비율이며, $s_I$, $s_T$는 최종 모델 추론 단계의 CFG 스케일이다.
-- $t=0$ 처리, 누적곱 정의, 특정 샘플러, 배치 크기, 메모리 사용량, 최적화기 등은 제공된 추출본에 구체적으로 없다. 이런 세부를 논문이 명시한 설정처럼 덧붙일 수는 없다.
+- 배치 크기와 sampler 등 부록의 보고 설정은 아래에 구분해 적었다. $t=0$ 처리, 누적곱·API 규약과 측정 최대 메모리 등 나머지 구현 세부는 별도로 확인해야 한다.
 
 ## 실험 설정과 평가 기준
 
@@ -408,7 +405,7 @@ edited_image = D(z)
 
 첫 번째 지표만 높으면 모델이 편집을 거의 하지 않았을 가능성이 있다. 두 번째 지표만 보면 원본의 구조를 지나치게 바꾼 결과가 유리해질 수 있다. 따라서 편집 모델은 두 지표의 트레이드오프를 함께 봐야 한다.
 
-하드웨어, GPU 시간, 배치 크기, 최적화기 등의 구체적인 학습 비용은 제공된 본문에 없다. Appendix C에 추가 학습 세부가 있다고 언급되지만, 이 글에서 확인할 수 있는 수치는 아니다.
+CVPR 부록 C.3(arXiv v2 A.3)에 따르면 모델은 8개의 40GB A100에서 배치 크기 1024, 해상도 256×256, 학습률 $10^{-4}$로 10,000스텝을 약 25.5시간 학습했다. 512×512 추론은 Karras 분산 스케줄의 Euler ancestral sampler로 100스텝을 사용하며 A100에서 이미지당 약 9초다. 보고된 장비 용량은 측정 최대 메모리 사용량과 다르고, 다른 장비의 지연시간을 보장하지 않는다.
 
 ## 실험에서 확인한 것
 
@@ -482,7 +479,7 @@ InstructPix2Pix의 실용적 장점은 이미지별 인버전이나 샘플별 �
 - 학습 단계에서는 45만 개 이상의 합성 이미지 편집 예시로 확산 모델을 학습한다.
 - 추론 단계에서는 이미지별 인버전과 파인튜닝 없이 확산 디노이징으로 편집한다.
 
-즉, 이 방법은 온라인 요청마다 치르는 비용 일부를 오프라인 데이터 구축과 학습으로 옮긴 구조다. 이후 연구에서 더 적은 디노이징 단계로 편집하거나, 더 효율적인 조건 결합을 설계하려는 시도는 이런 추론 비용 구조를 줄이려는 출발점으로 이해할 수 있다. 다만 제공된 추출본에는 샘플링 스텝 수, 파라미터 수, GPU 시간, 메모리 사용량의 구체적 수치가 없어 이 논문 자체의 비용을 정량 비교할 수는 없다.
+즉, 이 방법은 온라인 요청마다 치르는 비용 일부를 오프라인 데이터 구축과 학습으로 옮긴 구조다. 이후 연구에서 더 적은 디노이징 단계로 편집하거나, 더 효율적인 조건 결합을 설계하려는 시도는 이런 추론 비용 구조를 줄이려는 출발점으로 이해할 수 있다. 다만 보고된 학습·추론 설정만으로 다른 장비의 비용이나 측정 최대 메모리 사용량을 정량 비교할 수는 없다.
 
 ## 한계와 생각해볼 점
 
@@ -509,13 +506,13 @@ InstructPix2Pix의 실용적 장점은 이미지별 인버전이나 샘플별 �
 
 특히 $s_I$를 높인다고 특정 객체만 보존되는 것은 아니다. $s_I$는 입력 이미지의 공간 구조를 전반적으로 유지하는 가이던스이며, 사용자 지정 마스크나 객체 경계를 직접 나타내는 조건은 아니다. “전체 구조 보존”과 “이 객체만 바꾸기”는 다른 제어 문제다.
 
-순환 편집도 같은 이유로 조심해야 한다. 한 단계의 왜곡이나 구조 손상이 다음 단계의 입력이 되므로, 결과를 누적할수록 아티팩트가 쌓일 수 있다. 제공된 추출본만으로는 어느 횟수부터 품질 저하가 커지는지, 어떤 지시문 조합이 특히 취약한지는 판단할 수 없다.
+순환 편집도 같은 이유로 조심해야 한다. 한 단계의 왜곡이나 구조 손상이 다음 단계의 입력이 되므로, 결과를 누적할수록 아티팩트가 쌓일 수 있다. 품질 저하가 커지는 편집 횟수와 취약한 지시문 조합은 별도로 평가해야 한다.
 
-### 논문 범위 밖이라 알 수 없는 것
+### 추가 비교와 비용 해석
 
-제공된 본문은 Appendix A~D의 존재를 언급하지만, 그 전문은 포함하지 않는다. 따라서 GPU 사양, 배치 크기, 최적화기, 학습 시간, 메모리 사용량, 확산 스케줄, 샘플러 같은 세부를 이 글에서 확정할 수 없다.
+GPU 용량과 측정 최대 메모리 사용량은 다른 값이다. 사용한 GPU의 용량만으로 실행에 필요한 메모리를 추정할 수는 없다.
 
-부록에는 추가 선택 결과, 베이스라인과 구성 비교, 학습 세부사항, 두 조건 CFG의 추가 제형이 수록되어 있다고 언급된다. Fig. 14는 데이터와 사전학습 모델의 편향 분석을, Fig. 23은 다른 CLIP 모델을 사용한 추가 정량 검증을 다룬다고 소개되지만, 제공된 추출본에는 해당 결과의 세부 수치가 없다.
+부록에는 추가 선택 결과, 베이스라인과 구성 비교, 학습 세부사항, 두 조건 CFG의 추가 제형이 수록되어 있다고 언급된다. Fig. 14는 데이터와 사전학습 모델의 편향 분석을, Fig. 23은 다른 CLIP 모델을 사용한 추가 정량 검증을 다룬다고 소개된다.
 
 ## 정리
 

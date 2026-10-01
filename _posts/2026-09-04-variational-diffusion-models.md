@@ -273,7 +273,7 @@ $$
 
 $\exp(\gamma_\eta(t)-\gamma_\eta(s))-1$은 인접 시점 사이의 로그 SNR 변화가 만드는 가중치다. $\gamma_\eta$가 단조 증가하면 $t>s$에서 이 값은 비음수가 된다. 이산화 간격이 크면 한 구간이 넓은 노이즈 범위를 담당하여 가중치와 근사 오차가 커질 수 있고, $T$가 커지면 더 촘촘한 구간으로 연속 시간 적분에 접근한다.
 
-Eq. 12에서 Eq. 13으로 가는 세부 유도는 본문에서 부록 E를 참조한다. 제공된 추출본에는 부록이 포함되지 않았으므로, 가우시안 조건부분포의 KL에서 어떤 중간 항이 소거되는지까지는 이 글의 근거만으로 복원할 수 없다. 여기서는 추출된 결론인 SNR 차이 가중 MSE와 그 역할까지만 사용한다.
+Eq. 12에서 Eq. 13으로 가는 세부 유도는 본문에서 부록 E를 참조한다. 가우시안 조건부분포의 KL을 정리하면 SNR 차이로 가중한 MSE와 연결된다.
 
 ## 방법 4 — 연속 시간 극한과 스케줄 불변성
 
@@ -428,7 +428,7 @@ _그림 2. 푸리에 특성과 학습 가능한 SNR 스케줄을 함께 사용�
 
 ### 연속 시간 학습 루프
 
-Eq. 17을 그대로 옮기면 핵심 학습 단계는 다음과 같은 의사코드가 된다. 아래 코드는 수식의 데이터 흐름만 나타내며, 단조 신경망의 구체적인 구조나 미분 API는 추출본에 없으므로 추상 연산으로 남긴다.
+Eq. 17을 그대로 옮기면 핵심 학습 단계는 다음과 같은 의사코드가 된다. 아래 코드는 수식의 데이터 흐름만 나타내며, 단조 신경망과 미분 API는 각 역할을 나타내는 추상 연산으로 표현한다.
 
 ```python
 def continuous_vdm_loss(x, denoiser, gamma, fourier_frequencies):
@@ -455,12 +455,13 @@ def continuous_vdm_loss(x, denoiser, gamma, fourier_frequencies):
     # (B, C * (1 + 2 * len(fourier_frequencies)), H, W)
 
     eps_hat = denoiser(model_input, t)             # (B, C, H, W)
-    gamma_prime_t = derivative_of_gamma(t)         # (B, 1, 1, 1)
+    gamma_prime_t = derivative_of_gamma(t).reshape(x.shape[0])  # (B,)
 
     per_example_error = sum_over_chw(
         (eps - eps_hat) ** 2
     )                                              # (B,)
 
+    # 시간 가중치와 표본별 오차를 모두 (B,)로 맞춰 표본끼리 곱한다.
     diffusion_loss = 0.5 * mean(
         gamma_prime_t * per_example_error
     )
@@ -468,7 +469,7 @@ def continuous_vdm_loss(x, denoiser, gamma, fourier_frequencies):
     return diffusion_loss
 ```
 
-논문은 연속 시간 loss를 추정할 때 low-discrepancy sampler를 사용해 VLB 추정 분산을 크게 줄인다. 추출본에는 그 표본기의 세부 절차가 없으므로 위 코드에서도 `low_discrepancy_times`라는 역할만 표시했다. 이를 임의의 특정 알고리즘으로 바꾸어 적는 것은 근거 범위를 넘어선다.
+논문은 연속 시간 loss를 추정할 때 low-discrepancy sampler를 사용해 VLB 추정 분산을 크게 줄인다. 위 코드의 `low_discrepancy_times`는 이 표본화의 역할을 나타낸다. 재현할 때는 표본기의 구체적인 설정도 맞춰야 한다.
 
 Eq. 11의 전체 negative VLB를 구현하려면 위 diffusion loss 외에도 prior KL과 reconstruction loss가 필요하다.
 
@@ -506,7 +507,7 @@ def discrete_vdm_loss(x, denoiser, gamma, T):
     z_t = alpha_t * x + sigma_t * eps              # (B, C, H, W)
 
     eps_hat = denoiser_with_fourier(z_t, t)        # (B, C, H, W)
-    weight = exp(gamma_t - gamma_s) - 1            # (B, 1, 1, 1)
+    weight = (exp(gamma_t - gamma_s) - 1).reshape(x.shape[0])  # (B,)
 
     squared_error = sum_over_chw(
         (eps - eps_hat) ** 2
@@ -550,7 +551,7 @@ def sample_vdm(batch_shape, denoiser, gamma, T_eval):
     return x
 ```
 
-역전이 $q(z_s\mid z_t,x)$의 평균과 분산을 계산하는 상세 식은 추출본에 포함되지 않았다. 따라서 구현에서는 이를 `sample_reverse_conditional`로 남겨 두는 것이 안전하다. 임의의 다른 확산 모델의 역전이 식을 가져와 채우면 이 논문의 매개변수화와 일치한다고 보장할 수 없다.
+의사코드의 `sample_reverse_conditional`은 역전이 $q(z_s\mid z_t,x)$의 평균과 분산에 따라 표본을 뽑는 연산이다. 다른 확산 모델의 역전이 식을 가져와 채우면 이 논문의 매개변수화와 일치한다고 보장할 수 없다.
 
 ### 구현할 때 확인할 지점
 
@@ -574,13 +575,13 @@ def sample_vdm(batch_shape, denoiser, gamma, T_eval):
 
 비교 대상에는 VAE 계열의 ResNet VAE with IAF, Very Deep VAE, NVAE, CR-NVAE, 흐름 계열의 Glow와 Flow++, 자기회귀 계열의 PixelCNN, PixelCNN++, Image Transformer, SPN, Sparse Transformer, Routing Transformer, Sparse Transformer + DistAug, 확산 계열의 DDPM, EBM-DRL, Score SDE, Improved DDPM, LSGM, ScoreFlow가 포함된다.
 
-하드웨어 종류는 명시되지 않았다. 다만 Sparse Transformer와 동급 하드웨어에서 CIFAR-10 2.80 BPD에 도달하는 wall-clock time이 10배 빠르다고 보고한다. 이 수치는 최종 BPD뿐 아니라 특정 품질 수준까지 도달하는 최적화 효율을 비교한다는 점에서 의미가 있다.
+원문 Appendix B.1은 모든 모델을 TPUv3에서 학습했다고 명시하며, B.2는 데이터셋별 칩 수와 일부 학습 시간을 제시한다. 다만 Sparse Transformer와 동급 하드웨어에서 CIFAR-10 2.80 BPD에 도달하는 wall-clock time이 10배 빠르다고 보고한다. 이 수치는 최종 BPD뿐 아니라 특정 품질 수준까지 도달하는 최적화 효율을 비교한다는 점에서 의미가 있다.
 
 ## 실험에서 확인한 것
 
 ### 밀도 추정 결과
 
-Table 1의 전체 결과는 다음과 같다. 빈 칸은 추출본에 보고된 수치가 없는 경우다.
+Table 1의 전체 결과는 다음과 같다. 빈 칸은 0으로 해석하거나 해당 열의 비교에 사용하지 않는다.
 
 | Model | Type | CIFAR-10, no aug. | CIFAR-10, aug. | ImageNet 32×32 | ImageNet 64×64 |
 |---|---:|---:|---:|---:|---:|
@@ -680,13 +681,13 @@ Ablation을 종합하면 성능은 세 요소의 결합으로 이해할 수 있�
 
 VDM은 likelihood 성능을 높였지만 비용을 없애지는 않는다.
 
-학습에서는 연속 시간 적분을 매번 전부 계산하지 않고 시간 표본으로 추정한다. low-discrepancy sampler와 학습된 스케줄은 이 추정의 분산을 낮추므로, 같은 목적값에 도달하는 최적화 효율을 높이는 방향으로 작동한다. 실제로 Sparse Transformer와 동급 하드웨어에서 2.80 BPD에 도달하는 wall-clock time이 10배 빠르다고 보고되었다. 다만 하드웨어의 구체적인 종류나 전체 학습 비용은 추출본에 없다.
+학습에서는 연속 시간 적분을 매번 전부 계산하지 않고 시간 표본으로 추정한다. low-discrepancy sampler와 학습된 스케줄은 이 추정의 분산을 낮추므로, 같은 목적값에 도달하는 최적화 효율을 높이는 방향으로 작동한다. 실제로 Sparse Transformer와 동급 하드웨어에서 2.80 BPD에 도달하는 wall-clock time이 10배 빠르다고 보고되었다. 구체적인 하드웨어와 데이터셋별 설정은 원문 Appendix B에서 확인할 수 있다. 예를 들어 증강 없는 CIFAR-10 모델은 TPUv3 칩 8개에서 학습했다. 전체 설정을 동일한 단일 비용으로 일반화하지는 않는다.
 
 추론과 평가는 다른 병목을 가진다. 학습은 한 배치에서 하나의 시간 표본으로 Eq. 17을 추정할 수 있지만, 생성이나 유한 시간 우도 평가는 $T_{\text{eval}}$개의 역전이를 순차적으로 거쳐야 한다. Table 2에서 $T_{\text{eval}}=10$인 연속 시간 모델은 7.54 BPD이고, $100$에서 2.90, $1000$에서 2.67, $10000$에서 2.65로 개선된다. 품질과 평가 정확도를 높이려면 더 많은 신경망 순전파를 지불해야 한다.
 
 경량화 관점에서 병목은 명확하다. 디노이저 한 번의 비용만 줄여도 총비용은 평가 스텝 수만큼 반복되며, 반대로 네트워크를 그대로 둔 채 스텝 수를 줄이면 Table 2처럼 BPD가 악화될 수 있다. 이 논문에서 학습 가능한 스케줄은 최적화 분산을 줄이지만, 큰 $T_{\text{eval}}$에서 필요한 순차적 순전파 횟수 자체를 제거하지는 않는다.
 
-푸리에 특성도 추가 입력 채널을 만든다. 다만 이로 인해 늘어나는 정확한 파라미터 수, 메모리 또는 연산량은 추출본에 보고되지 않았다. 따라서 그 비용의 크기를 수치로 판단할 수는 없다.
+푸리에 특성도 추가 입력 채널을 만든다. 이로 인해 늘어나는 파라미터 수와 메모리, 연산량은 별도로 측정해야 한다.
 
 또 다른 트레이드오프는 목적함수 사이에 있다. likelihood에 맞춘 모델은 FID 7.41이었고, weighted loss는 FID를 4.0으로 개선했다. 지각적 품질을 위해 $w(v)$를 바꾸면 원래 VLB와 다른 노이즈 구간 가중치를 사용한다. 즉 likelihood 최적화와 지각적 생성 품질 사이에 하나의 고정된 최적 가중치가 있다고 볼 근거는 없다.
 
@@ -696,9 +697,9 @@ VDM은 기존 확산 모델의 기본 구조를 버리지 않는다. 순방향 �
 
 첫째, 고정된 diffusion process를 학습 가능한 단조 SNR 스케줄로 바꾼다. 둘째, VLB를 SNR 적분으로 표현하여 연속 시간 스케줄 불변성과 분산 감소 역할을 분리한다. 셋째, 원본 데이터 해상도에서 미세한 값을 다루기 위해 푸리에 특성을 추가한다.
 
-결과는 CIFAR-10뿐 아니라 ImageNet 32×32와 64×64에서도 개선되었다. 따라서 적어도 서로 다른 데이터셋과 두 이미지 해상도에서 likelihood 개선이 유지된다는 근거는 있다. 그러나 다른 모달리티, 더 큰 해상도, 다른 디노이저 규모에서도 같은 결론이 유지되는지는 추출본의 실험으로 확인할 수 없다.
+결과는 CIFAR-10뿐 아니라 ImageNet 32×32와 64×64에서도 개선되었다. 따라서 적어도 서로 다른 데이터셋과 두 이미지 해상도에서 likelihood 개선이 유지된다는 근거는 있다. 그러나 다른 모달리티, 더 큰 해상도, 다른 디노이저 규모에서도 같은 결론이 유지되는지는 이 실험으로 확인할 수 없다.
 
-기존 자기회귀·VAE·flow·diffusion 계열을 폭넓게 비교했다는 점은 밀도 추정에서의 위치를 보여준다. 반면 FID에 대해서는 likelihood 목적 7.41과 weighted loss 4.0의 비교만 추출되어 있으므로, 지각적 생성 품질 전반에서 모든 기준선을 능가한다고 확대해 해석해서는 안 된다.
+기존 자기회귀·VAE·flow·diffusion 계열을 폭넓게 비교했다는 점은 밀도 추정에서의 위치를 보여준다. FID의 likelihood 목적 7.41과 weighted loss 4.0을 비교할 때도, 이를 지각적 생성 품질 전반에서 모든 기준선을 능가한다는 결론으로 확대해서는 안 된다.
 
 ## 한계와 생각해볼 점
 
@@ -708,6 +709,4 @@ VDM은 기존 확산 모델의 기본 구조를 버리지 않는다. 순방향 �
 
 구현 관점에서 특히 확인해야 할 부분은 스케줄 학습과 endpoint 학습의 분리다. Eq. 18에 따르면 endpoint가 고정되었을 때 내부 스케줄 모양은 연속 시간 VLB 값을 바꾸지 않고 추정 분산을 바꾼다. 반면 최대 log-SNR을 약 8에서 13.3으로 바꾸는 endpoint 학습은 적분 구간 자체를 바꾼다. 두 효과를 하나의 “learned schedule”로 묶으면 목적함수 개선과 분산 감소를 혼동하기 쉽다.
 
-또한 연속 시간 목적함수의 스케줄 불변성에는 디노이저가 시간·SNR 변환에 대응할 수 있다는 조건이 붙는다. 유한한 모델 용량이나 불완전한 최적화에서도 동등성이 어느 정도 유지되는지는 추출된 실험만으로 일반화할 수 없다. 논문은 학습된 스케줄의 낮은 추정 분산을 보여주지만, 다른 데이터나 모델 규모에서도 같은 스케줄 형태가 최적인지는 확인되지 않는다.
-
-마지막으로 본문은 Eq. 13의 유도를 부록 E 등 여러 부록에 의존하지만, 제공된 문서 텍스트는 References에서 끝나 Appendix A–N이 누락되어 있다. 따라서 이 글은 Eq. 1–19의 본문 수식과 추출된 설명을 모두 다루되, 부록의 정리·가정·중간 유도를 임의로 복원하지 않았다. 특히 가우시안 전이 KL이 SNR 차이 가중 MSE로 정리되는 상세 소거 과정과 역방향 조건부분포의 구체식은 원문 부록이 확보되어야 추가로 검증할 수 있다.
+또한 연속 시간 목적함수의 스케줄 불변성에는 디노이저가 시간·SNR 변환에 대응할 수 있다는 조건이 붙는다. 유한한 모델 용량이나 불완전한 최적화에서도 동등성이 어느 정도 유지되는지는 이 실험만으로 일반화할 수 없다. 논문은 학습된 스케줄의 낮은 추정 분산을 보여주지만, 다른 데이터나 모델 규모에서도 같은 스케줄 형태가 최적인지는 확인되지 않는다.

@@ -53,7 +53,7 @@ OCI 표준 번들(`config.json` + `rootfs`)을 직접 생성한다.
 - `runc`를 실행한다. 인자는 `config.json`과 rootfs 경로
 - init process의 PID를 받아 **감시**하고, I/O 파이프라인을 연결·대기한다 (`docker exec`, `docker logs`가 여기로 붙는다)
 
-shim이 별도로 있는 이유가 중요하다. **`runc`는 컨테이너를 만들고 나면 빠진다.** 컨테이너가 도는 동안 계속 붙어 있는 것은 shim이고, 그래서 dockerd를 재시작해도 컨테이너가 죽지 않는다.
+shim이 별도로 있는 이유가 중요하다. `runc`는 컨테이너 생성 후 종료하고, shim은 컨테이너 프로세스의 I/O와 종료 상태를 관리한다. 다만 shim이 있다는 이유만으로 Docker 데몬 재시작 중 컨테이너 생존이 보장되지는 않는다. Docker는 기본적으로 데몬 종료 시 실행 중인 컨테이너를 중지하며, 계속 실행하려면 live-restore 설정과 재연결 조건을 확인해야 한다.
 
 [앞 편](/posts/skala-container-day2-kernel/)의 OOM 시나리오에서 "shim이 PID 1 종료를 감지"한다고 했던 것이 이 감시 역할이다.
 

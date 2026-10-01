@@ -19,9 +19,6 @@ pin: false
 2. **설계 근거를 수식으로 확인** — "왜 $\sqrt{d_k}$로 나누는가" 같은 질문에 말이 아니라 유도로 답한다
 3. **강의가 멈춘 지점 이어가기** — 2017년 원 논문과 현재 프로덕션 LLM이 갈라지는 곳(Post-LN → Pre-LN, PPO → DPO 등), 그리고 슬라이드가 다루지 않은 전제(벤치마크 오염, load balancing loss 등)를 함께 표시한다
 
-> 강의자료는 개념 지도를 잡는 참고 자료로 활용하고, 설명·수식·예시는 원 논문을 직접 확인해 재구성했다. 본문에서 "확인해 보니 / 검산해 보니"로 시작하는 대목은 슬라이드의 서술을 원문·계산과 대조해 바로잡은 부분이다.
-{: .prompt-info }
-
 ## 전체 흐름
 
 | 일차 | 날짜 | 핵심 주제 | 도달 목표 |
@@ -70,9 +67,9 @@ pin: false
 - **Distillation**: Soft label과 온도 $T$, 고전 KD vs 합성 데이터 SFT
 - **MoE**: Router와 Top-$k$, FFN 대체, Load Balancing Loss, 총 파라미터 vs 활성 파라미터
 
-## 이 시리즈에서 바로잡은 것들
+## 구분할 개념과 조건
 
-강의자료를 원문과 대조하면서 몇 군데를 수정해 적었다. 세부 근거는 각 글에 달아 두었고, 목록만 먼저 정리한다.
+개념을 정리할 때 구분할 조건은 다음과 같다.
 
 **1일차**
 
@@ -94,9 +91,9 @@ pin: false
 | 개념 | DeepSeek-R1의 distillation을 Hinton식 soft label KD로 설명 | R1은 **생성 텍스트 80만 건으로 SFT**했다. 로짓 KL이 아니라 sequence-level distillation |
 | 개념 | "Distillation은 압축이 아니다" → 같은 페이지에서 "모델 압축 기법" | 앞뒤 불일치. **결과는 압축, 방법은 재학습** |
 | 인용 | Scaling 3요소 설명에 GPT-3 논문 Fig 1.2 인용 | 그 그림은 **in-context learning 곡선**(가로축이 예시 개수). 거듭제곱 법칙 그래프는 Kaplan et al. Fig 1 |
-| 개념 | MoE Expert가 "처음에는 모두 동일하나" 전문화됨 | 완전 대칭이면 분화가 일어나지 않는다. **랜덤 초기화 + Router 편향 + load balancing** 셋이 필요 |
+| 개념 | MoE Expert가 "처음에는 모두 동일하나" 전문화됨 | 같은 초기 가중치만으로 전문화가 막히지는 않는다. Sparse Upcycling처럼 동일한 MLP를 Expert에 복사해도 router가 서로 다른 토큰을 배정하면 서로 다른 갱신으로 분화할 수 있다. |
 | 누락 | RLHF 목적함수를 "보상 최대화"로만 서술 | **KL 페널티**가 없으면 reward hacking으로 즉시 붕괴 |
-| 누락 | MoE Router 설명에 균형 장치 없음 | **Load balancing loss** 없이는 expert collapse |
+| 누락 | MoE Router 설명에 균형 장치 없음 | Expert 부하 균형을 위한 장치가 중요하다. 모든 MoE에 같은 load balancing loss가 필수인 것은 아니며, DeepSeek-V3는 동적 routing bias와 작은 sequence-wise 보조 손실을 함께 사용한다. |
 
 이 외에도 Word2Vec의 두 아키텍처 구분, ELMo가 LSTM 기반이라는 점, LSTM의 forget gate가 원 논문(1997)이 아니라 Gers et al.(2000)의 기여라는 점, Chinchilla의 주 비교 대상이 GPT-3가 아니라 Gopher라는 점 등 **원문과 슬라이드 요약 사이의 간극**을 각 글에 반영했다.
 

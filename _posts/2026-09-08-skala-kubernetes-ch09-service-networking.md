@@ -23,7 +23,7 @@ client → shop-api Service
           └─ Pod C IP
 ```
 
-Service의 selector가 Pod label과 맞고 Pod가 Ready여야 endpoint에 들어간다. 연결이 안 될 때 `kubectl get endpoints` 또는 `kubectl get endpointslices`를 먼저 보는 이유다.
+Service selector에 맞는 Pod는 Ready가 아니어도 EndpointSlice에 주소가 남을 수 있다. 일반적인 Service 라우팅은 endpoint의 ready 조건을 확인해 정상 트래픽 대상을 고르므로, 주소의 존재와 요청을 받을 준비 상태를 구분한다. `publishNotReadyAddresses` 같은 예외 설정도 함께 확인한다. 연결이 안 될 때 `kubectl get endpoints` 또는 `kubectl get endpointslices`를 먼저 보는 이유다.
 
 ## Service는 가상 IP다
 

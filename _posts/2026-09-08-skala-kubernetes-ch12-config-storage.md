@@ -33,7 +33,7 @@ envFrom:
   - configMapRef: { name: shop-config }
 ```
 
-ConfigMap을 volume으로 mount하면 kubelet이 file 내용을 갱신한다. 하지만 application이 file change를 감지하고 다시 읽어야 실제 동작이 바뀐다. “file이 바뀜”과 “application config가 reload됨”은 서로 다른 단계다.
+ConfigMap을 일반 projected volume으로 mount하면 kubelet이 변경 내용을 지연 후 반영한다. 단, `subPath`로 mount한 파일은 ConfigMap 변경을 자동 반영하지 않는다. 하지만 application이 file change를 감지하고 다시 읽어야 실제 동작이 바뀐다. “file이 바뀜”과 “application config가 reload됨”은 서로 다른 단계다.
 
 ```yaml
 volumes:

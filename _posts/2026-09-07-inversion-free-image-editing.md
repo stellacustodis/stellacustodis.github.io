@@ -437,7 +437,7 @@ $$
 \end{cases}
 $$
 
-이진 마스크가 1인 위치와 0인 위치의 조합에 따라 소스 잠재변수와 타깃 잠재변수가 공간적으로 혼합된다. 구현할 때는 $m$의 해상도와 $z_t$의 해상도가 다를 수 있으므로, 어텐션 맵을 잠재변수 공간에 맞춰 정렬하는 과정이 필요하다. 논문 추출본에는 그 구체적인 리사이즈 연산이나 API가 제시되어 있지 않으므로, 여기서는 두 텐서가 같은 공간 해상도로 정렬되어 있다고 가정한다.
+이진 마스크가 1인 위치와 0인 위치의 조합에 따라 소스 잠재변수와 타깃 잠재변수가 공간적으로 혼합된다. 구현할 때는 $m$의 해상도와 $z_t$의 해상도가 다를 수 있으므로, 어텐션 맵을 잠재변수 공간에 맞춰 정렬하는 과정이 필요하다. 아래 연산은 두 텐서가 같은 공간 해상도로 정렬되어 있다고 가정한다.
 
 ### 8. Mutual Self-Attention Control: 비강체 변경
 
@@ -491,7 +491,7 @@ _그림 1. 앉아 있는 갈색 곰을 서 있는 초록색 곰으로 편집할 
 
 ### DDCM 기반 가상 역전의 의사코드
 
-아래 의사코드는 논문의 Eq. 10과 Algorithm 1의 흐름을 구현 관점에서 다시 쓴 것이다. 구체적인 프레임워크 API는 논문 추출본에 없으므로, 네트워크 호출은 추상적인 함수로 둔다.
+아래 의사코드는 논문의 Eq. 10과 Algorithm 1의 흐름을 구현 관점에서 다시 쓴 것이다. 네트워크 호출은 프레임워크별 API 대신 각 연산의 역할을 나타내는 함수로 표현한다.
 
 ```python
 # z_tau: (B, C, H, W)
@@ -538,29 +538,35 @@ def virtual_inversion(z0, source_prompt, target_prompt, timesteps):
     return z_tgt
 ```
 
-다만 이 코드는 논문의 수식을 설명하기 위한 형태다. 실제 구현에서 `predict_initial`, `source_ddcm_step`, `sample_next`가 어떤 네트워크 입력 형식과 타임스텝 수열을 받는지는 추출본에 구체적으로 제시되어 있지 않다. 중요한 구현 원칙은 다음 세 가지다.
+다만 이 코드는 논문의 수식을 설명하기 위한 형태다. 실제 구현에서는 `predict_initial`, `source_ddcm_step`, `sample_next`의 네트워크 입력 형식과 타임스텝 수열을 백본 설정에 맞춰야 한다. 중요한 구현 원칙은 다음 세 가지다.
 
 첫째, 소스와 타깃은 동일한 터미널 노이즈에서 시작해야 한다. 두 브랜치의 초기 랜덤성이 다르면 이후 차이가 프롬프트 편집 때문인지 초기 노이즈 때문인지 분리하기 어렵다.
 
 둘째, 소스 브랜치는 각 타임스텝에서 현재 상태에 맞춰 전이해야 한다. 같은 초기 터미널 노이즈를 모든 스텝에서 반복 참조하면 $\varepsilon_{\tau_n}^{\mathrm{src}}$가 각 시점의 소스 잠재변수를 나타내지 못한다.
 
-셋째, $\varepsilon^{\mathrm{cons}}$의 분모 $\sqrt{1-\alpha_t}$를 계산할 때 스케줄의 경계값을 조심해야 한다. $1-\alpha_t$가 0에 가까운 시점에서는 수치적으로 불안정해질 수 있으므로, 실제 구현에서는 사용하려는 타임스텝의 정의와 경계 처리를 일관되게 유지해야 한다. 논문 추출본은 별도의 clipping 값이나 수치 안정화 상수를 제시하지 않는다.
+셋째, $\varepsilon^{\mathrm{cons}}$의 분모 $\sqrt{1-\alpha_t}$를 계산할 때 스케줄의 경계값을 조심해야 한다. $1-\alpha_t$가 0에 가까운 시점에서는 수치적으로 불안정해질 수 있으므로, 실제 구현에서는 사용하려는 타임스텝의 정의와 경계 처리를 일관되게 유지해야 한다.
 
 논문의 핵심은 현재 잠재변수 $z_t^{\mathrm{tgt}}$를 매번 직접 수정하는 데 있지 않다. $z_0^{\mathrm{tgt}}$ 예측에 노이즈 조건을 주입해 샘플링 갱신을 유도한다. 이 위치를 바꾸면 VI가 의도한 오차 누적 완화 구조와 달라진다.
 
 ### UAC 의사코드
+
+다음은 [원문 Algorithm 3](https://arxiv.org/html/2312.04965)의 상태 전이를 설명하는 의사코드이며, 검증된 실행 구현은 아니다. `unet_with_features`는 같은 U-Net 호출의 노이즈 예측·셀프 어텐션 특징·크로스 어텐션 맵을 반환한다. `sample_joint`는 Algorithm 3의 결합된 VI/DDCM 샘플링을 의미한다. 세 브랜치를 같은 다음 타임스텝으로 갱신하고 원본 초기 잠재변수 `z0_src`를 참조하며, 독립적인 일반 디노이저 세 번으로 대체해서는 안 된다. 샘플러의 스케줄과 공유 난수 계약은 실제 백본에 맞춰 별도로 구현해야 한다. 반환된 소스·타깃·레이아웃 상태는 이 순서를 유지해 모두 다음 스텝의 입력으로 넘긴다.
 
 ```python
 # z_src, z_lay, z_tgt: (B, C, H, W)
 # Q/K/V: (B, N, d), N은 공간 위치 수
 # M:     (B, N, L), L은 텍스트 토큰 수
 
-def uac_step(z_src, z_lay, z_tgt, t,
+def uac_step(z_src, z_lay, z_tgt, z0_src, t,
              source_prompt, target_prompt,
-             tau_c, tau_s):
+              tau_c, tau_s, source_threshold, target_threshold):
     # 1. 소스·타깃의 공간 특징에서 Q/K/V 추출
-    q_src, k_src, v_src = self_attention_features(z_src, t)
-    q_tgt, k_tgt, v_tgt = self_attention_features(z_tgt, t)
+    eps_src, (q_src, k_src, v_src), m_src = unet_with_features(
+        z_src, t, source_prompt
+    )
+    _, (q_tgt, k_tgt, v_tgt), m_tgt = unet_with_features(
+        z_tgt, t, target_prompt
+    )
 
     # 2. 상호 셀프 어텐션으로 레이아웃 정보 구성
     if t >= tau_s:
@@ -569,14 +575,12 @@ def uac_step(z_src, z_lay, z_tgt, t,
         q_lay, k_lay, v_lay = q_tgt, k_src, v_src
 
     # 3. 레이아웃 브랜치의 노이즈 예측
-    eps_lay = predict_with_attention(
-        z_lay, t, q_lay, k_lay, v_lay
+    eps_lay, m_lay = predict_with_attention(
+        z_lay, t, source_prompt, q_lay, k_lay, v_lay
     )
 
     # 4. 소스·레이아웃·타깃의 크로스 어텐션 맵 계산
-    m_src = cross_attention_map(z_src, t, source_prompt)
-    m_lay = cross_attention_map(z_lay, t, source_prompt)
-    m_tgt = cross_attention_map(z_tgt, t, target_prompt)
+    # m_src / m_tgt는 위 U-Net 호출에서, m_lay는 레이아웃 호출에서 얻는다.
 
     if t >= tau_c:
         m_tgt_refined = refine(m_lay, m_tgt)
@@ -589,7 +593,9 @@ def uac_step(z_src, z_lay, z_tgt, t,
     )
 
     # 6. 샘플링 갱신
-    z_tgt_next = denoise_update(z_tgt, eps_tgt, t)
+    z_src_next, z_tgt_next, z_lay_next = sample_joint(
+        [z_src, z_tgt, z_lay], [eps_src, eps_tgt, eps_lay], t, z0_src
+    )
 
     # 7. Eq. 13의 소스·타깃 어텐션 맵으로 블렌딩 마스크 생성
     mask_tgt = threshold(
@@ -602,11 +608,11 @@ def uac_step(z_src, z_lay, z_tgt, t,
     )
 
     z_tgt_next = (
-        (1 - mask_tgt + mask_src) * z_src
+        (1 - mask_tgt + mask_src) * z_src_next
         + (mask_tgt - mask_src) * z_tgt_next
     )
 
-    return z_lay, z_tgt_next
+    return z_src_next, z_tgt_next, z_lay_next
 ```
 
 여기서 `q_lay`, `k_lay`, `v_lay`는 레이아웃 브랜치의 어텐션 계산을 위한 중간 표현이다. 초기 단계에서는 소스의 모든 셀프 어텐션 텐서를 유지하고, 후기 단계에서는 타깃 쿼리만 사용한다. `k_src`, `v_src`를 계속 참조하는 이유는 타깃이 새로운 의미를 만들더라도 소스의 공간 관계를 완전히 버리지 않게 하기 위해서다.
@@ -618,7 +624,7 @@ def uac_step(z_src, z_lay, z_tgt, t,
 - Eq. 13의 마스크 연산은 원소별 곱이며, 채널 축과 공간 축으로 올바르게 브로드캐스트되어야 한다.
 - $M^{\mathrm{src}}$, $M^{\mathrm{tgt}}$, $M^{\mathrm{lay}}$의 토큰 인덱스가 서로 다른 프롬프트의 토큰 위치와 섞이지 않도록 $A(j)$ 정렬을 유지해야 한다.
 - LCM을 사용할 때는 일반 SD의 스텝 수와 LCM의 스텝 수를 동일한 의미로 해석하면 안 된다. Table 1과 Table 2는 백본에 따라 스텝 수와 CLIP Score가 달라짐을 보여준다.
-- 논문 추출본에는 $a^{\mathrm{src}}$, $a^{\mathrm{tgt}}$, $\tau_c$, $\tau_s$의 실제 값이 제시되어 있지 않다. 따라서 이 값을 임의로 채워 넣어 재현 설정처럼 쓰면 안 된다.
+- $a^{\mathrm{src}}$, $a^{\mathrm{tgt}}$, $\tau_c$, $\tau_s$는 어텐션 제어의 강도와 적용 시점을 결정하므로 재현하려는 설정과 일치시켜야 한다.
 
 학습 루프와 샘플링 루프도 분리해서 이해해야 한다. Eq. 2와 Eq. 5는 각각 확산 모델과 일관성 모델을 학습하는 목적 함수다. 반면 InfEdit의 VI와 UAC는 추가 파라미터 튜닝 없이 이미 학습된 백본의 샘플링 과정에 개입한다. 즉, 이 논문의 효율성 주장은 새로운 편집 데이터셋으로 모델을 다시 학습한 결과가 아니라, 기존 백본의 추론 루프에 수식 기반 보정과 어텐션 제어를 추가한 결과다.
 
@@ -688,7 +694,7 @@ SD v1.4는 2스텝에서 21.47로 시작해 32스텝에서 25.18까지 점진적
 
 ### 9개 편집 태스크별 비교
 
-Figure 5a는 Delete Object, Change Content, Add Object, Change Pose, Change Object, Change Color, Change Style, Change Material, Change Background에 대해 P2P, MasaCtrl, UAC의 CLIP Score를 비교한다. 추출본에 따르면 UAC는 9개 태스크 전반에서 P2P와 MasaCtrl보다 지속적으로 높은 CLIP Score를 기록했다.
+Figure 5a는 Delete Object, Change Content, Add Object, Change Pose, Change Object, Change Color, Change Style, Change Material, Change Background에 대해 P2P, MasaCtrl, UAC의 CLIP Score를 비교한다. UAC는 9개 태스크 전반에서 P2P와 MasaCtrl보다 지속적으로 높은 CLIP Score를 기록했다.
 
 Figure 5b는 같은 9개 태스크의 PSNR을 비교한다. UAC는 배경과 구조 보존 일관성에서도 P2P와 MasaCtrl보다 높은 결과를 보이며, 전반적으로 가장 높은 일관성을 달성했다.
 
@@ -720,7 +726,7 @@ InfEdit의 가장 큰 장점은 명시적 역전 과정과 추가 파라미터 �
 
 보고된 시간은 단일 NVIDIA A40 GPU 기준이다. VI*/UAC는 12스텝에서 $2.22\pm0.02$초, VI*/P2P는 15스텝에서 $2.60\pm0.00$초다. 역전 시간이 별도로 필요하지 않다는 점까지 고려하면, 이미지 편집 서비스에서 입력마다 역전 브랜치를 실행해야 하는 방식보다 지연시간을 예측하기 쉽다.
 
-반면 UAC는 단일 타깃 브랜치만 실행하는 구조는 아니다. 소스·레이아웃·타깃 세 브랜치의 정보를 관리해야 하므로, 단순한 한 번의 순방향 샘플링보다 메모리와 어텐션 계산량이 커질 가능성이 있다. 추출본에는 세 브랜치의 정확한 메모리 사용량이나 파라미터 수가 제시되어 있지 않으므로, 이 비용을 수치로 단정할 수는 없다.
+반면 UAC는 단일 타깃 브랜치만 실행하는 구조는 아니다. 소스·레이아웃·타깃 세 브랜치의 정보를 관리해야 하므로, 단순한 한 번의 순방향 샘플링보다 메모리와 어텐션 계산량이 커질 가능성이 있다. 이 비용은 세 브랜치의 메모리 사용량과 파라미터 수를 함께 측정해야 판단할 수 있다.
 
 품질과 구조 보존 사이의 트레이드오프도 남아 있다. Structure Distance를 낮추는 결과가 반드시 편집 지시를 잘 수행한다는 의미는 아니다. StyleDiffusion은 구조 거리에서 유리하지만 배경 보존과 CLIP 유사도에서 효과적인 편집의 한계를 보였다. Direct Inversion과 CycleDiffusion 역시 구조 거리 수치는 좋지만 소스 이미지를 그대로 남기는 실패가 빈번했다.
 
@@ -730,13 +736,13 @@ InfEdit의 가장 큰 장점은 명시적 역전 과정과 추가 파라미터 �
 
 논문이 본문에서 밝힌 한계는 StyleDiffusion 대비 Structure Distance가 다소 밀릴 수 있다는 점이다. 저자들은 이를 이미지 편집 거리 감소와 편집 충실도 향상 사이의 근본적인 트레이드오프로 설명한다. 원본과 가까운 결과를 유지하는 것과 텍스트 지시를 충실히 반영하는 것이 항상 같은 방향은 아니다.
 
-또한 논문에는 별도의 독립적인 Limitations 섹션이 없다. 정성적 비교를 위한 상세 샘플은 Appendix에 제공된다고 언급되지만, 제공된 본문 텍스트에는 그 부록의 독립적인 수식이나 실험 설정이 포함되어 있지 않다. 따라서 부록의 추가 결과까지 근거로 삼아 성능 범위를 확대해서 해석할 수는 없다.
+논문은 정성적 비교를 위한 상세 샘플을 Appendix에 수록했다고 설명한다. 성능 범위는 샘플이 사용한 모델과 편집 조건에 맞춰 해석해야 한다.
 
-구현 관점에서 주의할 지점은 임계값과 스케줄이다. $a^{\mathrm{src}}$, $a^{\mathrm{tgt}}$, $\tau_c$, $\tau_s$는 어텐션 제어의 강도와 적용 시점을 결정한다. 하지만 추출본에는 이 값들의 실제 설정이 제시되어 있지 않다. 따라서 논문의 정성적 결과를 재현하려면 이 설정과 프롬프트 토큰 정렬 방식이 추가로 필요하다. 이것은 저자가 명시한 한계라기보다, 현재 제공된 정보만으로는 재현 범위를 확정하기 어렵다는 점이다.
+구현 관점에서 주의할 지점은 임계값과 스케줄이다. $a^{\mathrm{src}}$, $a^{\mathrm{tgt}}$, $\tau_c$, $\tau_s$는 어텐션 제어의 강도와 적용 시점을 결정한다. 논문의 정성적 결과를 재현하려면 이 설정과 프롬프트 토큰 정렬 방식을 함께 맞춰야 한다.
 
-또 하나는 세 브랜치의 비용이다. UAC가 단일 A40에서 2초대 결과를 보고했지만, 세 브랜치의 메모리 사용량, 어텐션 저장량, 해상도별 실행 비용은 추출본에 없다. 다른 GPU나 더 큰 해상도에서 같은 지연시간이 유지되는지는 논문 내용만으로 알 수 없다.
+또 하나는 세 브랜치의 비용이다. UAC가 단일 A40에서 2초대 결과를 보고했더라도 다른 GPU나 더 큰 해상도에서 같은 지연시간이 유지되는지는 별도로 측정해야 한다. 세 브랜치의 메모리 사용량과 어텐션 저장량, 해상도별 실행 비용도 함께 비교해야 한다.
 
-일반화 가능성도 실험 범위 안에서 판단해야 한다. PIE-Bench의 9개 언어 유도 편집 태스크와 Summer/Winter, Horse/Zebra 변환에서는 UAC와 LCM 조합이 유리한 결과를 보였다. 그러나 다른 데이터 분포, 다른 이미지 해상도, 다른 모달리티, 더 큰 모델 규모에서 동일한 구조가 유지되는지는 추출본에 실험 근거가 없다. 따라서 모든 이미지 편집에 적용된다고 확대해석하기보다는, 입력 이미지의 초기 잠재변수를 알고 있고 텍스트 조건부 확산 백본을 사용하는 편집 문제에서 검증된 설계로 이해하는 편이 정확하다.
+일반화 가능성도 실험 범위 안에서 판단해야 한다. PIE-Bench의 9개 언어 유도 편집 태스크와 Summer/Winter, Horse/Zebra 변환에서는 UAC와 LCM 조합이 유리한 결과를 보였다. 다른 데이터 분포, 다른 이미지 해상도, 다른 모달리티, 더 큰 모델 규모에서도 같은 결과가 유지되는지는 별도 검증이 필요하다. 따라서 모든 이미지 편집에 적용된다고 확대해석하기보다는, 입력 이미지의 초기 잠재변수를 알고 있고 텍스트 조건부 확산 백본을 사용하는 편집 문제에서 검증된 설계로 이해하는 편이 정확하다.
 
 ## 정리
 

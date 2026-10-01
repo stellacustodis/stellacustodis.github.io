@@ -39,7 +39,7 @@ $$
 \frac{\partial h_t}{\partial h_k} = \prod_{i=k+1}^{t}\frac{\partial h_i}{\partial h_{i-1}}
 $$
 
-**의의** — "더 오래 학습시키면 되지 않나"라는 접근을 차단했다. 옵티마이저를 바꾸는 것으로는 해결할 수 없고 **구조를 바꿔야 한다**는 결론이 이후 LSTM·GRU·Transformer로 이어지는 흐름 전체의 출발점이 됐다.
+**의의** — "더 오래 학습시키면 되지 않나"라는 접근을 차단했다. 특정 안정적 상태 저장 조건에서는 장기 의존성을 **gradient descent로 효율적으로 학습하기 어렵다**는 결론이 이후 LSTM·GRU·Transformer로 이어지는 흐름 전체의 출발점이 됐다.
 
 ### 2. Long Short-Term Memory
 **Hochreiter, Schmidhuber · Neural Computation, 1997**
@@ -50,14 +50,14 @@ $$
 
 **핵심 아이디어** — **CEC(Constant Error Carousel)** 라는 별도의 경로를 둔다. 셀 상태가 곱셈이 아니라 덧셈으로 갱신되므로, 기울기가 가중치 행렬의 반복 곱을 거치지 않고 흐른다. 여기에 **입력 게이트**와 **출력 게이트**를 붙여 언제 쓰고 언제 읽을지를 학습하게 했다.
 
-**짚어둘 점** — **원 논문에는 forget gate가 없다.** 오늘날 교과서와 라이브러리에 실린 LSTM 그림에는 대부분 forget gate가 있는데, 그건 3년 뒤에 추가된 것이다. 1997년 판은 셀 상태를 지울 방법이 없었다.
+**짚어둘 점** — **원 논문에는 forget gate가 없다.** 오늘날 교과서와 라이브러리에 실린 LSTM 그림에는 대부분 forget gate가 있는데, 그건 3년 뒤에 추가된 것이다. 1997년 판에는 셀 상태를 학습된 비율로 감쇠시키는 forget gate가 없었다. 명시적인 시퀀스 경계에서 상태를 초기화하는 것까지 불가능했다는 뜻은 아니다.
 
 ### 3. Learning to Forget: Continual Prediction with LSTM
 **Gers, Schmidhuber, Cummins · Neural Computation, 2000**
 
 > 오늘날 "LSTM"이라 부르는 것의 마지막 조각.
 
-**배경** — 원 LSTM은 명확히 구분된 시퀀스에서는 잘 동작했지만, **끝없이 이어지는 스트림**에서는 셀 상태가 무한정 누적되어 포화됐다. 상태를 초기화할 방법이 없었기 때문이다.
+**배경** — 원 LSTM은 명확히 구분된 시퀀스에서는 잘 동작했지만, **끝없이 이어지는 스트림**에서는 셀 상태가 무한정 누적되어 포화됐다. 연속 스트림에서 언제 상태를 감쇠할지 학습하는 forget gate가 없었기 때문이다.
 
 **핵심 아이디어** — **forget gate** $f_t$를 추가해 셀 상태를 능동적으로 감쇠시킨다.
 
@@ -96,7 +96,7 @@ $f_t \approx 1$이면 기울기가 그대로 통과하고, $f_t \approx 0$이면
 
 > Word2Vec을 **실제로 학습 가능하게** 만든 후속편.
 
-**배경** — 4번 논문의 구조에는 여전히 병목이 있었다. 출력층이 어휘 전체($|V|$)에 대한 softmax라 샘플 하나당 $|V|$번의 내적이 필요했다.
+**배경** — 전작은 이미 Huffman tree 기반 hierarchical softmax로 전체 어휘 계산 비용을 줄였다. 이 후속 논문은 negative sampling을 비롯한 다른 효율화 방법을 제시한다.
 
 **핵심 아이디어** — 세 가지 기법을 제안한다.
 
@@ -135,7 +135,7 @@ $$
 
 **배경** — Word2Vec은 성능이 좋았지만 **왜 좋은지가 설명되지 않았다.** 신경망의 마법으로 여겨지는 분위기가 있었다.
 
-**핵심 아이디어** — SGNS(Skip-gram with Negative Sampling)의 목적함수를 정리하면, 최적해에서 두 벡터의 내적이 **shifted PMI**와 같아진다는 것을 보였다.
+**핵심 아이디어** — SGNS(Skip-gram with Negative Sampling)의 목적함수를 정리하면, negative context를 unigram 분포에서 뽑고 각 내적을 독립적으로 최적화할 만큼 차원이 충분하다는 조건에서, 최적 내적이 **shifted PMI**와 같아진다는 것을 보였다. 앞 절의 unigram 3/4 제곱 분포를 쓰면 PMI의 context 분포 항도 그에 맞게 바뀐다. 실제 저차원 임베딩에서는 이 행렬을 정확히 재구성하지 못할 수 있다.
 
 $$
 v_w^{\top}v'_c = \text{PMI}(w,c) - \log k
@@ -253,7 +253,7 @@ $\alpha_{ij}$는 "출력 $i$를 만들 때 입력 $j$를 얼마나 볼 것인가
 | RNN이 장기 의존성을 못 배운다 (1994) | LSTM의 덧셈 갱신 (1997) | 셀 상태가 포화된다 |
 | 셀 상태 포화 | Forget gate (2000) | — |
 | One-hot은 의미를 못 담는다 | Word2Vec (2013) | 계산량 |
-| 어휘 전체 softmax | Negative Sampling (2013) | 왜 되는지 모른다 |
+| 출력층 계산 비용 | Negative Sampling (2013) | 왜 되는지 모른다 |
 | 원리 불명 | SGNS ≡ shifted PMI 분해 (2014) | 고정 벡터는 문맥을 못 담는다 |
 | 길이가 다른 입출력 | Seq2Seq (2014) | 고정 context vector 병목 |
 | 고정 벡터 병목 | Attention (2015) | 여전히 순차적 |

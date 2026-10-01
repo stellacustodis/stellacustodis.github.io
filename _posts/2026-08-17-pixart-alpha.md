@@ -14,7 +14,7 @@ paper:
   url: "https://openreview.net/forum?id=eAKmQPe3m1"
 ---
 
-> 이 글은 개인 Obsidian에 정리해 둔 논문 노트를 블로그 형식으로 다시 편집한 글이다. 학습 비용을 줄이기 위한 3단계 분해와 파라미터를 공유하는 adaLN-single 설계에 초점을 맞춘다.
+> 학습 비용을 줄이기 위한 3단계 분해와 파라미터를 공유하는 adaLN-single 설계에 초점을 맞춘다.
 
 ## 세 줄 요약
 
@@ -69,7 +69,7 @@ $$
 N=\frac{H_z}{2}\frac{W_z}{2}.
 $$
 
-패치 임베딩 이후 이미지 토큰을 $X\in\mathbb{R}^{B\times N\times D}$로 둘 수 있다. 여기서 구체적인 잠재 채널 수와 hidden size는 추출본에 제시되지 않았으므로 기호로 남기는 편이 안전하다.
+패치 임베딩 이후 이미지 토큰을 $X\in\mathbb{R}^{B\times N\times D}$로 둘 수 있다. 잠재 채널 수와 hidden size는 모델 설정에 따라 정해진다.
 
 ### 텍스트 경로
 
@@ -144,7 +144,7 @@ $$
 
 이 식은 새로운 학습 목적을 추가한 것이 아니라 초기 파라미터가 만족해야 할 호환성 조건이다. $f$가 공유되어 자유도가 줄어든 부분을 $E^{(i)}$가 보정하도록 초기값을 잡는다. 그러면 adaLN-single로 구조를 바꾼 직후에도 선택한 기준점에서는 기존 DiT와 같은 조건을 만들 수 있다.
 
-왜 기준 timestep으로 정확히 500을 선택했는지는 추출본에서 확인되지 않는다. 따라서 이 값을 일반적인 최적점이라고 확대 해석해서는 안 된다. 확인 가능한 주장은 $t=500$에서 기존 class-condition 없는 DiT와 같은 $S^{(i)}$가 나오도록 초기화했다는 것까지다.
+기준 timestep 500은 초기화 조건이다. 이 값을 일반적인 최적점이라고 확대 해석해서는 안 된다. $t=500$에서 기존 class-condition 없는 DiT와 같은 $S^{(i)}$가 나오도록 초기화한다.
 
 ![PIXART-α 전체 아키텍처와 공유 파라미터를 사용하는 adaLN-single](/assets/img/posts/pixart-alpha/figure4.png){: w="700" }
 _그림 4. 이미지 토큰과 텍스트 특징은 블록별 Cross-attention에서 결합되고, timestep 조건은 한 번 계산한 전역 표현과 레이어별 임베딩으로 구성된다._
@@ -155,7 +155,7 @@ PIXART-α는 LLaVA에 다음 프롬프트를 사용해 캡션을 생성한다.
 
 > Describe this image and its style in a very detailed manner
 
-LAION과 SAM에는 서로 다른 입력 형식을 사용한다. 세부 입력 템플릿은 추출본에 포함되지 않았지만, 두 데이터 소스에 완전히 같은 입력 구성을 적용한 것은 아니라는 점은 구현 재현 시 확인해야 한다.
+LAION과 SAM에는 서로 다른 입력 형식을 사용한다. 재현할 때도 데이터 소스별 입력 템플릿을 구분해야 한다.
 
 논문은 캡션의 정보 밀도를 명사 통계로 비교한다.
 
@@ -168,16 +168,16 @@ LAION과 SAM에는 서로 다른 입력 형식을 사용한다. 세부 입력 �
 
 LAION에 LLaVA 캡션을 적용하면 이미지당 평균 명사 수가 6.4에서 20.9로 늘고, 총 명사 수도 72.0M에서 233.9M으로 증가한다. SAM-LLaVA는 이미지당 평균 29.3개와 총 327.9M으로 가장 높은 값을 보인다. Internal 데이터는 이미지당 평균 명사 수가 12.2지만 VN/DN 비율은 26.1%로 표에서 가장 높다.
 
-VN과 DN의 정확한 정의는 추출본에 들어 있지 않으므로 그 의미를 임의로 확장해서는 안 된다. 이 표에서 안전하게 읽을 수 있는 결론은 LLaVA 캡션이 원래 LAION 캡션보다 더 많은 명사 정보를 제공하며, SAM-LLaVA가 정렬 단계에 높은 정보 밀도의 감독 신호를 제공한다는 것이다.
+[원문 Table 1](https://arxiv.org/html/2310.00426v3)에서 VN은 데이터셋에서 10회를 초과하여 등장하는 서로 다른 명사의 수(valid distinct nouns), DN은 서로 다른 명사의 총수(total distinct nouns)다. 따라서 VN/DN은 이 기준을 충족하는 명사 유형의 비율이다. 이 표에서 안전하게 읽을 수 있는 결론은 LLaVA 캡션이 원래 LAION 캡션보다 더 많은 명사 정보를 제공하며, SAM-LLaVA가 정렬 단계에 높은 정보 밀도의 감독 신호를 제공한다는 것이다.
 
 다만 명사 수가 많다는 사실만으로 정렬 성능의 인과관계가 완전히 증명되는 것은 아니다. PIXART-α의 정렬 결과에는 Transformer 구조, 4.3B 텍스트 인코더, 120 토큰 길이와 단계별 학습도 함께 작용한다. 명사 통계는 고밀도 캡션이라는 설계의 근거이지, 다른 구성 요소를 통제한 단독 효과량은 아니다.
 
 ## 구현 관점에서 본 학습 루프
 
-추출본에는 확산 목적함수의 구체적인 예측 대상, timestep sampling 분포, 노이즈 스케줄이 제시되지 않았다. 따라서 그 부분을 특정 수식이나 라이브러리 호출로 채우면 재현 코드가 아니라 추측이 된다. 아래 의사코드는 확인 가능한 단계 구성, 텐서 흐름, 초기화 조건만 표현한다.
+아래 의사코드는 단계 구성, 텐서 흐름, 초기화 조건을 표현한다. 확산 목적함수의 예측 대상, timestep sampling 분포, 노이즈 스케줄은 별도 함수로 추상화했으며, 재현할 때는 논문의 설정에 맞춰야 한다.
 
 ```python
-# 의사코드: 구체적인 diffusion objective와 noise schedule은 추출본에 없음
+# 의사코드: diffusion objective와 noise schedule은 별도 함수로 추상화
 
 stage_configs = [
     {
@@ -240,7 +240,7 @@ for stage in stage_configs:
         # t: (B,)
         t = select_diffusion_timestep()
 
-        # 정확한 objective, 예측 대상, noise schedule은 이 추출본에서 확정할 수 없음
+        # objective, 예측 대상, noise schedule은 학습 설정에 맞춰 적용
         loss = diffusion_training_objective(
             model=model,
             latent=z,
@@ -253,7 +253,7 @@ for stage in stage_configs:
         optimizer.step()
 ```
 
-`batch_notation`은 Table 4에 적힌 값을 그대로 보존했다. 예를 들어 `178×64`에서 각 항이 정확히 무엇을 뜻하는지는 추출본에 정의되어 있지 않으므로 이를 장치당 배치와 GPU 수로 단정하지 않았다.
+`batch_notation`은 Table 4의 배치 표기다. 예를 들어 `178×64`를 장치당 배치와 GPU 수로 나누어 해석하려면 각 항의 정의를 먼저 확인해야 한다.
 
 모델 내부의 조건 흐름은 다음처럼 쓸 수 있다.
 
@@ -272,7 +272,7 @@ def pixart_transformer(latent_tokens, text_features, timestep):
     x = latent_tokens
     for i in range(28):
         # E[i]: 레이어별 학습 가능 임베딩
-        # condition_i의 마지막 차원 구성은 추출본에 명시되지 않음
+        # condition_i의 마지막 차원은 g와 adaLN 변조 연산의 계약에 맞춤
         condition_i = g(shared_condition, E[i])
 
         # Cross-attention은 self-attention과 feed-forward 사이에 위치
@@ -335,7 +335,7 @@ for bucket in aspect_ratio_buckets:
 논문은 iDDPM, DPM-Solver, SA-Solver를 비교하고 연산 효율성을 고려해 20단계 DPM-Solver를 선택했다. 학습 단계 수와 샘플링 단계 수는 같은 종류의 숫자가 아니다. 수십만 학습 step을 수행한 뒤, 추론 시에는 한 이미지를 생성하기 위해 20단계 solver를 사용한다.
 
 ```python
-# 의사코드: solver의 세부 갱신식과 초기 상태 분포는 추출본에 없음
+# 의사코드: solver 갱신식과 초기 상태 분포는 별도 함수로 추상화
 
 text_features = flan_t5_xxl_encode(prompt, max_tokens=120)
 state = initialize_sampler_state(output_shape)
@@ -351,7 +351,7 @@ for solver_step in dpm_solver_schedule(num_steps=20):
 image = frozen_vae_decode(state)
 ```
 
-“20단계”를 곧바로 정확히 20회의 네트워크 평가라고 해석할 수 있는지는 추출본에서 확인되지 않는다. 재현 시에는 사용한 DPM-Solver 구성의 함수 평가 횟수까지 별도로 확인해야 한다.
+솔버의 “20단계”와 네트워크 평가 횟수는 구분해야 한다. 재현 시에는 사용한 DPM-Solver 구성의 함수 평가 횟수도 확인해야 한다.
 
 ### 구현에서 특히 확인할 지점
 
@@ -366,7 +366,7 @@ image = frozen_vae_decode(state)
 - Multi-scale의 40개 버킷과 DiffFit positional encoding은 High aesthetics 단계에서만 사용한다.
 - 256, 512, 1024 해상도별 학습 step과 배치 표기가 서로 다르다.
 - 논문이 보고한 비용에는 오프라인 VAE/T5 feature extraction이 포함되지 않는다.
-- 추출본에 없는 노이즈 스케줄, objective parameterization, timestep 경계 처리, clipping 위치를 임의로 정하면 논문 구현과 같다고 주장할 수 없다.
+- 노이즈 스케줄, objective parameterization, timestep 경계 처리, clipping 위치도 논문의 구현 설정에 맞춰야 한다.
 
 ## 단계별 학습 설정과 비용
 
@@ -384,7 +384,7 @@ image = frozen_vae_decode(state)
 
 V100 GPU days를 합하면 1,656이다. 최종 모델은 64 V100에서 약 26일 동안 학습했다. 논문은 V100 대비 2.2배 속도 향상을 가정해 이를 753 A100 GPU days와 약 $28,400의 비용으로 환산한다. Transformer에서 5배 속도 향상을 가정하는 별도 기준에서는 332 A100 GPU days가 된다.
 
-해상도가 256에서 512, 1024로 올라갈수록 표의 batch size는 `178×64`, `40×64`, `12×32`로 감소한다. 고해상도 단계의 step 수 역시 마지막 1024 해상도에서는 16K다. 이 일정은 고해상도 학습 비용을 제어하는 장치로 읽을 수 있지만, 각 해상도 단계가 최종 품질에 기여한 독립 효과는 추출본에 제시되지 않았다.
+해상도가 256에서 512, 1024로 올라갈수록 표의 batch size는 `178×64`, `40×64`, `12×32`로 감소한다. 고해상도 단계의 step 수 역시 마지막 1024 해상도에서는 16K다. 이 일정은 고해상도 학습 비용을 제어하는 장치로 읽을 수 있다. 다만 일정만으로 각 해상도 단계가 최종 품질에 기여한 독립 효과를 분리할 수는 없다.
 
 ## 정량 결과: 적은 데이터와 계산량으로 어디까지 갔는가
 
@@ -434,7 +434,7 @@ PIXART-α는 Color 0.6690, Shape 0.4927, Texture 0.6477, Non-Spatial 0.3197, Com
 
 사용자 연구에는 고정 프롬프트 300개와 평가자 50명이 사용됐다. 비교 대상은 DALL·E 2, SDv2, SDXL, DeepFloyd다. SDv2와 비교했을 때 PIXART-α는 이미지 품질에서 7.2%, 텍스트 정렬에서 42.4% 향상된 것으로 보고됐다.
 
-부록에서는 Midjourney와 블라인드 비교를 수행했고, RAPHAEL 프롬프트를 사용한 비교도 제시했다. 이 비교에서 PIXART-α는 기존의 강력한 생성 모델들과 동등하거나 우수한 성능을 보였다. 다만 해당 비교의 세부 점수는 추출본에 없으므로 정성 결론 이상으로 수치화할 수 없다.
+부록에서는 Midjourney와 블라인드 비교를 수행했고, RAPHAEL 프롬프트를 사용한 비교도 제시했다. 이 비교에서 PIXART-α는 기존의 강력한 생성 모델들과 동등하거나 우수한 성능을 보였다.
 
 이 사용자 연구가 중요한 이유는 FID의 한계와 연결된다. 저자들은 COCO zero-shot FID가 시각적 미감과 음의 상관을 보일 수 있고, FID에 사용하는 ImageNet feature extractor가 생성 이미지 평가 도메인과 맞지 않을 수 있다고 지적한다. 따라서 FID 7.32만으로 미적 품질의 우열을 확정하기보다 사람의 품질 및 정렬 선호를 함께 봐야 한다.
 
@@ -462,7 +462,7 @@ adaLN-single-L은 총 1500K iterations를 학습해 FID 22.30을 기록한다. a
 
 PIXART-α의 생성 네트워크는 Table 2에서 0.6B로 보고되며, 상세 구조에서는 adaLN-single 적용 후 611M이다. 기존 adaLN의 833M에서 26%를 줄였고, 구조 실험의 GPU 메모리는 29G에서 23G로 감소했다. 28개 블록이 각각 큰 조건 projection을 갖는 대신 공유 함수와 작은 레이어별 임베딩을 쓰기 때문에 깊이가 커질수록 반복 파라미터를 피할 수 있다.
 
-그러나 시스템 전체를 611M 모델 하나로만 보면 안 된다. 텍스트 인코더로 4.3B Flan-T5-XXL을 사용한다. 이 인코더의 학습 시간과 데이터량은 비용 비교에 포함되지 않았고, 추출본에는 배포 시 텍스트 인코더를 어떻게 운용하는지에 대한 메모리 세부 수치도 없다. 따라서 611M은 PIXART-α Transformer의 경량화를 보여주지만 전체 텍스트-이미지 파이프라인의 총 파라미터 및 메모리 비용을 뜻하지 않는다.
+그러나 시스템 전체를 611M 모델 하나로만 보면 안 된다. 텍스트 인코더로 4.3B Flan-T5-XXL을 사용한다. 이 인코더의 학습 시간과 데이터량은 비용 비교에 포함되지 않았다. 배포 시에는 텍스트 인코더의 메모리도 별도로 고려해야 한다. 따라서 611M은 PIXART-α Transformer의 경량화를 보여주지만 전체 텍스트-이미지 파이프라인의 총 파라미터 및 메모리 비용을 뜻하지 않는다.
 
 학습 비용 표에서 제외된 항목은 다음과 같다.
 
@@ -488,7 +488,7 @@ $$
 
 PIXART-α는 이 범위 전반에서 SDv1.5보다 나은 FID-CLIP 성능을 보였고, T2I-CompBench에서도 안정적인 성능을 유지했다. 특정 scale 한 점에서만 우연히 좋은 결과를 얻은 것이 아니라 여러 guidance 강도에서 품질과 정렬이 유지된다는 의미다.
 
-다만 각 scale의 개별 수치나 최적 scale은 추출본에 포함되지 않았다. 따라서 기본값을 하나로 확정하거나 scale 변화에 따른 정확한 품질 곡선을 재구성할 수는 없다.
+이 정성 비교만으로 기본 scale을 하나로 확정하거나 scale 변화에 따른 정확한 품질 곡선을 계산할 수는 없다.
 
 ## 맞춤형 생성으로의 확장
 
@@ -498,7 +498,7 @@ DreamBooth 설정은 learning rate $5\times10^{-6}$, 300 steps이며 class-prese
 
 ControlNet 확장에서는 HED edge map을 조건으로 사용한다. 구조는 frozen block과 trainable block, 그리고 두 개의 zero linear layer를 포함한다. Learning rate는 $5\times10^{-6}$이고 20,000 steps를 학습했다. 이를 통해 특정 색상 제어 등을 포함한 맞춤형 이미지 생성이 가능함을 확인했다.
 
-이 두 실험은 기반 모델이 범용 텍스트-이미지 생성에만 고정된 것이 아니라 개인화와 공간 조건 제어 구조에도 연결될 수 있다는 근거다. 그러나 다른 데이터 모달리티나 더 큰 모델 규모에서도 같은 효율 이득이 유지되는지는 추출본의 실험 범위에서 확인되지 않는다.
+이 두 실험은 기반 모델이 범용 텍스트-이미지 생성에만 고정된 것이 아니라 개인화와 공간 조건 제어 구조에도 연결될 수 있다는 근거다. 이 두 실험만으로 다른 데이터 모달리티나 더 큰 모델 규모에서도 같은 효율 이득이 유지된다고 단정할 수는 없다.
 
 ## 한계와 생각해볼 점
 

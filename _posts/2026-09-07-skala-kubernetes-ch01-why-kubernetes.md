@@ -19,12 +19,14 @@ related: [skala-kubernetes-roadmap, skala-kubernetes-ch02-container-image]
 ```text
 desired state(spec): replicas = 3
              ↓ 비교
-current state(status): readyReplicas = 2
+current state(status): replicas = 2  # 삭제 등으로 실제 Pod 수가 부족한 경우
              ↓ 조정
 ReplicaSet이 Pod 1개 생성
              ↓
 status가 spec에 수렴
 ```
+
+실제 Pod가 세 개이고 그중 두 개만 Ready인 경우는 위의 복제본 부족과 다르다. Ready 수만 부족하다는 이유로 네 번째 Pod를 생성해야 하는 것은 아니다.
 
 Pod를 지웠는데 되살아나는 이유는 Pod가 불멸이어서가 아니다. Deployment가 원하는 개수를 세 개로 선언했고, ReplicaSet 컨트롤러가 현재 두 개뿐이라는 차이를 발견해 **새 Pod를 만든 것**이다.
 

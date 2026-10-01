@@ -121,4 +121,3 @@ lsof -ti :8080 | xargs kill -9
 수업을 들으며 막혔던 것들 — 서버 대여는 VM인가 컨테이너인가, GPU를 왜 장 단위로 파는가,
 tar은 압축이 아니라는데 그동안 쓰던 건 뭔가, OverlayFS가 venv와 뭐가 다른가 —
 은 따로 찾아보고 각 편의 해당 개념 자리에 함께 적었다.
-찾아본 기록은 <a href="https://share.gemini.google/6g2GPLjKRpUk" target="_blank" rel="noopener">여기</a>에 남아 있다.

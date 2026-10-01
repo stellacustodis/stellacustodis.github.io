@@ -251,7 +251,7 @@ $\gamma_i(t)$를 조절하면 속성별 기여도를 바꿀 수 있다. 논문�
 
 ## 구현 관점에서
 
-추출본에는 독립된 Algorithm 블록이 없으므로, 다음은 식 (6), (12), (13)을 옮긴 최소 의사코드다.
+다음은 식 (6), (12), (13)의 연산 순서를 옮긴 의사코드다.
 
 ```python
 def predict_x0(x_t, eps_t, alpha_t):
@@ -313,7 +313,7 @@ Pretrained-domain 조작에서는 입력 이미지와 사전 학습 도메인이
 
 Unseen-domain translation에서는 입력과 목표가 모두 사전 학습 도메인 바깥에 있을 수 있다. 이 경우 stochastic DDPM으로 $t_0=500$까지 교란한 뒤, 원래 모델과 미세조정 모델의 reverse sampling 결과를 각각 사전 학습 도메인과 목표 도메인의 결과로 사용한다.
 
-Stroke-conditioned image synthesis도 같은 확산·미세조정 틀의 응용으로 제시된다. 다만 제공된 추출본에는 stroke 조건을 어떤 tensor로 주입하는지나 별도 loss를 사용하는지에 대한 절차가 없으므로, 조건 주입 방식을 더 구체화할 근거는 없다.
+Stroke-conditioned image synthesis도 같은 확산·미세조정 틀의 응용으로 제시된다. 이를 구현할 때는 stroke 조건의 tensor 표현과 주입 위치, 별도 loss 사용 여부를 함께 확인해야 한다.
 
 ## 실험 설정
 
@@ -395,12 +395,10 @@ Fine-tuning은 NVIDIA Quadro RTX 6000에서 $1$~$7$분이 걸린다. 목표 속�
 
 다중 속성 결합은 속성마다 전체 reverse trajectory를 반복하는 비용을 피하지만, 각 step에서 $M$개 모델의 $\epsilon_{\hat{\theta}_i}(x_t,t)$를 모두 계산해야 한다. 따라서 reverse trajectory는 하나여도 계산량과 모델 파라미터 보관 비용은 속성 수와 함께 늘어날 수 있다.
 
-논문이 직접 확인한 효율화는 학습용 step 축소와 latent 사전 계산이다. 모델 공유, 파라미터 효율적 미세조정, 모델 증류, sampling step의 추가 감소는 제공된 실험에서 확인되지 않는다.
+논문이 직접 확인한 효율화는 학습용 step 축소와 latent 사전 계산이다. 모델 공유, 파라미터 효율적 미세조정, 모델 증류, sampling step의 추가 감소 효과는 별도로 평가해야 한다.
 
 ## 한계와 생각해볼 점
 
-저자들은 DiffusionCLIP에 한계와 사회적 위험이 있으므로 올바른 목적을 위해 주의해 사용할 것을 권고한다. 다만 구체적인 한계와 사회적 영향은 Supplementary Section에 위임되어 있고, 제공된 텍스트에는 보충자료 본문이 포함되지 않았다. 따라서 특정 오용 사례나 완화책을 저자의 주장으로 추가할 근거는 없다.
+저자들은 DiffusionCLIP에 한계와 사회적 위험이 있으므로 올바른 목적을 위해 주의해 사용할 것을 권고한다. 구체적인 한계와 사회적 영향은 Supplementary Section에서 다룬다.
 
 방법에서 직접 확인되는 트레이드오프는 강한 편집과 reconstruction 사이의 충돌이다. $t_0$를 키우면 큰 형상 변화를 다룰 수 있지만, Table 1의 reconstruction 지표는 낮아진다. 새로운 속성마다 fine-tuning이 필요하다는 비용도 있다.
-
-보충자료의 Supplementary Sections A–H에는 유도, 절차, 구조, 추가 실험, 한계와 사회적 영향이 언급되지만 본문은 제공되지 않았다. 따라서 Supplementary Section F의 세부 ablation 수치나 구체적인 사회적 위험은 이 글에서 재구성하지 않았다.

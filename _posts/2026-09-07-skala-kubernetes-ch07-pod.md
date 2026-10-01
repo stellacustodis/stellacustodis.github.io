@@ -18,7 +18,7 @@ Pod는 반드시 같은 노드에 배치되어 네트워크 namespace와 volume�
 
 ## Running과 Ready는 다른 상태다
 
-`Running`은 하나 이상의 컨테이너가 실행 중이라는 phase일 뿐 요청을 받을 준비가 됐다는 뜻이 아니다. Service endpoint에 들어갈 수 있는지는 Ready condition이 결정한다.
+`Running`은 Pod가 노드에 배정되고 모든 컨테이너가 생성되었으며, 적어도 하나의 컨테이너가 실행 중이거나 시작·재시작 중인 phase다. 이 phase만으로 요청을 받을 준비가 됐다고 판단할 수는 없다. 일반 Service 트래픽 대상 여부는 endpoint의 ready 조건과 관련 설정을 함께 확인한다.
 
 | 표시 | 의미 | 먼저 볼 것 |
 |---|---|---|
@@ -37,7 +37,7 @@ BackOff는 포기했다는 뜻이 아니라 재시도 간격을 늘리는 상태
 |---|---|---|
 | startup | 애플리케이션 기동이 끝났는가 | 아직 기동 못 했다고 보고 재시작 기준 적용 |
 | liveness | 스스로 회복할 수 없는 정지 상태인가 | 컨테이너 재시작 |
-| readiness | 지금 새 요청을 받아도 되는가 | EndpointSlice에서 제외 |
+| readiness | 지금 새 요청을 받아도 되는가 | 일반 Service 트래픽 대상에서 제외하며 EndpointSlice의 ready 조건으로 상태 표시 |
 
 느린 JVM 애플리케이션은 startup probe로 기동 시간을 보호하고, 그 전에는 liveness/readiness 평가를 미룬다. liveness에 DB 연결 상태를 넣으면 DB의 일시 장애가 모든 application Pod의 동시 재시작으로 확대될 수 있다. liveness는 프로세스 자체의 생존, readiness는 요청 처리 가능성과 필요한 의존성을 본다.
 
@@ -62,11 +62,11 @@ DB migration을 각 application replica의 init container에서 무조건 수행
 
 ## 종료는 즉시가 아니라 절차다
 
-Pod 삭제가 시작되면 endpoint 제거와 종료 신호가 비동기적으로 진행된다. 이미 전달된 요청과 늦게 갱신된 routing 정보 때문에 종료 직전 Pod로 새 요청이 들어갈 수 있다.
+Pod 삭제가 시작되면 EndpointSlice의 `terminating=true`·`ready=false` 상태 전파와 컨테이너 종료 절차가 비동기적으로 진행된다. endpoint 주소가 즉시 삭제되는 것은 아니며, 종료 중 연결 정리가 필요하면 `serving` 조건도 함께 확인한다. 이미 전달된 요청과 늦게 갱신된 routing 정보 때문에 종료 직전 Pod로 새 요청이 들어갈 수 있다.
 
 ```text
 deletionTimestamp
-  ├─ EndpointSlice에서 제거 전파
+  ├─ EndpointSlice 종료·ready 상태 전파
   └─ preStop hook
        ↓
      SIGTERM
@@ -76,7 +76,7 @@ deletionTimestamp
      SIGKILL
 ```
 
-짧은 `preStop` 대기는 endpoint 제거가 load balancer와 kube-proxy에 전파될 시간을 준다. `terminationGracePeriodSeconds`는 preStop 시간과 애플리케이션 종료 유예의 합보다 커야 한다.
+짧은 `preStop` 대기는 routing 상태 변경이 load balancer와 kube-proxy에 전파될 시간을 준다. 주소가 즉시 제거됨을 전제로 하지는 않는다. `terminationGracePeriodSeconds`는 preStop 시간과 애플리케이션 종료 유예의 합보다 커야 한다.
 
 ## 멀티 컨테이너 패턴과 경계
 

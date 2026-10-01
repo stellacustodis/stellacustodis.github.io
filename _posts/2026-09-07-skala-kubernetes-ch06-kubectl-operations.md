@@ -20,7 +20,7 @@ kubectl port-forward pod/<pod> 8080:8080
 kubectl port-forward deploy/shop-api 8081:8081
 ```
 
-Service로 연결하면 backend Pod 중 하나를 선택하고, 특정 Pod로 연결하면 Service와 load balancing을 건너뛴다. “Service로는 안 되지만 Pod로는 된다”면 애플리케이션보다 Service selector·port·EndpointSlice 영역을 의심할 수 있다.
+Service 이름을 지정해도 kubectl은 selector로 Pod 하나를 선택한 뒤 그 Pod의 targetPort로 전달한다. 따라서 Service와 Pod를 대상으로 한 port-forward 모두 실제 ClusterIP·로드밸런싱 경로를 검증하지 않는다. Service 지정만 실패한다면 selector와 port/targetPort 및 선택된 Pod를 확인하고, Service 데이터 경로는 클러스터 내부에서 Service DNS나 ClusterIP로 별도 요청해 검증한다.
 
 ## exec보다 먼저 describe와 logs
 

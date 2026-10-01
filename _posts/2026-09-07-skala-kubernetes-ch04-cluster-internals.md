@@ -104,7 +104,7 @@ kubectl get endpointslice -n demo \
   -l kubernetes.io/service-name=shop-api -o wide
 ```
 
-Deployment의 `generation`이 증가했는데 ReplicaSet의 Pod template이 바뀌지 않았다면 controller가 아직 관찰하지 못했거나 매니페스트가 기대한 경로를 수정하지 않은 것이다. Pod까지 생겼는데 EndpointSlice가 비어 있으면 readiness, Service selector를 본다. 이처럼 API 객체의 `metadata`, `status`, `ownerReferences`, Events를 함께 읽어야 “어느 프로세스가 고장 났다”는 추측을 줄일 수 있다.
+Deployment의 `generation`이 증가했더라도 replicas만 바꾼 경우에는 Pod template이 그대로인 것이 정상이다. 새 rollout은 `spec.template`이 변경될 때 시작된다. 먼저 어떤 spec 필드가 바뀌었는지 확인하고, controller의 관찰 여부는 `generation`과 `observedGeneration`을 비교한다. Pod가 있는데 Service 대상에서 빠졌다면 readiness, Service selector와 EndpointSlice를 함께 확인한다. 이처럼 `metadata`, `status`, `ownerReferences`, Events를 연결해 원인을 좁힌다.
 
 ## 정리
 

@@ -77,7 +77,7 @@ rollback으로 돌아오는 것은 Pod template이다. DB schema, 외부 queue m
 
 1. readiness probe가 준비된 Pod만 endpoint에 넣는다.
 2. `maxUnavailable: 0`이 rollout 중 처리 용량을 보존한다.
-3. replica가 둘 이상이어야 교체 중에도 endpoint가 남는다.
+3. 복제본을 둘 이상 유지하면 장애 내성이 좋아진다. 다만 계획된 rolling update에서 기존 endpoint를 유지하기 위한 필수 조건은 아니다. `replicas: 1`도 `maxSurge: 1`, `maxUnavailable: 0`과 추가 스케줄링 용량, 올바른 readiness를 갖추면 새 Pod가 준비된 뒤 기존 Pod를 내릴 수 있다.
 4. preStop이 endpoint 제거 전파 시간을 확보한다.
 5. application이 SIGTERM을 받고 진행 중 요청을 마친다.
 6. grace period가 preStop과 application 종료 시간을 포함한다.

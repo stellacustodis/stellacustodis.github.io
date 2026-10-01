@@ -29,13 +29,13 @@ url: jdbc:mariadb://mariadb:3306/skala
 
 특성을 비교하면 선택 기준이 분명해진다.
 
-| 유형 | 격리 | DNS | 성능 | 사용 목적 |
+| 유형 | 격리 | 컨테이너 이름 자동 해석 | 성능 | 사용 목적 |
 |---|---|---|---|---|
 | bridge | O | ✗ | 보통 | 단순 테스트 |
 | custom bridge | O | ✓ | 보통 | **실무 기본** |
 | host | ✗ | ✗ | 최고 | 성능 최우선 |
 
-**DNS 열이 이 표의 핵심이다.** 기본 `bridge`에는 DNS가 없고 custom bridge에만 있다. 교재의 문장이 정확하다.
+이 표의 DNS는 컨테이너 이름의 자동 해석을 뜻한다. 기본 `bridge`는 컨테이너 사이의 자동 이름 해석을 제공하지 않지만, 외부 도메인을 조회할 DNS 설정까지 없는 것은 아니다. 사용자 정의 bridge에서는 Docker의 내장 DNS를 이용해 같은 네트워크의 컨테이너 이름을 해석할 수 있다.
 
 > Custom Bridge는 DNS를 지원하는데 이것은 **Docker Network 내부에 DNS 서버가 자동으로 동작**하기 때문
 
@@ -258,7 +258,7 @@ url: jdbc:mariadb://mariadb:3306/skala
 
 ## 이 장에서 남는 것
 
-- 기본 `bridge`에는 DNS가 없다. **커스텀 브리지에만 있다.** 실무 기본이 커스텀 브리지인 이유다.
+- 기본 `bridge`에는 컨테이너 이름의 자동 해석이 없다. **커스텀 브리지에서는 내장 DNS로 이름을 해석한다.**
 - `-p 8888:8080`은 Netfilter에 DNAT 규칙을 넣는 일이다. 그 뒤로 라우팅 테이블이 `docker0`를, FDB가 veth를 고른다.
 - `--network host`는 네트워크 네임스페이스를 만들지 않는 것이다. 그래서 격리도 없다.
 - Docker bridge는 단일 호스트용이고 Swarm overlay는 멀티 호스트를 잇는다. Kubernetes의 멀티 노드 네트워크 계층은 CNI(Calico 등)다.

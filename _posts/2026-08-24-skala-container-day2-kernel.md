@@ -224,7 +224,8 @@ venv는 그중 "의존성 분리" 한 조각만 담당한다.
 FROM python:3.11 AS builder
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 FROM python:3.11-slim
 COPY --from=builder /opt/venv /opt/venv

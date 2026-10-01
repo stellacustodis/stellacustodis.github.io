@@ -83,7 +83,7 @@ export const useCounterStore = defineStore('counter', () => {
 })
 ```
 
-`return`한 것만 외부에서 접근할 수 있다. 반환하지 않은 변수는 store 내부에서만 쓰이는 비공개 상태가 된다.
+`return`한 것만 외부에서 접근할 수 있다. Pinia가 관리해야 하는 반응형 state는 모두 반환해야 한다. [Setup Store](https://pinia.vuejs.org/core-concepts/#setup-stores)에서 state를 반환하지 않거나 readonly로 숨기면 SSR, devtools, plugin 동작이 깨질 수 있다. store의 상태가 아닌 내부 helper와 구분해야 한다.
 
 내보내는 함수 이름은 **`use` + 이름 + `Store`** 규칙을 따른다. Composable 관례와 같다.
 

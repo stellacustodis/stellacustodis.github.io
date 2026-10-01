@@ -5,18 +5,8 @@ categories:
   - AI
   - Engineering
 tags: [cuda, gpu, nvidia, linux, deep-learning-environment]
-description: "한 대의 Linux 개발 환경에서 여러 CUDA 버전을 함께 관리하는 방법을 정리한다. NVIDIA 드라이버·CUDA·cuDNN의 관계와 프로젝트별 버전 확인 절차를 다룬다."
 ---
-<!-- 이미지 경로: /assets/img/posts/cuda-version-여러-개-사용하기/<파일명> -->
-<!-- 예시: ![fig1](/assets/img/posts/cuda-version-여러-개-사용하기/fig1.png) -->
-
-_본 게시글은 과거 tistory에 올렸던 내용과 따로 정리하던 내용을 짜깁기한 게시글이다_
-
-
-
-
-
-첫 블로그 글을 논문 리뷰로 올리기 위해 작성중인 글이 있었는데, 수식 정리를 latex로 정리하려고 하니 시간이 많이 걸린다. 그래서 첫 글은 내가 뉴비 of 뉴비일 때 제일 애를 먹었던 cuda version 관리로 하고자 한다.
+CUDA를 처음 다룰 때 가장 어려웠던 부분은 버전 관리였다. 이 글에서는 여러 CUDA 버전을 설치하고 선택하는 방법을 정리한다.
 
 **what is cuda?**
 
@@ -70,7 +60,7 @@ sudo ln -sfn /usr/local/cuda-11.6 /usr/local/cuda
 
 10. 매번 `~/.bashrc`를 변경해야한다고 인터넷에 나와있는 경우도 있는데, 전역 소프트링크를 재설정하는 경우라면 건들지 않아도 된다. 특히 서버에서 타인과 공유하는 환경에서는 전역 소프트링크를 **제발** 건들지 마라.
 
-11. 기억을 복기하여 윈도우 환경에서 작성한 글이라 우분투 환경에서 다시 해보고 필요한 부분이 있다면 재수정하겠다.
+11. 명령어는 Ubuntu 환경을 대상으로 하며, 현재 Ubuntu 환경에서 다시 실행해 검증한 상태는 아니다.
 
 12. 추가. 쉘 단위에서 cuda version을 따로 관리하고 싶을 때는 해당 쉘에서 직접 path를 수정해주면된다. 그리고 이 방식을 가장 권장한다.
 ```bash

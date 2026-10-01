@@ -748,15 +748,15 @@ docker network inspect 03anwsers_private    # backend의 IP 확인
 
 ```text
 localhost:8080
-localhost:8080/health
-localhost:8080/users
+localhost:8080/api/health
+localhost:8080/api/users
 ```
 
 {: .prompt-warning }
 > backend의 healthcheck는 컨테이너 안에서 `wget`을 실행한다. `Dockerfile.backend`는 `python:3.11-slim` 위에 `fastapi`, `uvicorn`, `psycopg2-binary`만 설치하고 `wget`이나 `curl`을 설치하지 않는다. 베이스 이미지에 해당 바이너리가 없으면 healthcheck가 계속 실패하고, `depends_on: condition: service_healthy` 때문에 **frontend가 영영 뜨지 않는다.** `docker compose ps`에서 backend가 `unhealthy`로 머물면 이 지점을 먼저 확인한다. 필요하면 Dockerfile에 설치를 추가하거나, 파이썬으로 대체한다.
 >
 > ```dockerfile
-> RUN apt-get update && apt-get install -y --no-install-recommends curl \
+> RUN apt-get update && apt-get install -y --no-install-recommends wget \
 >     && rm -rf /var/lib/apt/lists/*
 > ```
 >

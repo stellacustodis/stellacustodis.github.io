@@ -10,7 +10,6 @@ tags: [deep-learning, reproducibility, pytorch, cuda, random-seed, cudnn]
 description: "PyTorch와 CUDA 환경에서 random seed를 고정하는 이유와 재현성이 완벽하지 않은 원인을 설명하고, 실험 재현을 위한 설정과 점검 방법을 정리한다."
 ---
 
-<!-- 이미지 경로: /assets/img/posts/seed-fixing-1/<파일명> -->
 
 아래의 내용은 연구실 노션에 정리해놨던 글을 복사해 온 것임.
 
@@ -149,8 +148,13 @@ def get_dataloader(opt, train_dataset, test_dataset=None):
             test_sampler = torch.utils.data.distributed.DistributedSampler(
                 test_dataset,
                 num_replicas=opt.world_size,
-                rank=opt.rank
+                rank=opt.rank,
+                shuffle=False,
+                drop_last=False,
             )
+            # DataLoader의 shuffle=False는 sampler의 순서를 바꾸지 않는다.
+            # 데이터 수가 world_size로 나누어떨어지지 않으면 중복 인덱스가 생긴다.
+            # 전체 평가 지표는 표본 ID로 중복을 제거하거나 중복 없는 평가 sampler를 쓴다.
         else:
             test_sampler = None
     else:

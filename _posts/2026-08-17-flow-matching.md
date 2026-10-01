@@ -14,7 +14,7 @@ paper:
   url: "https://openreview.net/forum?id=PqvMRDCJT9t"
 ---
 
-> 이 글은 개인 Obsidian에 정리해 둔 논문 노트를 블로그 형식으로 다시 편집한 글이다. ODE 시뮬레이션 없이 CNF를 학습하는 조건부 벡터장 회귀와, 조건부 OT 경로가 주는 이점에 초점을 맞춘다.
+> ODE 시뮬레이션 없이 CNF를 학습하는 조건부 벡터장 회귀와, 조건부 OT 경로가 주는 이점에 초점을 맞춘다.
 
 ## 세 줄 요약
 
@@ -783,14 +783,14 @@ s_t(x)-\nabla\log p_t(x\mid x_1)
 \tag{42}
 $$
 
-이다. Gaussian 경로에 대해서는 논문의 표기로
+이다. Gaussian 경로에 대해서는 다음과 같다. 원문 Eq. 43에도 마이너스가 적혀 있지만, Gaussian score가 $-(x-\mu_t)/\sigma_t^2$이므로 Eq. 42의 타깃을 빼면 아래처럼 플러스가 된다. 이는 원문 내부의 부호 불일치를 바로잡은 것이며 전체 baseline 구현의 검증을 뜻하지 않는다.
 
 $$
 \mathcal{L}_{\mathrm{SM}}(\theta) =
 \mathbb{E}
 \lambda(t)
 \left\|
-s_t(x) -
+s_t(x) +
 \frac{x-\mu_t(x_1)}{\sigma_t^2(x_1)}
 \right\|^2
 \tag{43}

@@ -27,7 +27,7 @@ related: [skala-kubernetes-roadmap, skala-kubernetes-ch09-service-networking, sk
 
 ## 1구간: 도메인에서 load balancer까지
 
-DNS record가 load balancer 주소를 가리키고 인증서가 유효해야 한다. wildcard DNS를 사용하면 등록하지 않은 host도 load balancer까지 도착할 수 있으며, 최종 차단은 Ingress host rule이 담당한다.
+DNS record가 load balancer 주소를 가리키고 인증서가 유효해야 한다. wildcard DNS를 사용하면 등록하지 않은 host도 load balancer까지 도착할 수 있다. Ingress host rule에 일치하지 않는 요청은 default backend나 controller의 기본 처리로 전달될 수 있으므로, 알 수 없는 host를 차단하려면 그 기본 처리 정책을 명시하고 검증해야 한다.
 
 ```bash
 dig +short api.example.com
@@ -51,7 +51,7 @@ LB → NodeIP:NodePort → PodIP
 
 `target-type: ip`에서는 실제 data packet이 Service ClusterIP를 거치지 않을 수 있다. 그래도 Ingress backend는 Service name/port를 참조하고 controller가 그 관계에서 Pod target을 구성한다. 즉, **논리적 리소스 흐름과 실제 packet hop은 다를 수 있다.**
 
-LB health check가 통과한 target만 요청을 받는다. Kubernetes readiness와 LB health check 경로가 서로 다르면 Pod는 Ready지만 LB에서는 unhealthy이거나 그 반대가 될 수 있다.
+정상적인 경우에는 LB health check를 통과한 target으로 요청을 보낸다. 다만 AWS ALB는 등록된 모든 target이 unhealthy이면 fail-open으로 unhealthy target에도 라우팅할 수 있으므로, health check 실패가 항상 트래픽 차단을 뜻하지는 않는다. Kubernetes readiness와 LB health check 경로가 서로 다르면 Pod는 Ready지만 LB에서는 unhealthy이거나 그 반대가 될 수 있다.
 
 ## 3·4구간: 보이지 않는 주소 변환
 

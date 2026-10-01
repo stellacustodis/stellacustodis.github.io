@@ -14,7 +14,7 @@ paper:
   arxiv: "https://arxiv.org/abs/1905.07088"
 ---
 
-> 이 글은 개인 Obsidian에 정리해 둔 논문 노트를 블로그 형식으로 다시 편집한 글이다. Hessian trace 계산을 랜덤 투영으로 우회한다는 아이디어와 그 대가에 초점을 맞춘다.
+> Hessian trace 계산을 랜덤 투영으로 우회한다는 아이디어와 그 대가에 초점을 맞춘다.
 
 ## 세 줄 요약
 
@@ -1277,7 +1277,7 @@ Figure 2는 다변량 표준정규분포에서 미니배치 100개의 평균 실
 
 ### NICE 설정과 결과
 
-NICE 실험은 MNIST를 $[-1/512,1/512]$ 범위로 dequantize한 뒤 $[-0.001,0.001]$로 clipping하고 logit transform을 적용했다. 모델은 coupling layer 4개를 사용하고, 각 coupling layer에는 은닉층 5개가 있어 총 20개 hidden layer가 된다. 각 층은 1000 units이며 final scale layer와 softplus를 사용했다.
+NICE 실험은 MNIST에 $[-1/512,1/512]$의 균등 잡음을 더해 dequantization한 뒤 logit 변환을 적용한다. [원문 부록 C.2](https://proceedings.mlr.press/v115/song20a/song20a-supp.pdf)에는 clipping 범위가 $[-0.001,0.001]$로 기재돼 있으나, 이 범위는 실수 logit의 정의역 $0<x<1$과 맞지 않아 그대로 구현할 수 없다. 정확한 clipping 설정은 저자 코드와 추가 대조가 필요하다. 모델은 coupling layer 4개를 사용하고, 각 coupling layer에는 은닉층 5개가 있어 총 20개 hidden layer가 된다. 각 층은 1000 units이며 final scale layer와 softplus를 사용했다.
 
 학습은 Adam $10^{-3}$, 100 epochs, 배치 128로 수행했다. train-validation 비율은 90/10이고, 100 iteration마다 exact SM loss를 평가해 가장 좋은 checkpoint를 선택했다. 모델 하나의 학습 시간은 약 2시간이었다. 표준 SM은 한 epoch에 7시간이 걸려 비교에서 제외됐다.
 
@@ -1363,7 +1363,7 @@ VAE SSM은 10k에서 108.52로 ELBO의 96.20보다 높지만, 40k부터는 70.28
 
 VAE Stein과 Spectral은 40k 이후에도 FID가 각각 118.87 이상, 125.04 이상이며 100k에는 126.76과 133.93이다. WAE에서는 세 방법의 격차가 더 작다. 10k에는 Stein 82.93과 Spectral 82.30이 SSM 84.11보다 낮지만, 40k에는 SSM이 61.09로 가장 낮아지고 100k에는 SSM 54.33, Spectral 55.96, Stein 57.61 순이다. 한 시점의 결과만 보면 초기와 후기의 결론이 달라지므로 학습 iteration 전체를 함께 보아야 한다.
 
-Table 4부터 Table 7은 정량표가 아니라 생성 표본 비교다. 추출본에서 이미지 셀은 판독할 수 없으므로 ELBO, SSM, Stein, Spectral 사이의 시각적 우열은 판단하지 않는다. 구성은 다음과 같다.
+Table 4부터 Table 7은 생성 표본 비교다. 정량 지표와 표본의 시각적 품질을 구분해 읽어야 하며, 구성은 다음과 같다.
 
 - Table 4: MNIST의 VAE 표본을 latent dimension 8과 32에서 ELBO, SSM, Stein, Spectral별로 비교한다.
 - Table 5: CelebA의 VAE 표본을 ELBO, SSM, Stein, Spectral의 2×2 배치로 비교한다.
@@ -1436,4 +1436,4 @@ DKEF에서는 $M=1$이 기본값이지만 15 seeds, validation patience 200, AIS
 
 또한 일반 신경망 score estimator가 curl-free가 아닐 수 있다는 각주는 중요하다. 추정된 벡터장이 downstream 엔트로피 그래디언트에 유용할 수는 있어도, 항상 어떤 정규화 가능한 밀도의 로그 gradient로 적분된다고 볼 수는 없다. 밀도 복원까지 요구하는 응용이라면 자유로운 $h$ 대신 energy parameterization이나 integrability 제약이 필요하고, 그 대가로 미분 깊이와 계산량이 늘어난다.
 
-실험 범위에 관한 유보는 한 번만 두는 것이 적절하다. 이 논문은 UCI 표형 데이터, MNIST, CelebA와 fully connected·convolutional 구조에서 가능성을 보였지만, 더 높은 해상도·다른 모달리티·더 큰 score network에서 같은 $M$과 projection 분포가 충분한지는 별도의 검증 문제다. 특히 차원이 커질수록 한 투영이 싸다는 사실과, 원하는 통계적 효율을 위해 작은 $M$이 충분하다는 사실은 서로 다른 주장이다.
+이 논문은 UCI 표형 데이터, MNIST, CelebA와 fully connected·convolutional 구조에서 가능성을 보였지만, 더 높은 해상도·다른 모달리티·더 큰 score network에서 같은 $M$과 projection 분포가 충분한지는 별도의 검증 문제다. 특히 차원이 커질수록 한 투영이 싸다는 사실과, 원하는 통계적 효율을 위해 작은 $M$이 충분하다는 사실은 서로 다른 주장이다.

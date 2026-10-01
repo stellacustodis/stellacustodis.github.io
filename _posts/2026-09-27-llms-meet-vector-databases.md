@@ -74,7 +74,7 @@ $$
 
 RAG는 바뀌는 자료를 매번 모델 매개변수에 새겨 넣지 않고 활용하는 방법이다. 시맨틱 캐시는 생성 호출 자체를 줄이는 방법이다. 대화 메모리는 이전 입력 가운데 지금 필요한 내용을 다시 찾는 방법이다. 세 경우 모두 벡터 데이터베이스가 **관련 항목을 찾는 장치**이고, 어떤 항목이 사실인지 또는 답을 재사용해도 되는지를 스스로 판정하는 장치는 아니다.
 
-논문은 산업계 사례로 Azure AI Search의 Qdrant를 활용한 벡터 검색, Pinecone의 오픈소스 Canopy 프레임워크, Spotify와 Yahoo의 Vespa 채택을 든다. 이 사례들은 벡터 데이터베이스를 외부 지식 저장소로 연결해 조직별 자료를 검색하는 RAG의 활용 범위를 보여준다.
+논문은 산업계 사례로 Azure AI Search, Pinecone의 오픈소스 Canopy 프레임워크, Spotify와 Yahoo의 Vespa 채택을 든다. 다만 원문의 “Azure AI Search가 Qdrant를 사용한다”는 서술은 해당 원문이 연결한 [Microsoft 공식 문서](https://learn.microsoft.com/en-us/azure/search/vector-search-overview)에서 확인되지 않는다. 공식 문서는 Azure AI Search 자체의 벡터 인덱싱·저장·질의 기능을 설명하므로, 이 구현 관계는 검증된 사실로 받아들이지 않는다. 이 사례들은 벡터 데이터베이스를 외부 지식 저장소로 연결해 조직별 자료를 검색하는 RAG의 활용 범위를 보여준다.
 
 ## RAG를 수식으로 따라가기
 

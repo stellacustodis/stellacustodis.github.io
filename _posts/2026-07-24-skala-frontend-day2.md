@@ -420,7 +420,7 @@ div.sticky   { position: sticky; top: 0; }
 img { position: absolute; z-index: -1; }
 ```
 
-`z-index`는 **`position`이 `static`이 아닌 요소에만 적용된다.** 적용이 안 될 때 대부분 이 조건을 빠뜨린 경우다.
+`z-index`는 positioned 요소뿐 아니라 flex·grid item에도 적용된다. 따라서 `position: static`인 flex·grid item도 예외이며, 적용 여부를 확인할 때는 해당 요소의 layout과 stacking context를 함께 살펴야 한다.
 
 ## 상속
 
@@ -1588,7 +1588,7 @@ console.log(obj.name);            // "홍길동"
 console.log(typeof obj);          // "object"
 ```
 
-네트워크로는 텍스트만 오갈 수 있기 때문에, 객체를 보내려면 문자열로 바꾸고(`stringify`) 받은 쪽에서 다시 객체로 되돌린다(`parse`). 뒤에서 다룰 `fetch`의 `response.json()`이 내부적으로 이 역할을 한다.
+네트워크는 텍스트와 바이너리 데이터를 모두 전송할 수 있다. 여기서는 JavaScript 객체를 JSON 형식으로 보내기 위해 `JSON.stringify()`로 직렬화하고, 받은 쪽에서 `JSON.parse()`나 `response.json()`으로 해석한다.
 
 `JSON.stringify`는 함수와 `undefined` 속성을 제외한다는 점에 주의한다.
 
@@ -1914,7 +1914,7 @@ hello().then(res => console.log(res));   // "안녕하세요!"
 **`await`**
 
 - "비동기 작업이 끝날 때까지 다음 줄로 넘어가지 말고 기다려라"
-- **`async` 함수 안에서만** 사용할 수 있다
+- `async` 함수 안이나 JavaScript 모듈의 최상위에서 사용할 수 있다. 일반 script의 최상위에서는 사용할 수 없다
 
 에러 처리는 `try...catch`로 한다. Promise의 `.catch()`보다 익숙한 문법이라는 것도 장점이다.
 
@@ -2141,8 +2141,6 @@ External JS가 코드를 **파일로 나눈 것**뿐이라면, 모듈은 각 파
 
 이틀 동안 다룬 것은 프레임워크가 아니라 **프레임워크가 추상화하고 있는 층**이다. React의 상태 갱신도, Vue의 반응성도 결국 DOM 조작과 이벤트, 그리고 비동기 처리 위에 얹혀 있다. 바닥을 알고 있으면 추상화가 새는 순간에 무슨 일이 일어나는지 추적할 수 있다.
 
-> 개인 회고: 이 자리에 실제 실습에서 막혔던 지점이나 인상 깊었던 부분을 추가하면 글의 밀도가 올라간다.
-{: .prompt-tip }
 
 ---
 

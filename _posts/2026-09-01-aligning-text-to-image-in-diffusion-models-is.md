@@ -15,7 +15,7 @@ paper:
   code: "https://github.com/softrepa/SoftREPA"
 ---
 
-> 이 글은 개인 Obsidian에 정리한 논문 노트를 블로그 형식으로 다시 편집한 글이다. SoftREPA가 고정된 확산 모델의 오차를 어떻게 image--text 대조 점수로 바꾸는지, 그리고 정렬 향상과 이미지 품질 사이에 어떤 대가가 남는지를 중심으로 읽었다.
+> SoftREPA가 고정된 확산 모델의 오차를 어떻게 image--text 대조 점수로 바꾸는지, 그리고 정렬 향상과 이미지 품질 사이에 어떤 대가가 남는지를 중심으로 읽었다.
 
 ## 세 줄 요약
 

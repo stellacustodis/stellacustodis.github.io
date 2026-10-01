@@ -64,12 +64,12 @@ flowchart LR
     G --> H[LaTeX와 PDF]
 ```
 
-루트 config/pipeline.json에는 논문 경로, 자연어 요청, 평가 목적과 도메인, RAG 실행 모드가 들어 있다. python -m pipeline을 실행하면 pipeline/__main__.py가 입력과 실행 상태를 읽고 각 단계를 호출한다.
+루트 config/pipeline.json에는 논문 경로, 자연어 요청, 평가 목적과 도메인, RAG 실행 모드가 들어 있다. python -m pipeline을 실행하면 `pipeline/__main__.py`가 입력과 실행 상태를 읽고 각 단계를 호출한다.
 
 RAG에는 두 가지 모드가 있다.
 
 - **saved**: 이미 만든 기술 조사 결과를 재사용한다. 기본값이다.
-- **live** (명령행에서는 --run-rag): 입력 PDF를 다시 파싱하고 검색·추출·감사를 수행한다.
+- **live** (명령행에서는 `--run-rag`): 입력 PDF를 다시 파싱하고 검색·추출·감사를 수행한다.
 
 저장 결과를 쓸 때 자연어 요청을 바꾸면 후속 평가에는 반영되지만, 과거 기술 조사 결과가 새 요청으로 다시 생성되지는 않는다. 이 차이를 실행 기록에 남긴다.
 
@@ -83,7 +83,7 @@ config/pipeline.json은 두 논문과 사용자의 요청을 연결한다. 현�
 
 ### pipeline: 서로 다른 팀 모듈을 잇는다
 
-pipeline/__main__.py는 전체 실행 진입점이다. 입력과 코드의 해시를 기록하고 prepare, domain, stakeholders, market, review, report 단계를 순서대로 실행한다.
+`pipeline/__main__.py`는 전체 실행 진입점이다. 입력과 코드의 해시를 기록하고 prepare, domain, stakeholders, market, review, report 단계를 순서대로 실행한다.
 
 pipeline/research_input.py는 기술 조사 에이전트의 dossier, comparison, evidence registry를 후속 에이전트가 읽을 수 있는 공통 상태로 바꾼다. 모든 원문을 무작정 넘기지 않고 기술 개요·적용 범위·한계를 번갈아 선택한다. 빠진 항목은 context manifest에 기록하고 전체 원본은 별도 bundle에 보존한다.
 
@@ -239,7 +239,7 @@ flowchart TD
 
 강의에서 배운 전처리, hybrid retrieval, reranking, 평가, Agentic RAG는 프로젝트 안에서 따로 떨어진 기능이 아니었다. PDF의 읽기 순서와 표 셀을 보존하는 일은 검색 품질과 근거 감사로 이어졌다. 검색과 생성의 평가는 dossier 계약과 semantic audit으로 이어졌다. LangGraph의 State, Node, Conditional Edge는 보완이 필요한 항목만 다시 처리하는 흐름으로 이어졌다.
 
-기존 정리에서 바로잡아야 할 부분도 있다. 프로젝트는 일반 논문 리뷰 Agent가 아니라 KV cache 기술을 다중 관점에서 평가하는 시스템이며, 기술 조사 에이전트의 sparse 검색은 BM25가 아니라 BGE-M3 learned sparse다. 앞으로 이 글을 기준으로 프로젝트의 목적과 구현을 설명할 수 있게 됐다.
+프로젝트는 KV cache 기술을 다중 관점에서 평가하는 시스템이며, 기술 조사 에이전트의 sparse 검색은 BGE-M3 learned sparse다.
 
 ---
 

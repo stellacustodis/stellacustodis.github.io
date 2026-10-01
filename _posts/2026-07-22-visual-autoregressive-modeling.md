@@ -15,7 +15,7 @@ paper:
   code: "https://github.com/FoundationVision/VAR"
 ---
 
-> 이 글은 개인 Obsidian에 작성했던 논문 노트를 블로그 형식으로 다시 편집한 글이다. 논문의 핵심인 next-scale prediction과 기존 next-token 방식의 차이에 집중한다.
+> 논문의 핵심인 next-scale prediction과 기존 next-token 방식의 차이에 집중한다.
 
 ## 세 줄 요약
 
@@ -360,17 +360,16 @@ def generate(condition, scales, transformer, tokenizer, sampling_options):
 
 훈련 시 현재 정답 스케일을 입력 문맥에 그대로 노출하면 목표 토큰이 누출된다. Eq. 6이 허용하는 조건은 $r_1$부터 $r_{k-1}$까지다. 같은 스케일의 정답을 보고 그대로 복사하는 경로는 attention mask와 입력 배치에서 막아야 한다.
 
-Attention에서는 query와 key를 스코어 계산 전에 단위 벡터로 정규화한다. head 차원을 $d_h$라고 하면 정규화된 attention score는 다음과 같이 cosine similarity로 정리된다.
+Attention에서는 query와 key를 스코어 계산 전에 단위 벡터로 정규화한다. Q와 K의 내적은 cosine similarity가 되지만, 그 사실만으로 score가 $\cos\theta/\sqrt{d_h}$라고 결정되지는 않는다. [공식 구현](https://github.com/FoundationVision/VAR/blob/main/models/basic_var.py)의 `attn_l2_norm` 경로는 기본 scale을 1로 두고, head별 학습 가능한 양의 scale을 정규화된 Q에 곱한다. 이 scale은 4로 초기화되고 최대 100으로 제한된다.
 
 $$
-s_{ij} =
-\frac{
+s_{ij}^{(h)} =
+a_h
 \left(q_i/\|q_i\|_2\right)^\top
 \left(k_j/\|k_j\|_2\right)
-}{
-\sqrt{d_h}
-} =
-\frac{\cos\theta_{ij}}{\sqrt{d_h}}
+=
+a_h\cos\theta_{ij},\qquad
+a_h=\exp(\min(\ell_h,\log 100))
 \tag{D6}
 $$
 
@@ -668,7 +667,7 @@ $N$과 $C_{\min}$을 키울 때 손실과 오류율이 모두 멱법칙 형태�
 ![ImageNet 256×256에서 생성 모델군의 FID·추론 시간·파라미터 규모 비교](/assets/img/posts/var/figure3.png){: w="700" }
 _원문 Figure 3. ImageNet $256\times256$에서 VAR과 다른 생성 모델군의 FID를 배치 크기 1의 추론 시간에 따라 비교한다. 점 크기는 파라미터 수(0.3B~5B)를 나타내고, 점선은 검증 세트의 FID 기준선 1.78이다. 이 그림은 앞서 언급한 원문 Figure 5·6의 멱법칙 피팅 자체가 아니라 품질·속도·모델 규모를 함께 보여주는 계열 간 비교다._
 
-스케일링 실험에는 깊이 6부터 30, 18M부터 2B 파라미터 범위의 12개 모델이 사용됐다. ImageNet의 1.28M 이미지를 사용했고, 에폭당 870B 이미지 토큰과 최대 305B 훈련 토큰이 보고되었다. 평가는 검증 이미지 50,000장으로 수행됐다.
+스케일링 실험에는 깊이 6부터 30, 18M부터 2B 파라미터 범위의 12개 모델이 사용됐다. ImageNet의 1.28M 이미지를 사용했고, 원문에는 에폭당 870B 이미지 토큰과 최대 305B 훈련 토큰이라고 기재돼 있지만, 한 에폭의 수가 전체 학습 토큰 수보다 커 단위가 서로 맞지 않는다. 이는 원문에도 있는 수치·단위 불일치이므로, 에폭당 토큰 수의 확정값으로 사용하지 않는다. 평가는 검증 이미지 50,000장으로 수행됐다.
 
 ## 실험 설정
 
@@ -719,7 +718,7 @@ _원문 Figure 3. ImageNet $256\times256$에서 VAR과 다른 생성 모델군�
 
 규모를 키우면 VAR-d16의 FID 3.30에서 VAR-d20 2.57, VAR-d24 2.09, VAR-d30 1.92로 낮아진다. 같은 과정에서 파라미터 수는 310M에서 2.0B, 상대 시간은 0.4에서 1로 증가한다. 품질 개선이 계산과 모델 크기 증가를 대가로 얻어진다는 점이 함께 나타난다.
 
-VAR-d30-re는 2.0B 파라미터, 10단계, 상대 시간 1에서 FID 1.73과 IS 350.2를 기록한다. DiT-XL/2는 FID 2.27, IS 278.2, 250단계, 상대 시간 45다. 논문이 제시한 비교대로 VAR-d30-re의 추론 시간은 DiT-XL/2보다 45배 짧다.
+VAR-d30-re의 -re는 rejection sampling을 적용한 설정이다. 이 설정은 2.0B 파라미터·10단계에서 FID 1.73과 IS 350.2를 기록했고, 표의 상대 시간은 1이다. Rejection sampling을 쓰지 않은 VAR-d30의 FID는 1.92이므로 두 설정의 품질을 구분해야 한다. DiT-XL/2는 FID 2.27, IS 278.2, 250단계, 상대 시간 45다. 논문이 제시한 비교대로 VAR-d30-re의 추론 시간은 DiT-XL/2보다 45배 짧다.
 
 Precision과 Recall은 별도로 볼 필요가 있다. VAR-d30-re는 Precision 0.82, Recall 0.60이다. 검증 데이터 행의 Recall 0.67에는 미치지 않으며, FID 한 지표만으로 분포 포괄 범위를 모두 설명할 수 없음을 표에서 확인할 수 있다.
 
@@ -762,7 +761,7 @@ CFG $1.5$를 추가하면 비용이 0.016에서 0.022로 증가하는 대신 FID
 
 Query와 key의 attention 전 정규화를 추가하면 비용 표기는 0.022로 유지되면서 FID가 3.60에서 3.30으로 낮아진다. 이 결과가 Stage 2 구성에서 attention normalization을 유지해야 할 실험적 근거다.
 
-마지막으로 VAR-d16에서 2.0B 파라미터의 VAR-d30으로 확장하면 비용이 0.022에서 0.052로 증가하고 FID는 3.30에서 1.73으로 낮아진다. 스케일업이 추가 품질을 만들지만, 그 이전에 이미 모델링 방식, AdaLN, 샘플링, CFG, attention normalization의 효과가 누적되어 있다.
+마지막 행은 2.0B 규모 확장과 표에 명시된 샘플링 조건을 함께 반영한 결과다. 본 비교표에서 rejection sampling 없는 VAR-d30은 FID 1.92, -re 설정은 1.73이므로, 3.30→1.73 전체 차이를 모델 규모만의 효과로 분리해서는 안 된다. 스케일업이 추가 품질을 만들지만, 그 이전에 이미 모델링 방식, AdaLN, 샘플링, CFG, attention normalization의 효과가 누적되어 있다.
 
 내가 보기에는 이 ablation이 가장 강하게 지지하는 기여는 “더 큰 트랜스포머”가 아니라 AR에서 VAR로의 모델링 단위 변경이다. AdaLN, top-$k$, CFG, attention normalization, 스케일업은 최종 성능을 높이는 중요한 구성요소이지만, VAR이라는 방법을 정의하는 변화는 아니다. 이들을 제거해도 next-scale prediction은 남지만, AR to VAR 변경을 제거하면 논문의 핵심 생성 순서가 사라진다.
 
@@ -825,5 +824,3 @@ VAR은 [VQGAN](/posts/vqgan/)의 이산 이미지 표현을 버리지 않고 자
 내가 이 논문의 핵심 기여를 한 문장으로 정리하면, “이미지의 자기회귀 순서를 어디에 둘 것인가”를 다시 설계한 일이다. 토큰의 좌표를 따라가는 순서를 표현의 해상도를 따라가는 순서로 바꾸자, 공간 구조와 병렬성을 함께 확보하고 스케일업 가능한 트랜스포머 학습 문제로 연결할 수 있었다.
 
 다만 이 결과를 경량 모델 자체로 읽는 것은 맞지 않아 보인다. 순차 단계와 논문이 가정한 생성 비용은 크게 줄었지만, 최고 성능 모델은 2.0B 파라미터이고 학습 규모도 크다. VAR의 효율성은 작은 모델을 만드는 효율성이라기보다, 큰 자기회귀 이미지 모델의 샘플링 경로를 짧게 만드는 효율성에 가깝다.
-
-<!-- DEEPEN 유도보강: 6곳 / 설계판단: 8곳 / 유보정리: 6곳 / 논문연결: vqgan -->

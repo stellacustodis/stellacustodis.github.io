@@ -100,7 +100,7 @@ public String classifyWithExamples(String inquiry) {
 | 말로 지시 | 약함 | 짧은 지시문만큼 입력 토큰 증가 | 형식이 단순할 때 |
 | Few-shot 예시 | 중간 | 토큰 증가 | 말로 설명하기 어려운 형식 |
 | `entity()` 구조화 출력 | 강함 | 스키마 지시문만큼 입력 토큰 증가 | **기본 선택** |
-| 공급자 JSON 모드 | 가장 강함 | 공급자 종속 | 절대 깨지면 안 될 때 |
+| 공급자 JSON 모드 | JSON 문법을 제한 | 공급자 종속 | 유효한 JSON이 필요할 때; 필드·타입·enum 준수는 별도의 JSON Schema 기반 구조화 출력과 구분 |
 
 세 번째가 다음 글의 주제다. `entity()`는 별도 기능 요금이 붙는 것은 아니지만, 스키마와 형식 지시문이 프롬프트에 붙으므로 그만큼 입력 토큰을 쓴다. 다만 Few-shot 예시를 여러 개 넣는 것보다 짧을 수 있다.
 
@@ -297,7 +297,8 @@ public Flux<String> stream(String question) {
             .user(question)
             .stream()
             .content()
-            // 전체 상한 — 무한정 기다리지 않는다
+            // 유휴 시간 상한 — 구독 또는 직전 토큰 이후 60초 동안 신호가 없으면 timeout
+            // 전체 응답 시간 상한이 필요하면 별도의 total deadline을 구현한다.
             .timeout(Duration.ofSeconds(60))
             // 첫 토큰까지의 시간(TTFB)은 체감 성능을 좌우한다. 따로 잰다.
             .doOnNext(token -> {

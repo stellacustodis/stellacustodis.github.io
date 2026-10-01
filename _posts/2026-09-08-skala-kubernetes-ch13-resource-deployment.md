@@ -57,7 +57,7 @@ node resource pressure에서는 BestEffort가 먼저 위험해지고, Burstable�
 
 ## Spring Boot management port와 probe
 
-management endpoint를 application traffic port와 분리하면 Ingress/Service에서 내부 actuator 정보를 노출하지 않으면서 kubelet probe에 사용할 수 있다.
+management endpoint를 application traffic port와 분리하면 외부 노출을 제한하면서 kubelet probe에 사용할 수 있다. 다만 별도 management context의 probe가 성공해도 주 application port나 connection pool이 고장 난 상태일 수 있다. Spring Boot는 `management.endpoint.health.probes.add-additional-paths=true`로 주 포트에 `/livez`와 `/readyz`도 제공할 수 있다. 이 경로의 외부 노출과 접근 정책은 별도로 제한한다.
 
 ```yaml
 management:
