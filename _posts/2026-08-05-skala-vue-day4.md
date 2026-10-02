@@ -528,7 +528,7 @@ ElMessageBox.confirm('파일을 영구히 삭제하시겠습니까?', '최종 �
 
 `ElMessageBox`가 Promise를 반환한다는 점이 유용하다. 확인은 `.then()`, 취소는 `.catch()`로 자연스럽게 분기된다. 브라우저 기본 `confirm()`은 동기적으로 실행을 멈추지만 이쪽은 비동기라 화면이 멈추지 않는다.
 
-**Loading, Skeleton, Empty 세 가지는 실무에서 반드시 쓰게 된다.** 데이터를 서버에서 가져오는 순간부터 화면에는 최소 네 가지 상태가 생기기 때문이다.
+서버 데이터를 표시할 때는 로딩 중, 성공, 빈 결과, 실패를 구분한다. 각 상태에 맞춰 Loading, Skeleton, Empty 같은 표현을 선택할 수 있다.
 
 ```text
 로딩 중  →  Skeleton 또는 v-loading

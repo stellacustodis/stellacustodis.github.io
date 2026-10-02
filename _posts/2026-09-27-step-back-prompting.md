@@ -138,10 +138,10 @@ $$
 
 논문은 모델 파라미터를 갱신하는 학습 방법이 아니라 추론 시점의 프롬프트 절차를 제안한다. 따라서 여기서 구분할 루프는 학습과 샘플링이라기보다 **상위 질문·원리 생성 루프와 최종 답 생성 루프**다. 앞 단계의 출력이 뒤 단계의 입력이 되는 순차 실행이며, 연구에서 답을 생성할 때 모든 추론은 그리디 디코딩(greedy decoding)으로 수행했다.
 
-아래 의사코드의 `generate`와 `retrieve`는 특정 라이브러리 API가 아니라 각각 모델 생성과 검색을 뜻한다. `B`는 한 번에 처리할 질문 수다. 입력·출력은 길이가 서로 다를 수 있는 문자열 목록이므로, 여기의 `(B,)`는 고정 길이 텐서가 아닌 **항목 수**를 표시한다.
+아래 의사코드는 STEM의 원리 생성 경로와 검색을 결합한 질의응답 경로를 나타낸다. `generate`와 `retrieve`는 특정 라이브러리 API가 아니라 각각 모델 생성과 검색을 뜻한다. `B`는 한 번에 처리할 질문 수다. 입력·출력은 길이가 서로 다를 수 있는 문자열 목록이므로, 여기의 `(B,)`는 고정 길이 텐서가 아닌 **항목 수**를 표시한다.
 
 ```python
-def step_back_batch(questions, domain, use_retrieval):
+def step_back_batch(questions, domain):
     # questions: 원래 질문 문자열 B개, (B,)
     final_answers = []
 
@@ -163,33 +163,24 @@ def step_back_batch(questions, domain, use_retrieval):
                 stepback_prompt(question)
             )  # 상위 질문 문자열 1개
 
-            if use_retrieval:
-                original_passage = retrieve(question)
-                stepback_passage = retrieve(stepback_question)
+            original_passage = retrieve(question)
+            stepback_passage = retrieve(stepback_question)
 
-                # Table 14: 두 검색 문맥 + 원래 질문 -> 최종 답
-                answer = generate(
-                    qa_answer_prompt(
-                        question,
-                        original_passage,
-                        stepback_passage,
-                    )
-                )  # 답 문자열 1개
-            else:
-                # 검색 없는 Step-Back 실험에 해당
-                answer = generate(
-                    qa_answer_prompt_without_retrieval(
-                        question,
-                        stepback_question,
-                    )
-                )  # 답 문자열 1개
+            # Table 14: 두 검색 문맥 + 원래 질문 -> 최종 답
+            answer = generate(
+                qa_answer_prompt(
+                    question,
+                    original_passage,
+                    stepback_passage,
+                )
+            )  # 답 문자열 1개
 
         final_answers.append(answer)
 
     return final_answers  # 답 문자열 B개, (B,)
 ```
 
-`qa_answer_prompt_without_retrieval`의 세부 문구는 위 의사코드에 명시하지 않았다. 원문 발췌에는 검색을 결합한 최종 프롬프트가 구체적으로 실려 있지만, 검색 없는 변형의 완전한 템플릿을 이 코드처럼 단정할 만큼의 문구는 보이지 않는다. 이 분기는 Table 2와 Table 3에 **Step-Back 단독 실험이 존재한다는 사실**을 표현한다.
+위 코드는 Table 7·8의 STEM 경로와 Table 12·14의 검색 결합 경로를 표현한다. Table 2와 Table 3의 검색 없는 Step-Back 단독 결과는 별도 실험 조건이며, 위 검색 경로의 결과와 구분해 비교해야 한다.
 
 재현하거나 제품에 붙인다면 다음 지점을 확인해야 한다.
 

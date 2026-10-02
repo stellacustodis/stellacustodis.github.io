@@ -156,7 +156,7 @@ try:
     
     try:
         while True:
-            # [수정됨] 모든 GPU를 순회하도록 range(device_count) 사용
+            # 모든 GPU를 순회하며 팬 속도 조절
             for gpu_id in range(device_count):
                 handle = gpu_handles[gpu_id]
                 

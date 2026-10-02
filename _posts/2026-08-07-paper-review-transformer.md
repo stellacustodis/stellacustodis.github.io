@@ -110,7 +110,7 @@ $s_j$는 태스크마다 학습되는 층별 가중치다. 논문의 관찰이 �
 
 **짚어둘 점** — 논문 제목이 자주 잘못 인용된다. "Improving Language Understanding **with Unsupervised Learning**"은 OpenAI **블로그 포스트** 제목이고, 논문은 "**by Generative Pre-Training**"이다. 약어 GPT가 여기서 나온다.
 
-**의의** — decoder-only 구조를 택한 것이 결과적으로 옳았다. 당시엔 BERT에 밀렸지만, 생성과 in-context learning으로 확장 가능한 쪽은 이쪽이었다.
+**의의** — 다음 토큰 예측으로 사전학습한 decoder를 여러 태스크의 파인튜닝에 사용했다. 같은 자기회귀 생성 방식을 유지한 채 입력 문맥을 바꾸는 구성은 뒤의 GPT-2와 GPT-3의 zero-shot·few-shot 실험으로도 이어진다.
 
 ## 4. BERT: Pre-training of Deep Bidirectional Transformers
 
@@ -209,7 +209,7 @@ few-shot    태스크 설명 + 예시 10~100개
 
 각 단계에서 사람이 하는 일이 줄고 모델이 하는 일이 늘었다. 그리고 그 대가로 **연산량과 데이터가 늘었다** — 이 교환 비율을 정량화한 것이 Scaling Law이고, [네 번째 글](/posts/paper-review-alignment-scaling/)에서 다룬다.
 
-읽으면서 인상적이었던 건 **BERT의 NSP 사례**다. 그럴듯한 보조 과제가 실제로는 도움이 안 됐고, 그 사실이 밝혀지기까지 1년 넘게 걸렸다. 사전학습 목적함수 설계에서 직관이 얼마나 안 통하는지를 보여주는 예라서, 내 쪽(생성모델) 손실 함수 설계를 생각할 때도 기억해 둘 만하다고 느꼈다.
+**BERT의 NSP와 RoBERTa 비교**에서는 보조 과제의 효과를 전체 학습 설정과 구분해야 한다. RoBERTa는 NSP를 제거하면서 데이터와 학습량도 바꿨다. 따라서 두 모델의 최종 점수 차이를 NSP 제거만의 효과로 읽을 수 없다. 생성모델의 보조 손실을 비교할 때에도 데이터·학습량·평가 조건을 맞춘 실험이 필요한 이유다.
 
 ---
 

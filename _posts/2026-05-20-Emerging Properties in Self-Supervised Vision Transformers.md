@@ -7,7 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, self-supervised-learning, vision-transformer, dino, knowledge-distillation]
-description: "레이블 없는 자기 증류로 ViT를 학습하는 DINO. k-NN 성능과 attention 맵에 나타나는 분할 정보를 Table 1~15 전량과 함께 정리한다."
+description: "레이블 없는 자기 증류로 ViT를 학습하는 DINO. k-NN 성능과 attention 맵의 분할 정보, 붕괴 방지 조건과 작은 패치의 계산 비용을 살펴본다."
 related: [ddpm, Self-Flow, visual-autoregressive-modeling]
 paper:
   authors: "Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, Armand Joulin (Facebook AI Research, Inria)"
@@ -554,4 +554,4 @@ Table 13에서 DINO와 다른 방법의 차이는 RN50보다 ViT-small에서 크
 
 마지막으로 객체 경계가 self-attention 맵에 나타난다는 관찰은 강하지만, 그 현상이 어떤 데이터와 규모에서도 유지되는지는 논문 범위 밖이다. 이미지 이외의 모달리티, 더 작은 계산 예산, 다른 증강 체계에서도 같은 창발적 특성이 생기는지는 제시된 근거만으로 단정할 수 없다.
 
-부록에는 Lemma, Theorem, Proposition에 해당하는 정리나 별도의 번호 수식이 없다. 대신 Table 10~15와 프로젝션 헤드 실험이 본문의 주장을 보강한다. 이 부록 결과까지 함께 보면 DINO의 핵심은 단일 손실식보다 여러 시간 척도의 평균, 분포의 엔트로피 조절, 뷰 구성, 헤드 정규화를 동시에 맞추는 데 있다고 정리할 수 있다.
+부록의 Table 10~15와 프로젝션 헤드 실험은 본문의 주장을 보강한다. 이 부록 결과까지 함께 보면 DINO의 핵심은 단일 손실식보다 여러 시간 척도의 평균, 분포의 엔트로피 조절, 뷰 구성, 헤드 정규화를 동시에 맞추는 데 있다고 정리할 수 있다.

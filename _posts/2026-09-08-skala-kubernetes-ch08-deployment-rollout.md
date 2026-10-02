@@ -45,9 +45,10 @@ replicas가 3이고 위 설정이면 새 Pod 하나를 추가로 만들고 Ready
 kubectl apply -f k8s/deployment.yaml
 kubectl rollout status deployment/shop-api --timeout=180s
 kubectl rollout history deployment/shop-api
+kubectl get rs,pod -l app=shop-api -o wide
 ```
 
-CI/CD pipeline은 `rollout status`의 종료 코드를 확인해야 한다. apply만 성공한 뒤 pipeline을 녹색으로 끝내면 ImagePullBackOff나 readiness 실패로 멈춘 rollout을 성공으로 기록하게 된다.
+CI/CD pipeline은 `rollout status`의 종료 코드와 revision을 함께 기록한다. apply만 성공한 뒤 pipeline을 녹색으로 끝내면 ImagePullBackOff나 readiness 실패로 멈춘 rollout을 성공으로 기록하게 된다.
 
 ## 멈춘 배포는 기존 서비스를 보존할 수 있다
 
@@ -60,14 +61,26 @@ CI/CD pipeline은 `rollout status`의 종료 코드를 확인해야 한다. appl
 
 새 배포가 멈췄다고 곧바로 기존 서비스가 중단된 것은 아니다. 기존 version의 endpoint 수를 확인하고, 원인을 고치거나 rollback한다.
 
+원인을 조사하는 동안 추가 rollout을 일시 중지할 수 있다.
+
+```bash
+kubectl rollout pause deployment/shop-api
+kubectl describe deployment/shop-api
+kubectl rollout resume deployment/shop-api
+```
+
+`pause`는 이미 생성된 Pod를 멈추는 명령이 아니라 Deployment의 추가 rollout을 일시 중지하는 명령이다. 변경 내용을 확인한 뒤 `resume`으로 재개한다.
+
 ## rollback의 범위
 
 ```bash
+# 직전 revision으로 되돌리거나, 검증한 revision을 지정한다.
 kubectl rollout undo deployment/shop-api
 kubectl rollout undo deployment/shop-api --to-revision=3
+kubectl rollout status deployment/shop-api --timeout=180s
 ```
 
-rollback으로 돌아오는 것은 Pod template이다. DB schema, 외부 queue message, 이미 변경된 data, Git repository는 돌아오지 않는다. schema migration은 old/new application version이 동시에 동작할 수 있도록 backward-compatible하게 나누는 전략이 필요하다.
+rollback으로 돌아오는 것은 이미지·환경변수·probe·리소스 설정을 포함한 Pod template이다. DB schema, 외부 queue message, 이미 변경된 data, Git repository는 돌아오지 않는다. schema migration은 old/new application version이 동시에 동작할 수 있도록 backward-compatible하게 나누는 전략이 필요하다.
 
 긴급 rollback 뒤 Git을 그대로 두면 다음 declarative apply가 문제 version을 다시 배포한다. cluster 복구와 source of truth 복구를 함께 수행한다.
 
@@ -88,28 +101,6 @@ rollback으로 돌아오는 것은 Pod template이다. DB schema, 외부 queue m
 ## HPA와 선언형 replica 충돌
 
 HPA가 replica 수를 자동 조정하는 Deployment에 고정 `spec.replicas`를 계속 적용하면 deploy 시마다 replica 수가 파일 값으로 되돌아갈 수 있다. 자동 scaling의 소유권을 HPA에 줄 것인지 manifest에 둘 것인지 명확히 한다.
-
-## rollout을 멈추고 확인하는 명령
-
-롤아웃은 한 번의 `apply`가 아니라 새 ReplicaSet이 Ready가 되고 이전 ReplicaSet이 줄어드는 시간적 과정이다. CI에서는 명령의 종료 코드와 revision을 함께 기록한다.
-
-```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl rollout status deployment/shop-api -n demo --timeout=180s
-kubectl rollout history deployment/shop-api -n demo
-kubectl get rs,pod -n demo -l app=shop-api -o wide
-
-# 위험한 변경을 발견하면 새 ReplicaSet 생성을 잠시 멈춘다.
-kubectl rollout pause deployment/shop-api -n demo
-kubectl describe deployment/shop-api -n demo
-kubectl rollout resume deployment/shop-api -n demo
-
-# 검증된 revision으로만 되돌린다.
-kubectl rollout undo deployment/shop-api -n demo --to-revision=3
-kubectl rollout status deployment/shop-api -n demo --timeout=180s
-```
-
-`pause`는 이미 생성된 Pod를 멈추는 명령이 아니라 Deployment controller가 추가 rollout을 진행하지 않게 하는 명령이다. `undo`는 Pod template을 이전 revision으로 바꾸는 것이므로, 이미지뿐 아니라 환경변수·probe·리소스 설정도 함께 되돌아간다. DB schema처럼 애플리케이션 밖의 변경은 이 명령만으로 복구되지 않으므로 backward-compatible migration과 별도 복구 계획이 필요하다.
 
 ## 정리
 

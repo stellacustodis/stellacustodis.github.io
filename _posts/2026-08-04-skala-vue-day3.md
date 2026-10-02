@@ -551,7 +551,7 @@ import WeatherAboutView from '@/views/WeatherAboutView.vue'
 { path: '/about', component: () => import('@/views/WeatherAboutView.vue') }
 ```
 
-동적 import를 쓰면 Vite가 해당 컴포넌트를 **별도 청크 파일로 분리**한다. 1일차에서 SPA의 단점으로 "모든 로직이 하나의 거대한 덩어리로 묶여 초기 로딩이 느리다"고 했는데, Lazy Loading이 그 문제의 표준 해법이다. 사용자가 방문하지 않는 페이지의 코드는 아예 내려받지 않는다.
+동적 import를 쓰면 Vite가 해당 컴포넌트를 **별도 청크 파일로 분리**한다. 라우트별 Lazy Loading은 해당 화면이 필요할 때 코드를 가져오도록 해 초기 로딩에 필요한 JavaScript 양을 줄인다.
 
 첫 화면(`/`)은 어차피 즉시 필요하므로 정적 import로 두고, 나머지를 동적으로 두는 방식이 일반적이다.
 

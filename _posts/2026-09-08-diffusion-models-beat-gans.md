@@ -109,15 +109,12 @@ L_{\text{hybrid}}
 =
 L_{\text{simple}}
 +
-\text{(가중 계수)}L_{\text{vlb}}
+\lambda L_{\text{vlb}}
 $$
 
 $L_{\text{simple}}$은 앞서 본 노이즈 예측 MSE이고, $L_{\text{vlb}}$는 변분 하한(variational lower bound) 손실이다. 전자는 $\epsilon_\theta$를 학습하고, 후자는 학습되는 분산 매개변수 $v$를 포함한 확률적 역과정을 다루는 역할을 한다. 둘을 결합하지 않으면 노이즈 예측과 역과정 분산을 같은 목적 안에서 안정적으로 맞추기 어렵다.
 
-하이브리드 손실은 $L_{\text{vlb}}$의 가중 계수를 포함한다. 두 손실의 단순 합으로 구현하지 말고, 가중 계수는 원문 또는 공개된 보충자료에서 확인해야 한다.
-
-> 구현할 때는 Appendix C의 Equation 3, 5, 13의 계수·인덱스와 Equation 12의 기댓값 정의를 확인해야 한다. 역할 설명만 보고 계수를 추정해서는 안 된다.
-{: .prompt-warning }
+$\lambda$는 변분 손실의 가중치다. 이 표기는 [원문 §2.1](https://arxiv.org/html/2105.05233)의 하이브리드 목적함수를 따른다. 평균을 학습하는 경로와 분산을 학습하는 경로를 구분해야 하므로, 두 손실 항을 같은 역할로 해석해서는 안 된다.
 
 샘플링 단계가 50스텝 미만이면 저자들은 결정론적 역과정인 DDIM 샘플러를 사용한다. 이는 적은 스텝에서 고정 분산을 사용하는 표준 확률적 샘플링보다 적절한 경로를 선택하기 위한 결정이다. 실험에서는 25스텝 DDIM 결과가 별도로 보고된다.
 
@@ -279,8 +276,18 @@ x0 = xt
 
 ### DDIM 가이던스 샘플링 루프
 
+DDIM에서는 분류기 그래디언트로 평균 대신 예측 노이즈를 보정한다. 공개 구현의 `condition_score`와 `classifier_sample.py`의 `cond_fn`을 합쳐 쓰면 다음과 같다.
+
+$$
+\hat\epsilon_\theta(x_t,t)
+=\epsilon_\theta(x_t,t)
+-s\sqrt{1-\bar\alpha_t}\,\nabla_{x_t}\log p_\phi(y\mid x_t,t).
+$$
+
+$s$는 분류기 가이던스 스케일이다. `cond_fn`이 이미 $s$를 곱한 그래디언트를 반환하므로, 실제 코드를 옮길 때 이 값을 다시 곱하면 안 된다. 아래 의사코드는 스케일 적용 위치를 드러내기 위해 그래디언트와 $s$를 분리했다.
+
 ```python
-# Algorithm 2의 확인 가능한 흐름만 표현한 의사코드
+# 공식 구현의 condition_score와 cond_fn을 풀어 쓴 의사코드
 xt = sample_initial_noise(batch_size, channels, height, width)
 # xt: (B, C, H, W)
 
@@ -288,24 +295,21 @@ for t in reverse_ddim_timesteps():
     eps_pred = diffusion_model.predict_noise(xt, t)
     # eps_pred: (B, C, H, W)
 
-    log_prob = classifier_log_probability(xt, t, target_y)
+    xt_for_grad = require_input_gradient(xt)
+    log_prob = classifier_log_probability(xt_for_grad, t, target_y)
     # log_prob: (B,)
-
-    grad = gradient_of_sum(log_prob, xt)
+    grad = gradient_of_sum(log_prob, xt_for_grad)
     # grad: (B, C, H, W)
 
-    guided_eps = apply_algorithm2_guidance(
-        eps_pred=eps_pred,
-        classifier_gradient=grad,
-        scale=scale,
-        timestep=t,
-    )
+    alpha_bar = cumulative_alpha(t)
+    guided_eps = eps_pred - scale * sqrt(1 - alpha_bar) * grad
     # guided_eps: (B, C, H, W)
-    # 정확한 식과 scale의 위치는 Algorithm 2 원문 확인이 필요하다.
 
     xt = ddim_reverse_step(xt, guided_eps, t)
     # xt: (B, C, H, W)
 ```
+
+연산과 스케일 위치는 OpenAI의 [`condition_score`](https://github.com/openai/guided-diffusion/blob/main/guided_diffusion/gaussian_diffusion.py)와 [`cond_fn`](https://github.com/openai/guided-diffusion/blob/main/scripts/classifier_sample.py)에 대응한다. 타임스텝을 부분 수열로 줄인 경우에도 모델과 분류기에 전달되는 시간 인덱스는 학습 때의 시간축과 일치해야 한다.
 
 ### 업샘플링 스택
 

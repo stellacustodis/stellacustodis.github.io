@@ -7,8 +7,8 @@ categories:
   - AI
   - Engineering
 tags: [pytorch, state-dict, checkpoint, model-serialization, gpu-memory]
-description: "PyTorch state_dict에 parameter와 buffer가 어떻게 저장되는지, optimizer 상태와 checkpoint를 어떻게 복원하는지 실전 코드로 정리한다."
 related: [seed-fixing-1, python-mutable-immutable]
+description: "PyTorch state_dict에 parameter와 buffer가 어떻게 저장되는지, optimizer 상태와 checkpoint를 어떻게 복원하는지 실전 코드로 정리한다."
 ---
 
 PyTorch 모델을 저장하고 불러올 때 가장 자주 만나는 객체가 `state_dict`다. 단순히 “모델의 weight가 들어 있는 dictionary”라고만 이해하면 optimizer 복원이나 GPU 메모리 문제에서 혼란을 겪기 쉽다. 무엇이 들어 있고, 무엇이 들어 있지 않은지부터 정리해보자.
@@ -173,6 +173,6 @@ torch.save(checkpoint, "last.pt")
 - `strict=False`를 사용할 때는 누락 및 예상 밖 key를 반드시 확인
 - 메모리에 보관한 최적 weight가 계속 바뀌지 않도록 깊은 복사 여부를 점검
 
-원본 메모에서는 `state_dict`가 무엇을 담는지에만 집중했지만, 실제로는 저장 형식보다 **어떤 상태를 어느 device에서 어떤 목적으로 복원하는가**가 더 중요하다.
+`state_dict`를 저장하고 불러올 때는 **어떤 상태를 어느 device에서 어떤 목적으로 복원하는가**를 함께 정해야 한다.
 
 참고: [PyTorch Serialization semantics](https://docs.pytorch.org/docs/stable/notes/serialization.html)

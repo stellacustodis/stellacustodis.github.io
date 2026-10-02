@@ -296,6 +296,14 @@ CREATE TABLE order_items (
 
 이메일이 바뀌면 모든 주문 행을 수정해야 한다. 일부만 수정되면 같은 고객에게 서로 다른 이메일이 생긴다. 이를 갱신 이상(update anomaly)이라고 한다.
 
+중복이 심한 테이블에서는 세 가지 이상현상이 자주 생긴다.
+
+| 이상현상 | 무엇이 문제인가 | 예 |
+|---|---|---|
+| 갱신 이상 | 같은 정보를 여러 행에서 동시에 고쳐야 한다 | 고객 이메일 변경 시 주문 행을 전부 수정해야 함 |
+| 삽입 이상 | 어떤 정보를 넣으려면 다른 정보도 강제로 필요하다 | 고객만 등록하고 싶어도 주문이 없으면 저장하기 어려움 |
+| 삭제 이상 | 어떤 행을 지우면 필요했던 다른 정보까지 함께 사라진다 | 마지막 주문을 지우면 고객 정보까지 잃는 상황 |
+
 고객 정보는 `customers`, 주문 정보는 `orders`에 한 번씩 저장하고 FK로 연결하면 중복과 불일치를 줄일 수 있다. 이것이 정규화의 핵심 목적이다.
 
 다만 정규화는 무조건 테이블을 많이 쪼개는 일이 아니다. **각 사실을 어디에 한 번만 저장할지 결정하는 과정**으로 이해하는 편이 좋다.
@@ -437,6 +445,20 @@ CREATE TABLE customer_profiles (
 );
 ```
 
+### 자기 자신을 참조하는 관계
+
+예를 들어 직원-관리자 구조는 자기 자신을 참조하는 관계로 표현할 수 있다.
+
+```sql
+CREATE TABLE employees (
+    employee_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name        VARCHAR(50) NOT NULL,
+    manager_id  BIGINT REFERENCES employees (employee_id)
+);
+```
+
+이런 구조는 조직도, 댓글의 대댓글, 카테고리의 상하위 관계처럼 여러 곳에서 나타난다.
+
 ### DBML로 ERD를 코드처럼 관리하기
 
 dbdiagram.io에서는 DBML로 논리 구조를 빠르게 그릴 수 있다.
@@ -484,6 +506,18 @@ ERD가 완성되면 다음을 역으로 검증한다.
 | 물리 모델 | 선택한 DBMS에 어떻게 구현할 것인가? | 자료형, 인덱스, 파티션, 이름 규칙 |
 
 물리 모델에서는 조회 패턴, 예상 데이터량, 보존 기간, 동시 수정 방식까지 고려한다. 예를 들어 금액은 부동소수점 `REAL`보다 `NUMERIC(12, 2)`가 안전하고, 시각은 시스템 전체의 시간대 정책에 맞춰 `TIMESTAMPTZ`를 선택한다.
+
+### 물리 모델에서 자주 붙는 컬럼
+
+생성·수정 이력과 동시 수정 방식을 구현할 때는 다음 컬럼을 검토한다.
+
+- `created_at`: 생성 시각
+- `updated_at`: 수정 시각
+- `deleted_at`: 소프트 삭제 시각
+- `status`: 현재 상태
+- `version`: 낙관적 잠금이나 변경 버전
+
+특히 `status`는 문자열 하나로 끝내기보다, 허용 가능한 값이 정해져 있다면 `CHECK` 제약조건과 함께 관리하는 편이 더 안전하다.
 
 ### 약한 엔티티와 N:M 관계
 
@@ -587,6 +621,16 @@ PostgreSQL, MySQL, Oracle 같은 RDBMS는 모두 관계형 모델과 SQL을 사�
 
 ANSI SQL은 `SELECT`, `JOIN`, 제약조건, Window Function 같은 공통 기반을 제공하지만, 실제 이식성은 자료형·자동 증가·날짜 함수·페이지네이션·프로시저 문법에서 깨진다. 먼저 표준적인 표현을 사용하고, 필요한 기능만 제품별 마이그레이션 스크립트로 분리하는 전략이 현실적이다.
 
+### 이식 가능한 SQL을 위한 기준
+
+- `INTEGER`, `NUMERIC(p,s)`, `VARCHAR(n)`, `DATE`, `TIMESTAMP` 같은 표준형을 우선한다.
+- 예약어를 객체 이름으로 쓰지 않고 소문자 `snake_case`를 사용한다.
+- 자동 증가, 날짜 함수, JSON 연산, 프로시저는 DBMS별 스크립트로 분리한다.
+- `CHECK`나 ENUM에 변동이 잦은 업무 목록을 과도하게 고정하지 않는다.
+- 시간은 저장 기준(보통 UTC)과 사용자 표시 시간대를 구분한다.
+- collation과 문자셋을 처음부터 일관되게 정한다.
+- JSON은 스키마가 없는 것이 아니라 스키마 검증 책임이 이동한 것임을 기억한다.
+
 ## DDL과 DML
 
 SQL은 역할에 따라 구분할 수 있다.
@@ -599,6 +643,13 @@ SQL은 역할에 따라 구분할 수 있다.
 | TCL | 트랜잭션을 제어 | `COMMIT`, `ROLLBACK` |
 
 앞에서 사용한 `CREATE TABLE`은 DDL이다. 만들어진 테이블에 데이터를 넣고 조회하는 작업은 DML이다.
+
+구조를 바꾸는 다른 DDL 명령에는 다음이 있다.
+
+- `ALTER TABLE`: 열 추가, 제약조건 변경
+- `DROP TABLE`: 테이블 자체 삭제
+- `CREATE INDEX`: 검색 속도 개선을 위한 구조 생성
+- `TRUNCATE`: 테이블의 모든 행 제거
 
 ### 데이터베이스와 스키마 생성
 
@@ -695,6 +746,63 @@ WHERE customer_id = 1;
 
 `UPDATE`나 `DELETE`에서 `WHERE`를 빠뜨리면 모든 행이 대상이 된다. 실습 환경에서도 변경 범위를 항상 확인해야 한다.
 
+실습에서는 명시적 트랜잭션으로 변경을 묶고 `ROLLBACK`으로 되돌려 볼 수 있다.
+
+```sql
+BEGIN;
+
+INSERT INTO customers (name, email)
+VALUES ('김지훈', 'jihoon@example.com');
+
+UPDATE customers
+SET email = 'new-address@example.com'
+WHERE customer_id = 1;
+
+ROLLBACK;
+```
+
+### ALTER TABLE과 운영 DDL
+
+테이블을 만든 뒤 구조를 바꾸는 작업은 데이터량이 많을수록 신중해야 한다.
+
+```sql
+-- nullable 컬럼 추가는 비교적 단순하다.
+ALTER TABLE students
+ADD COLUMN phone VARCHAR(20);
+
+-- 기존 행을 채운 뒤 검증하고 NOT NULL로 전환한다.
+UPDATE students
+SET phone = '미등록'
+WHERE phone IS NULL;
+
+ALTER TABLE students
+ALTER COLUMN phone SET NOT NULL;
+
+-- 제약조건을 이름 붙여 추가한다.
+ALTER TABLE students
+ADD CONSTRAINT chk_students_email
+CHECK (email LIKE '%@%');
+```
+
+컬럼 타입 변경, 기본값을 가진 `NOT NULL` 컬럼 추가, 컬럼 삭제는 버전과 조건에 따라 테이블 재작성이나 강한 잠금을 일으킬 수 있다. PostgreSQL에서 운영 중 큰 인덱스를 만들 때는 쓰기 차단을 줄이는 `CONCURRENTLY`를 검토한다.
+
+```sql
+CREATE INDEX CONCURRENTLY idx_students_grade
+ON students (grade);
+```
+
+`CREATE INDEX CONCURRENTLY`는 일반 생성보다 오래 걸리고 트랜잭션 블록 안에서 실행할 수 없으며 실패한 invalid index 정리가 필요할 수 있다. “무잠금”이라기보다 읽기·쓰기와 병행하기 위한 별도 절차라고 이해하는 편이 정확하다.
+
+`TRUNCATE`와 `DELETE`도 목적이 다르다.
+
+| 명령 | 범위 | WHERE | 일반적 특성 |
+|---|---|---:|---|
+| `DELETE` | 선택 행 또는 전체 행 | 가능 | 행 단위 처리, DELETE trigger 실행 |
+| `TRUNCATE` | 전체 테이블 | 불가 | 빠른 페이지 단위 제거, 강한 잠금 |
+| `DROP TABLE` | 데이터와 구조 | 불가 | 객체 자체 제거 |
+
+PostgreSQL에서는 `TRUNCATE`도 트랜잭션 안에서 롤백할 수 있다. “DDL은 모든 DB에서 무조건 자동 커밋” 같은 규칙은 제품별 차이가 크므로 사용 DBMS 문서를 확인해야 한다.
+
 ### SELECT의 논리적 실행 순서와 기본 함수
 
 SQL의 작성 순서와 논리적 평가 순서는 다르다.
@@ -763,135 +871,6 @@ CHECK (price >= 0);
 ```
 
 이런 제약조건은 단순히 “에러를 내기 위한 장치”가 아니라, 잘못된 데이터를 애초에 저장하지 않게 하는 방어선이다.
-
-## 정규화에서 자주 보는 이상현상
-
-정규화는 중복을 줄이는 과정이지만, 실제로는 “무엇을 한 번만 저장할 것인가”를 정하는 일에 가깝다.
-중복이 심한 테이블에서는 세 가지 이상현상이 자주 생긴다.
-
-| 이상현상 | 무엇이 문제인가 | 예 |
-|---|---|---|
-| 갱신 이상 | 같은 정보를 여러 행에서 동시에 고쳐야 한다 | 고객 이메일 변경 시 주문 행을 전부 수정해야 함 |
-| 삽입 이상 | 어떤 정보를 넣으려면 다른 정보도 강제로 필요하다 | 고객만 등록하고 싶어도 주문이 없으면 저장하기 어려움 |
-| 삭제 이상 | 어떤 행을 지우면 필요했던 다른 정보까지 함께 사라진다 | 마지막 주문을 지우면 고객 정보까지 잃는 상황 |
-
-이런 문제를 막기 위해 고객 정보는 `customers`, 주문 정보는 `orders`에 나누어 저장하고 FK로 연결한다.
-정규화의 목표는 테이블을 많이 만드는 것이 아니라, 데이터의 의미를 분리해서 관리 가능하게 만드는 것이다.
-
-## ERD를 그릴 때 더 확인할 것
-
-ERD는 “테이블이 어떤 모양이어야 하는가”를 미리 검증하는 작업이다.
-이 단계에서 특히 자주 놓치는 포인트는 다음과 같다.
-
-- 관계가 선택적인가, 필수적인가
-- 한쪽이 여러 개를 가질 수 있는가
-- 관계 자체가 속성을 가지는가
-- 자기 자신을 참조하는 관계가 있는가
-
-예를 들어 직원-관리자 구조는 자기 자신을 참조하는 관계로 표현할 수 있다.
-
-```sql
-CREATE TABLE employees (
-    employee_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name        VARCHAR(50) NOT NULL,
-    manager_id  BIGINT REFERENCES employees (employee_id)
-);
-```
-
-이런 구조는 조직도, 댓글의 대댓글, 카테고리의 상하위 관계처럼 여러 곳에서 나타난다.
-ERD를 그릴 때는 “선 하나”보다 “업무 의미가 정말 맞는지”를 더 중요하게 봐야 한다.
-
-## DDL과 DML, 그리고 실수하기 쉬운 SQL들
-
-앞에서 `CREATE TABLE`은 DDL이라고 했다. 그 밖에도 구조를 바꾸는 명령은 모두 DDL에 가깝다.
-
-- `ALTER TABLE`: 열 추가, 제약조건 변경
-- `DROP TABLE`: 테이블 자체 삭제
-- `CREATE INDEX`: 검색 속도 개선을 위한 구조 생성
-- `TRUNCATE`: 테이블의 모든 행 제거
-
-DML은 데이터를 실제로 넣고 바꾸는 SQL이다.
-
-```sql
-BEGIN;
-
-INSERT INTO customers (name, email)
-VALUES ('김지훈', 'jihoon@example.com');
-
-UPDATE customers
-SET email = 'new-address@example.com'
-WHERE customer_id = 1;
-
-ROLLBACK;
-```
-
-이처럼 변경 작업은 트랜잭션과 함께 생각해야 한다.
-실습 때는 특히 `UPDATE`, `DELETE`의 `WHERE`를 먼저 확인하고, 정말 필요한 행만 건드리는 습관이 중요하다.
-
-### ALTER TABLE과 운영 DDL
-
-테이블을 만든 뒤 구조를 바꾸는 작업은 데이터량이 많을수록 신중해야 한다.
-
-```sql
--- nullable 컬럼 추가는 비교적 단순하다.
-ALTER TABLE students
-ADD COLUMN phone VARCHAR(20);
-
--- 기존 행을 채운 뒤 검증하고 NOT NULL로 전환한다.
-UPDATE students
-SET phone = '미등록'
-WHERE phone IS NULL;
-
-ALTER TABLE students
-ALTER COLUMN phone SET NOT NULL;
-
--- 제약조건을 이름 붙여 추가한다.
-ALTER TABLE students
-ADD CONSTRAINT chk_students_email
-CHECK (email LIKE '%@%');
-```
-
-컬럼 타입 변경, 기본값을 가진 `NOT NULL` 컬럼 추가, 컬럼 삭제는 버전과 조건에 따라 테이블 재작성이나 강한 잠금을 일으킬 수 있다. PostgreSQL에서 운영 중 큰 인덱스를 만들 때는 쓰기 차단을 줄이는 `CONCURRENTLY`를 검토한다.
-
-```sql
-CREATE INDEX CONCURRENTLY idx_students_grade
-ON students (grade);
-```
-
-`CREATE INDEX CONCURRENTLY`는 일반 생성보다 오래 걸리고 트랜잭션 블록 안에서 실행할 수 없으며 실패한 invalid index 정리가 필요할 수 있다. “무잠금”이라기보다 읽기·쓰기와 병행하기 위한 별도 절차라고 이해하는 편이 정확하다.
-
-`TRUNCATE`와 `DELETE`도 목적이 다르다.
-
-| 명령 | 범위 | WHERE | 일반적 특성 |
-|---|---|---:|---|
-| `DELETE` | 선택 행 또는 전체 행 | 가능 | 행 단위 처리, DELETE trigger 실행 |
-| `TRUNCATE` | 전체 테이블 | 불가 | 빠른 페이지 단위 제거, 강한 잠금 |
-| `DROP TABLE` | 데이터와 구조 | 불가 | 객체 자체 제거 |
-
-PostgreSQL에서는 `TRUNCATE`도 트랜잭션 안에서 롤백할 수 있다. “DDL은 모든 DB에서 무조건 자동 커밋” 같은 규칙은 제품별 차이가 크므로 사용 DBMS 문서를 확인해야 한다.
-
-### 이식 가능한 SQL을 위한 기준
-
-- `INTEGER`, `NUMERIC(p,s)`, `VARCHAR(n)`, `DATE`, `TIMESTAMP` 같은 표준형을 우선한다.
-- 예약어를 객체 이름으로 쓰지 않고 소문자 `snake_case`를 사용한다.
-- 자동 증가, 날짜 함수, JSON 연산, 프로시저는 DBMS별 스크립트로 분리한다.
-- `CHECK`나 ENUM에 변동이 잦은 업무 목록을 과도하게 고정하지 않는다.
-- 시간은 저장 기준(보통 UTC)과 사용자 표시 시간대를 구분한다.
-- collation과 문자셋을 처음부터 일관되게 정한다.
-- JSON은 스키마가 없는 것이 아니라 스키마 검증 책임이 이동한 것임을 기억한다.
-
-## 물리 모델에서 자주 붙는 컬럼
-
-논리 모델이 “무엇을 저장할까”를 정한다면, 물리 모델은 “DB에 어떻게 저장할까”를 정한다.
-이 단계에서 자주 같이 검토하는 컬럼이 있다.
-
-- `created_at`: 생성 시각
-- `updated_at`: 수정 시각
-- `deleted_at`: 소프트 삭제 시각
-- `status`: 현재 상태
-- `version`: 낙관적 잠금이나 변경 버전
-
-특히 `status`는 문자열 하나로 끝내기보다, 허용 가능한 값이 정해져 있다면 `CHECK` 제약조건과 함께 관리하는 편이 더 안전하다.
 
 ## 종합 실습: 학사관리 시스템 설계와 구축
 

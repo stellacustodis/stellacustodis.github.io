@@ -1424,13 +1424,13 @@ DKEF에서는 $M=1$이 기본값이지만 15 seeds, validation patience 200, AIS
 
 ## 한계와 생각해볼 점
 
-저자가 명시한 한계는 세 가지다.
+계산 비용과 통계적 효율 사이에는 두 가지 제약이 있다.
 
 첫째, $M$이 데이터 차원에 가까워지면 SSM은 표준 SM에 대한 계산 이점을 잃는다. 이는 구현 복잡도의 $M+1$ 대 $D+1$ 비교에서 직접 나온다.
 
 둘째, Rademacher SSM의 점근 분산은 표준 SM보다 항상 크다. $M$이 증가할수록 차이는 줄지만 계산량도 함께 증가한다. 작은 $M$의 확장성과 큰 $M$의 통계적 효율 사이에서 선택해야 한다.
 
-셋째, 기존 Hyvärinen의 결과는 이 논문에서 증명하는 consistency보다 약한 local consistency로 구분된다. SSM의 더 강한 결론은 compactness, 식별가능성, 경계 조건, smoothness와 유한 모멘트 조건을 포함한 Assumption 1부터 9의 틀 안에서 성립한다.
+이론적 보증의 적용 조건도 별도로 보아야 한다. 기존 Hyvärinen의 local consistency와 구분되는 SSM의 consistency 결과는 compactness, 식별가능성, 경계 조건, smoothness와 유한 모멘트 조건을 포함한 Assumption 1부터 9의 틀 안에서 성립한다. 임의의 신경망과 학습 설정이 이 조건을 자동으로 만족하는 것은 아니다.
 
 내가 구현 관점에서 추가로 주의해서 읽은 부분은 목적함수의 불편성과 실제 학습 안정성이 같지 않다는 점이다. Eq. 7이 불편 추정량이라는 사실만으로 작은 $M$에서 최적화가 안정적이라고 결론 내릴 수는 없다. DKEF에서 SSM-VR이 기본 SSM보다 크게 개선된 결과가 그 차이를 보여준다. 새 데이터와 모델에서는 $M$, projection 분포, control-variate 계수가 별도의 최적화 설계 변수가 된다.
 

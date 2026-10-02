@@ -16,7 +16,7 @@ tags: [deep-learning, computer-vision, learning-roadmap, generative-model, self-
 "왜 이 모델이 나왔고, 다음 모델이 무엇을 해결했는가"를 자연스럽게 이해할 수 있다.
 
 > 연도는 대표 논문 발표 시점 기준이며, 모든 걸 다 읽을 필요는 없다.
-> 각 분야에서 **굵게 표시된 전환점(turning point)** 부터 보는 것을 추천한다.
+> 관심 분야를 고른 뒤, 각 항목에 적은 구조와 목적의 차이를 비교하며 읽으면 된다. 굵은 글씨는 모델·기법 이름을 구분하기 위한 표시다.
 {: .prompt-tip }
 
 ---

@@ -183,11 +183,11 @@ $m$은 헤드마다 고정된 기울기(학습하지 않음)다. 멀리 있는 �
 ### 8. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness
 **Dao, Fu, Ermon, Rudra, Ré (Stanford) · NeurIPS, 2022**
 
-> 근사하지 않고 **메모리 접근만 바꿔서** 이긴 논문.
+> **정확한 attention을 유지하면서 메모리 이동을 줄인** 논문.
 
-**배경** — Self-attention은 $O(n^2)$ 복잡도라 긴 시퀀스에서 병목이다. 2020~2022년에 Linformer·Performer·Longformer 등 **근사 attention**이 쏟아졌는데, 품질 손실 때문에 실제 채택은 저조했다.
+**배경** — Self-attention은 $O(n^2)$ 복잡도라 긴 시퀀스에서 병목이다. 2020~2022년에는 Linformer·Performer·Longformer 등 계산량을 줄이려는 방법들이 제안됐다. FlashAttention은 표준 attention의 결과를 유지하면서 GPU 메모리 계층 사이의 이동을 줄이는 접근을 택한다.
 
-**핵심 아이디어** — 저자들의 진단이 다르다. **병목은 연산(FLOPs)이 아니라 메모리 이동**이다.
+**핵심 아이디어** — FLOPs뿐 아니라 **GPU 메모리 계층 사이의 이동**을 비용으로 고려한다.
 
 ```text
 GPU 메모리 계층
@@ -205,7 +205,7 @@ GPU 메모리 계층
 
 **결과** — 표준 attention과 수학적으로 같은 연산을 계산하며, 부동소수점 연산 순서에 따른 수치 차이는 있을 수 있다. 논문은 BERT-large에서 MLPerf 대비 15% speedup, GPT-2에서 HuggingFace 대비 3배 가속을 보고했다. 15% speedup은 실행 시간이 정확히 15% 줄었다는 뜻과 다르다. Attention 중간값 메모리는 시퀀스 길이에 선형이다.
 
-**의의** — 이 논문의 교훈이 크다고 본다. 근사를 도입한 방법들은 품질 손실 때문에 밀려났고, **정확도를 유지한 채 하드웨어 특성에 맞춘** 접근이 표준이 됐다. 점근 복잡도 $O(n^2)$는 그대로인데 실측이 크게 개선됐다는 점도 시사적이다 — 알고리즘 분석과 실제 성능이 갈리는 지점이다.
+**의의** — attention의 점근 복잡도 $O(n^2)$를 유지하면서도 중간값 저장과 메모리 왕복을 줄여 측정한 실행 시간을 단축했다. 반대로 역전파에는 재계산이 추가된다. FLOPs가 줄었는지만으로 속도를 판단하기 어렵다는 사례이며, 다른 attention 방법의 채택 원인까지 이 실험으로 설명할 수는 없다.
 
 ### 9. GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints
 **Ainslie, Lee-Thorp, de Jong 외 (Google Research) · EMNLP, 2023**

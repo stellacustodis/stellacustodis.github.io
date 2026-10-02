@@ -184,14 +184,14 @@ public class ReviewLab {
 
 ## 실패 복구: 온도 0 → 재요청 → 기본값
 
-구조화 출력은 거의 성공한다. 그 "거의"가 운영에서 장애 알람이 된다.
+형식 지시를 넣어도 변환은 실패할 수 있다. [Spring AI의 구조화 출력 변환](https://docs.spring.io/spring-ai/reference/1.1/api/structured-output-converter.html)은 모델의 형식 준수를 보장하지 않으므로, 변환 실패를 처리하고 반환 객체도 검증해야 한다.
 
 샘플 코드는 3단 복구를 구현해 뒀다.
 
 ```java
 /**
  * ⑤ 실패 복구 — 온도 0, 형식만 재요청, 마지막엔 안전한 기본값.
- * 구조화 출력은 "거의" 성공한다. 그 '거의'가 운영에서는 장애 알람이다.
+ * 형식 변환 실패를 처리하고 최종 실패를 기본값에 표시한다.
  */
 public Ticket classifySafely(String inquiry) {
     try {
@@ -223,7 +223,7 @@ public Ticket classifySafely(String inquiry) {
 
 3차의 기본값이 단순한 빈 객체가 아니라는 점이 중요하다. `summary`에 실패 사실을 적어 두면 운영 중에 "자동 분류가 얼마나 실패하고 있는가"를 집계할 수 있다.
 
-> 구조화 출력 코드에 try-catch가 없다면 천 건 중 몇 건이 그대로 장애 알람이 된다.
+> 변환 실패를 처리하지 않으면 예외가 호출자에게 전파될 수 있다. API 오류 처리와 재시도·기본값의 범위를 정해 둔다.
 {: .prompt-warning }
 
 ## 모델을 부르지 않는 테스트

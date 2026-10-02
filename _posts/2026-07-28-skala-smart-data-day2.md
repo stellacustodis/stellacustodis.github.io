@@ -125,6 +125,8 @@ GROUP BY o.customer_id;
 
 `orders`와 `order_items`를 JOIN하면 주문 하나가 상품 종류 수만큼 여러 행으로 늘어난다. 그래서 주문 수는 `COUNT(*)`가 아니라 `COUNT(DISTINCT o.order_id)`로 세었다. **집계 전 데이터가 어느 단위의 한 행인지** 확인하는 것이 중요하다.
 
+예를 들어 고객 1명이 주문 3개를 했고, 그 주문마다 주문 항목이 4개씩 있다면 단순 조인 결과는 12행으로 늘어난다.
+
 ### WHERE와 HAVING
 
 `WHERE`는 그룹을 만들기 전의 행을 필터링하고, `HAVING`은 집계된 그룹을 필터링한다.
@@ -367,6 +369,28 @@ WHERE NOT EXISTS (
 ```
 
 일반 JOIN으로 존재 여부를 구하면 고객의 주문 수만큼 행이 늘어 `DISTINCT`가 필요할 수 있다. 존재 여부만 필요하다면 `EXISTS`가 의도를 더 정확히 나타낸다.
+
+### USING과 ON
+
+`USING`은 조인 키 이름이 양쪽 테이블에서 같을 때 간단하게 쓸 수 있다.
+
+```sql
+SELECT o.order_id, c.name
+FROM orders AS o
+JOIN customers AS c USING (customer_id);
+```
+
+`USING`은 문장을 짧게 만들어 주지만, 조건이 복잡하거나 컬럼 이름이 다르면 `ON`이 더 유연하다.
+
+```sql
+SELECT o.order_id, c.name
+FROM orders AS o
+JOIN customers AS c
+  ON c.customer_id = o.customer_id
+ AND c.joined_at <= o.ordered_at::date;
+```
+
+추가 조건이 있는 두 번째 예제에서는 `ON`에 고객 등록일과 주문일의 관계까지 명시했다.
 
 ## JOIN 알고리즘
 
@@ -615,6 +639,32 @@ ORDER BY ct.total_amount DESC;
 
 CTE는 현재 SQL 문이 끝나면 사라지며 데이터를 별도로 저장하는 테이블이 아니다. 또한 CTE를 사용했다고 항상 빨라지거나 느려지는 것은 아니다. PostgreSQL 버전, 참조 횟수, `MATERIALIZED` 지정 여부 등에 따라 Planner의 처리 방식이 달라질 수 있으므로 성능은 실행 계획으로 확인해야 한다.
 
+### 단계별 집계와 LEFT JOIN
+
+최근 30일 주문을 먼저 고르고 고객별로 집계한 뒤, 주문이 없는 고객도 남기도록 LEFT JOIN한다.
+
+```sql
+WITH recent_orders AS (
+    SELECT order_id, customer_id, ordered_at
+    FROM orders
+    WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days'
+),
+recent_sales AS (
+    SELECT
+        ro.customer_id,
+        COUNT(*) AS order_count
+    FROM recent_orders AS ro
+    GROUP BY ro.customer_id
+)
+SELECT
+    c.customer_id,
+    c.name,
+    COALESCE(rs.order_count, 0) AS order_count
+FROM customers AS c
+LEFT JOIN recent_sales AS rs
+  ON rs.customer_id = c.customer_id;
+```
+
 ### 재귀 CTE로 계층 탐색하기
 
 재귀 CTE는 자기 자신을 참조하면서 조직도, 카테고리 트리, 댓글 계층, 그래프 경로를 탐색한다. 앵커 쿼리가 시작 행을 만들고, 재귀 쿼리가 앞 단계 결과에서 다음 행을 확장한다.
@@ -770,6 +820,25 @@ Window Function 여러 주문 → 주문 행 유지 + 고객별 계산 결과
     ORDER BY 그룹 안의 순서
     ROWS BETWEEN 윈도우 범위
 )
+```
+
+### 주문별 금액과 고객별 총액
+
+주문별 집계 결과에 Window Function을 적용하면 주문 행을 유지하면서 고객별 총액을 함께 볼 수 있다.
+
+```sql
+SELECT
+    o.order_id,
+    o.customer_id,
+    SUM(oi.quantity * oi.unit_price) AS order_amount,
+    SUM(SUM(oi.quantity * oi.unit_price)) OVER (
+        PARTITION BY o.customer_id
+    ) AS customer_total_amount
+FROM orders AS o
+JOIN order_items AS oi
+  ON oi.order_id = o.order_id
+WHERE o.status = 'COMPLETED'
+GROUP BY o.order_id, o.customer_id;
 ```
 
 ### ROW_NUMBER, RANK, DENSE_RANK
@@ -1102,149 +1171,6 @@ ORDER BY cohort_month, month_number;
 
 분모는 코호트 최초 고객 수이고 분자는 각 월에 다시 활동한 고유 고객 수다. 주문 건수를 세면 유지율이 아니라 활동량을 측정하게 되므로 집계 단위를 주의한다.
 
-## JOIN 결과 행 수를 예측하는 습관
-
-JOIN은 “두 테이블을 붙이는 것”처럼 보이지만, 실제로는 행 수가 어떻게 바뀌는지를 먼저 예측해야 한다.
-
-| 관계 | 결과 특징 |
-|---|---|
-| 1:1 | 보통 행 수가 크게 늘지 않는다 |
-| 1:N | 왼쪽 한 행이 오른쪽 여러 행으로 복제될 수 있다 |
-| N:M | 조인 후 행 수가 급격히 늘어날 수 있다 |
-
-예를 들어 고객 1명이 주문 3개를 했고, 그 주문마다 주문 항목이 4개씩 있다면 단순 조인 결과는 12행으로 늘어난다.
-그래서 `COUNT(*)`를 썼는데 기대보다 값이 커졌다면, JOIN 전에 어느 단위의 행을 세고 있었는지 다시 확인해야 한다.
-
-## USING과 ON
-
-`USING`은 조인 키 이름이 양쪽 테이블에서 같을 때 간단하게 쓸 수 있다.
-
-```sql
-SELECT o.order_id, c.name
-FROM orders AS o
-JOIN customers AS c USING (customer_id);
-```
-
-`USING`은 문장을 짧게 만들어 주지만, 조건이 복잡하거나 컬럼 이름이 다르면 `ON`이 더 유연하다.
-
-```sql
-SELECT o.order_id, c.name
-FROM orders AS o
-JOIN customers AS c
-  ON c.customer_id = o.customer_id
- AND c.joined_at <= o.ordered_at::date;
-```
-
-실무에서는 “가능하면 짧게”보다 “의도가 명확하게”가 더 중요하다.
-조건이 한 줄로 끝나지 않으면 `ON`이 결과 의미를 드러내는 데 더 낫다.
-
-## 서브쿼리를 더 실전적으로 읽는 법
-
-서브쿼리는 위치보다 반환 형태를 먼저 보는 것이 편하다.
-
-| 형태 | 무엇을 반환하는가 | 보통 함께 쓰는 연산자 |
-|---|---|---|
-| 스칼라 서브쿼리 | 값 하나 | 비교 연산자 |
-| 다중 행 서브쿼리 | 값의 집합 | `IN`, `ANY`, `ALL` |
-| 상관 서브쿼리 | 바깥 행마다 다시 평가되는 서브쿼리 | `EXISTS`, 집계 |
-
-```sql
-SELECT product_id, name
-FROM products
-WHERE price > (SELECT AVG(price) FROM products);
-```
-
-이 쿼리는 평균보다 비싼 상품을 찾는다.
-반대로 고객마다 마지막 주문일을 구하는 상관 서브쿼리는 바깥 행을 참조하므로 표현은 직관적이지만, 데이터가 커질수록 다른 방식과 실행 계획을 비교해 볼 가치가 있다.
-
-```sql
-SELECT
-    c.customer_id,
-    c.name,
-    (
-        SELECT MAX(o.ordered_at)
-        FROM orders AS o
-        WHERE o.customer_id = c.customer_id
-    ) AS last_ordered_at
-FROM customers AS c;
-```
-
-부재 여부를 확인할 때는 `NOT IN`보다 `NOT EXISTS`를 우선 떠올리는 편이 안전하다.
-서브쿼리 결과에 `NULL`이 섞이면 `NOT IN`은 예상과 다른 결과를 만들 수 있기 때문이다.
-
-## CTE는 단계가 많은 쿼리를 이해시키는 도구다
-
-CTE는 단순히 쿼리를 “짧게” 만드는 도구가 아니라, 단계별 사고를 코드로 옮기는 도구다.
-
-```sql
-WITH recent_orders AS (
-    SELECT order_id, customer_id, ordered_at
-    FROM orders
-    WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days'
-),
-recent_sales AS (
-    SELECT
-        ro.customer_id,
-        COUNT(*) AS order_count
-    FROM recent_orders AS ro
-    GROUP BY ro.customer_id
-)
-SELECT
-    c.customer_id,
-    c.name,
-    COALESCE(rs.order_count, 0) AS order_count
-FROM customers AS c
-LEFT JOIN recent_sales AS rs
-  ON rs.customer_id = c.customer_id;
-```
-
-이런 식으로 나누면 중간 결과를 읽기 쉬워지고, 각 단계가 무엇을 책임지는지도 분명해진다.
-다만 CTE를 썼다고 항상 성능이 좋아지는 것은 아니므로, 이해를 위한 분해와 성능은 별도로 판단해야 한다.
-
-## Window Function은 행을 잃지 않는다는 점이 핵심이다
-
-`GROUP BY`는 행을 줄이지만 Window Function은 기존 행을 유지한다.
-이 차이를 이해하면 “왜 누적합은 Window Function이 더 자연스러운가”가 보인다.
-
-| 방식 | 결과 행 수 | 잘 맞는 질문 |
-|---|---|---|
-| `GROUP BY` | 줄어든다 | 고객별 총합, 월별 매출 |
-| Window Function | 유지된다 | 각 주문의 순위, 누계, 이전 값 |
-
-예를 들어 같은 고객 안에서 주문이 전체에서 얼마나 큰 비중을 차지하는지도 계산할 수 있다.
-
-```sql
-SELECT
-    o.order_id,
-    o.customer_id,
-    SUM(oi.quantity * oi.unit_price) AS order_amount,
-    SUM(SUM(oi.quantity * oi.unit_price)) OVER (
-        PARTITION BY o.customer_id
-    ) AS customer_total_amount
-FROM orders AS o
-JOIN order_items AS oi
-  ON oi.order_id = o.order_id
-WHERE o.status = 'COMPLETED'
-GROUP BY o.order_id, o.customer_id;
-```
-
-같은 결과를 서브쿼리로도 만들 수 있지만, Window Function은 “현재 행을 유지한 채 비교하는 작업”에 더 잘 맞는다.
-
-## 자주 쓰는 윈도우 패턴
-
-윈도우 함수를 읽을 때는 이름보다 용도를 먼저 떠올리면 쉽다.
-
-| 함수 | 떠올리면 좋은 상황 |
-|---|---|
-| `ROW_NUMBER()` | 그룹 안에서 순서대로 하나씩 번호를 붙이고 싶을 때 |
-| `RANK()` | 동점이 있으면 같은 순위를 주고 다음 순위를 건너뛸 때 |
-| `DENSE_RANK()` | 동점이 있어도 순위를 연속적으로 매기고 싶을 때 |
-| `LAG()` | 이전 시점과 차이를 보고 싶을 때 |
-| `LEAD()` | 다음 시점을 미리 보고 싶을 때 |
-
-`ROWS`는 물리적인 행 기준 범위를 뜻하고, `RANGE`는 정렬 값 기준으로 묶이는 느낌이 강하다.
-누적합처럼 행 단위로 정확히 계산하고 싶다면 `ROWS`를 명시하는 편이 보통 더 안전하다.
-
 ## LATERAL JOIN: 왼쪽 행마다 실행되는 테이블식
 
 `LATERAL`은 오른쪽 서브쿼리가 왼쪽의 현재 행을 참조하게 한다. 고객별 최근 주문 3개처럼 “각 부모별 제한된 자식 행”을 찾을 때 유용하다.
@@ -1471,19 +1397,6 @@ LIMIT 10;
 
 구조화 필터는 테넌트·권한·카테고리를 제한하고, 벡터 거리는 의미상 가까운 문서를 정렬한다. 검색 결과 품질은 SQL 문법만이 아니라 embedding 모델, chunk 크기, 거리 함수, 재정렬과 평가 데이터에 달려 있다.
 
-## 모든 문제는 한 가지 방법으로만 풀리지 않는다
-
-같은 결과를 얻더라도 표현 방식은 다양할 수 있다.
-실무에서는 다음 기준으로 선택하는 경우가 많다.
-
-- 의미가 가장 분명한가
-- 동작을 읽기 쉬운가
-- 동점, `NULL`, 중복에 안전한가
-- 실행 계획이 감당 가능한가
-
-예를 들어 “카테고리별 상위 3개 상품”은 `ROW_NUMBER()`로 풀 수도 있고, 다른 방식의 조합으로도 표현할 수 있다.
-중요한 건 정답 하나를 외우는 것이 아니라, 상황에 맞는 도구를 고를 수 있는가이다.
-
 ## 하나의 문제를 여러 방식으로 풀기
 
 “주문이 없는 고객”은 LEFT JOIN, NOT EXISTS, 집합 연산자로 모두 표현할 수 있다.
@@ -1519,7 +1432,7 @@ WHERE customer_id IN (
 );
 ```
 
-정답은 하나가 아니다. 먼저 쿼리가 업무 의미를 정확히 표현하는지 확인하고, 읽기 쉬운 방식을 선택한다. 성능 차이가 중요한 규모에서는 추측하지 않고 실제 데이터와 실행 계획으로 비교한다.
+먼저 업무 의미와 동점·`NULL`·중복 처리가 맞는지 확인하고 읽기 쉬운 방식을 선택한다. 성능 차이가 중요한 규모에서는 실제 데이터와 실행 계획으로 비교한다.
 
 ## SQL 안티패턴과 개선 기준
 

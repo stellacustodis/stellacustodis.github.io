@@ -91,14 +91,8 @@ $$
 
 이 관점은 이후 Flow Matching과 여러 연속 시간 생성 모델을 이해하는 기반이 된다. Neural ODE 자체는 범용적인 연속 깊이 모델이지만, 생성 모델의 맥락에서는 “샘플이 시간에 따라 어떤 vector field를 따라 이동하는가”라는 질문으로 이어진다.
 
-## 정리
+## 비교할 때 볼 조건
 
-Neural ODE의 핵심은 단순히 ODE solver를 신경망에 붙이는 것이 아니다. 네트워크의 깊이를 이산적인 층의 개수가 아니라 **상태가 연속적으로 변화하는 시간**으로 다시 정의한다는 데 있다.
-
-- Residual update는 Euler discretization으로 해석할 수 있다.
-- 신경망은 상태가 아니라 상태의 변화율을 학습한다.
-- ODE solver가 정확도에 맞춰 함수 평가 횟수를 결정한다.
-- adjoint method는 메모리 사용을 줄일 수 있지만 수치 오차와 추가 계산을 고려해야 한다.
-- Continuous Normalizing Flow와 Flow Matching으로 이어지는 수학적 토대를 제공한다.
+연속 깊이라는 해석을 실제 효율과 연결하려면 solver의 허용 오차와 함수 평가 횟수(NFE)를 함께 봐야 한다. 허용 오차를 작게 잡으면 더 정확한 적분을 요구하므로, 같은 vector field라도 계산량이 달라질 수 있다. Adjoint method 역시 저장하는 상태를 줄이는 이점과 역방향 재구성의 수치 오차를 함께 평가해야 한다. 따라서 모델을 비교할 때는 예측 성능뿐 아니라 solver 설정, NFE, 메모리 사용량과 gradient 계산 방식까지 맞추는 것이 중요하다.
 
 논문: [Neural Ordinary Differential Equations (NeurIPS 2018)](https://proceedings.neurips.cc/paper_files/paper/2018/hash/69386f6bb1dfed68692a24c8686939b9-Abstract.html)

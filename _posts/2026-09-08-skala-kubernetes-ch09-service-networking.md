@@ -86,6 +86,8 @@ Service load balancing은 connection 단위로 다른 Pod를 선택할 수 있�
 
 ## 계층별 진단
 
+Service는 자체 프로세스가 아니라 selector로 EndpointSlice를 만들고, kube-proxy 또는 eBPF data plane이 그 목록으로 패킷을 보낸다. 따라서 Service 객체의 존재만으로 정상 통신을 판단할 수 없다.
+
 ```text
 1. PodIP:targetPort 직접 호출
 2. Service ClusterIP:port 호출
@@ -93,15 +95,6 @@ Service load balancing은 connection 단위로 다른 Pod를 선택할 수 있�
 4. EndpointSlice와 Ready Pod 수 확인
 5. NetworkPolicy와 CNI 정책 확인
 ```
-
-- Pod IP는 되는데 Service가 안 됨: selector, port, EndpointSlice, kube-proxy
-- Service IP는 되는데 name이 안 됨: CoreDNS, namespace, search domain
-- endpoint가 비어 있음: selector 불일치 또는 Pod가 Ready가 아님
-- timeout: targetPort, bind address, policy route를 확인
-
-## Service를 Pod까지 분해해 확인하기
-
-Service는 자체 프로세스가 아니라 selector로 EndpointSlice를 만들고, kube-proxy 또는 eBPF data plane이 그 목록으로 패킷을 보낸다. 따라서 `Service` 객체만 `Running`인지 보는 것으로는 충분하지 않다.
 
 ```bash
 kubectl get service shop-api -n demo -o wide
@@ -119,7 +112,12 @@ kubectl run http-test -n demo --rm -i --restart=Never \
   --image=busybox:1.36 -- wget -qO- http://shop-api:80/actuator/health
 ```
 
-`EndpointSlice`의 `ready`가 false인 주소는 정상적인 Service backend로 취급되지 않는다. Pod IP 직접 호출은 되는데 Service 호출이 실패하면 selector·port·data plane을, ClusterIP 호출은 되는데 DNS만 실패하면 CoreDNS와 namespace search path를 우선 본다. `kubectl run --rm` 디버그 Pod는 테스트가 끝나면 삭제되지만, 실행 중인 namespace의 NetworkPolicy와 DNS 정책을 그대로 적용받는다는 점이 오히려 장점이다.
+- Pod IP는 되는데 Service가 안 됨: selector, port, EndpointSlice, kube-proxy 또는 eBPF data plane
+- Service IP는 되는데 name이 안 됨: CoreDNS, namespace, search domain
+- 사용할 Ready endpoint가 없음: selector 일치 여부와 Pod의 Ready 상태
+- timeout: targetPort, bind address, policy route를 확인
+
+`kubectl run --rm` 디버그 Pod는 테스트가 끝나면 삭제되지만, 실행 중인 namespace의 NetworkPolicy와 DNS 정책을 그대로 적용받는다.
 
 ## 정리
 

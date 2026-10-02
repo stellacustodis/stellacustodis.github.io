@@ -45,7 +45,7 @@ pin: false
 
 1일차 마지막 화살표가 이 모듈의 분기점이다. Attention은 2014~2015년에 이미 나왔고 **RNN의 보조 장치**였다. Transformer의 기여는 attention을 발명한 것이 아니라 **순환을 제거해도 attention만으로 충분하다는 것을 보인 것**이다. 논문 제목이 "Attention Is All You Need"인 이유이고, 병렬화라는 실질 이득도 recurrence 제거에서 나온다.
 
-2일차의 구도는 다르다. **네 주제 모두 아키텍처를 거의 건드리지 않는다.** GPT-1부터 지금까지 Transformer 블록 자체는 정규화 위치와 위치 인코딩 정도만 바뀌었고, 실질적 발전은 학습 목적함수·데이터 배분·용량 배분에서 나왔다.
+2일차에서는 학습 목적함수, 데이터·용량·연산 배분과 모델 간 지식 이전을 다룬다. Transformer의 기본 구성을 이어받으면서도 MoE처럼 FFN과 라우팅 구조를 바꾸는 방법을 함께 살펴본다.
 
 ## 다루는 범위
 
@@ -92,7 +92,7 @@ pin: false
 | 개념 | "Distillation은 압축이 아니다" → 같은 페이지에서 "모델 압축 기법" | 앞뒤 불일치. **결과는 압축, 방법은 재학습** |
 | 인용 | Scaling 3요소 설명에 GPT-3 논문 Fig 1.2 인용 | 그 그림은 **in-context learning 곡선**(가로축이 예시 개수). 거듭제곱 법칙 그래프는 Kaplan et al. Fig 1 |
 | 개념 | MoE Expert가 "처음에는 모두 동일하나" 전문화됨 | 같은 초기 가중치만으로 전문화가 막히지는 않는다. Sparse Upcycling처럼 동일한 MLP를 Expert에 복사해도 router가 서로 다른 토큰을 배정하면 서로 다른 갱신으로 분화할 수 있다. |
-| 누락 | RLHF 목적함수를 "보상 최대화"로만 서술 | **KL 페널티**가 없으면 reward hacking으로 즉시 붕괴 |
+| 누락 | RLHF 목적함수를 "보상 최대화"로만 서술 | **KL 페널티**는 참조 모델에서 지나치게 벗어나는 것을 억제해 보상 과최적화 위험을 줄이는 장치다 |
 | 누락 | MoE Router 설명에 균형 장치 없음 | Expert 부하 균형을 위한 장치가 중요하다. 모든 MoE에 같은 load balancing loss가 필수인 것은 아니며, DeepSeek-V3는 동적 routing bias와 작은 sequence-wise 보조 손실을 함께 사용한다. |
 
 이 외에도 Word2Vec의 두 아키텍처 구분, ELMo가 LSTM 기반이라는 점, LSTM의 forget gate가 원 논문(1997)이 아니라 Gers et al.(2000)의 기여라는 점, Chinchilla의 주 비교 대상이 GPT-3가 아니라 Gopher라는 점 등 **원문과 슬라이드 요약 사이의 간극**을 각 글에 반영했다.
