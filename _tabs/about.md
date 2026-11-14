@@ -121,7 +121,7 @@ order: 5
 - 밑바닥부터 시작하는 딥러닝 1 ~ 5
 - 면접을 위한 CS 전공지식 노트
 - Clean Code
-- Claen Architecture
+- Clean Architecture
 - 알고리즘 코딩테스트(파이썬 편)
 - 이것이 자료구조 + 알고리즘이다 with C언어
 - 파이토치 딥러닝 프로그래밍 1,2
@@ -132,5 +132,5 @@ order: 5
 - 한걸음 앞선 개발자가 지금 꼭 알아야 할 클로드 코드
 - Computer Vision
 - Pattern Recognition and Machine Learning
-- An Introduction to Staticstical Learning
+- An Introduction to Statistical Learning
 - 이펙티브 파이썬 3판
