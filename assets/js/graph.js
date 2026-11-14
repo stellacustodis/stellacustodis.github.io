@@ -435,7 +435,7 @@
     }
   });
 
-  svg.addEventListener('pointerup', () => {
+  function endPointer(cancelled) {
     const clickedNode = draggedNode;
     const wasDragged = dragMoved;
     if (draggedNode) draggedNode.fixed = false;
@@ -444,8 +444,12 @@
     panState = null;
     svg.classList.remove('is-panning');
     dragMoved = false;
-    if (clickedNode && !wasDragged) selectNode(clickedNode.id);
-  });
+    if (!cancelled && clickedNode && !wasDragged) selectNode(clickedNode.id);
+  }
+
+  svg.addEventListener('pointerup', () => endPointer(false));
+  // 브라우저가 제스처를 가져가면(스크롤·핀치) pointerup 없이 끝난다.
+  svg.addEventListener('pointercancel', () => endPointer(true));
 
   svg.addEventListener('dblclick', (event) => {
     const nodeElement = event.target.closest('.graph-node');
@@ -454,6 +458,12 @@
     if (nodes[index]) window.location.href = nodes[index].url;
   });
 
-  window.addEventListener('resize', fitGraph);
+  // 모바일은 주소창이 접히고 펴질 때마다 resize가 온다. 폭이 바뀔 때만 다시 맞춘다.
+  let fittedWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === fittedWidth) return;
+    fittedWidth = window.innerWidth;
+    fitGraph();
+  });
   applyFilters();
 })();

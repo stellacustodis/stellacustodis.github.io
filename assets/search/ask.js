@@ -48,48 +48,56 @@ async function search() {
   if (!q || !embed) return;
   go.disabled = true;
   say("찾는 중…", true);
+  try {
+    // 빌드 때 문단에 "passage: " 를 붙였으므로 질문에는 "query: " 를 붙인다.
+    // 접두사를 빼면 학습 조건과 달라져 유사도가 무너진다.
+    const r = await embed(["query: " + q], { pooling: "mean", normalize: true });
+    const qv = r.data, d = index.dim, n = index.chunks.length;
 
-  // 빌드 때 문단에 "passage: " 를 붙였으므로 질문에는 "query: " 를 붙인다.
-  // 접두사를 빼면 학습 조건과 달라져 유사도가 무너진다.
-  const r = await embed(["query: " + q], { pooling: "mean", normalize: true });
-  const qv = r.data, d = index.dim, n = index.chunks.length;
+    // 문서 벡터도 질문 벡터도 정규화돼 있으므로 내적이 곧 코사인 유사도다
+    const scored = new Array(n);
+    for (let i = 0; i < n; i++) {
+      let dot = 0;
+      for (let j = 0; j < d; j++) dot += index.M[i * d + j] * qv[j];
+      scored[i] = { i, dot };
+    }
+    scored.sort((a, b) => b.dot - a.dot);
 
-  // 문서 벡터도 질문 벡터도 정규화돼 있으므로 내적이 곧 코사인 유사도다
-  const scored = new Array(n);
-  for (let i = 0; i < n; i++) {
-    let dot = 0;
-    for (let j = 0; j < d; j++) dot += index.M[i * d + j] * qv[j];
-    scored[i] = { i, dot };
+    // 같은 글이 상위를 독차지하지 않게 글당 하나만 남긴다
+    const seen = new Set(), top = [];
+    for (const s of scored) {
+      const c = index.chunks[s.i];
+      if (seen.has(c.u)) continue;
+      seen.add(c.u);
+      top.push({ ...c, score: s.dot });
+      if (top.length >= 8) break;
+    }
+
+    out.innerHTML = top.map(c => `
+      <div class="card mb-2">
+        <div class="card-body py-2">
+          <a href="${c.u}" class="fw-bold">${esc(c.t)}</a>
+          <span class="text-muted small ms-2">${esc(c.d || "")} · 유사도 ${c.score.toFixed(3)}</span>
+          ${c.h ? `<div class="small text-muted">§ ${esc(c.h)}</div>` : ""}
+          <p class="mb-0 mt-1 small">${esc(c.s)}…</p>
+        </div>
+      </div>`).join("");
+
+    say(`상위 ${top.length}편`);
+  } catch (e) {
+    status.className = "text-danger";
+    status.textContent = "검색하지 못했다: " + e.message;
+  } finally {
+    go.disabled = false;
   }
-  scored.sort((a, b) => b.dot - a.dot);
-
-  // 같은 글이 상위를 독차지하지 않게 글당 하나만 남긴다
-  const seen = new Set(), top = [];
-  for (const s of scored) {
-    const c = index.chunks[s.i];
-    if (seen.has(c.u)) continue;
-    seen.add(c.u);
-    top.push({ ...c, score: s.dot });
-    if (top.length >= 8) break;
-  }
-
-  out.innerHTML = top.map(c => `
-    <div class="card mb-2">
-      <div class="card-body py-2">
-        <a href="${c.u}" class="fw-bold">${esc(c.t)}</a>
-        <span class="text-muted small ms-2">${esc(c.d || "")} · 유사도 ${c.score.toFixed(3)}</span>
-        ${c.h ? `<div class="small text-muted">§ ${esc(c.h)}</div>` : ""}
-        <p class="mb-0 mt-1 small">${esc(c.s)}…</p>
-      </div>
-    </div>`).join("");
-
-  go.disabled = false;
-  say(`상위 ${top.length}편`);
 }
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g,
   ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 
 go.addEventListener("click", search);
-box.addEventListener("keydown", (e) => { if (e.key === "Enter") search(); });
+box.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" || e.isComposing || go.disabled) return;
+  search();
+});
 boot();

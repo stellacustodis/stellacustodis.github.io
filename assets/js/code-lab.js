@@ -317,6 +317,12 @@ public class Main {
     for (const tab of tabs) tab.disabled = busy;
     stopButton.hidden = !busy;
     runtimeDot.classList.toggle("is-busy", busy);
+
+    // A focused control that becomes disabled drops focus to <body>, which
+    // takes Escape, Ctrl+Enter and the Tab trap (bound on root) with it.
+    const active = document.activeElement;
+    const focusLost = active === document.body || (root.contains(active) && (active.disabled || active.hidden));
+    if (!root.hidden && focusLost) (busy ? stopButton : runButton).focus();
   }
 
   function resetTimer(milliseconds) {
@@ -385,7 +391,7 @@ public class Main {
     pythonWorker.addEventListener("message", handlePythonMessage);
     pythonWorker.addEventListener("error", (event) => {
       if (!activeRun || activeRun.language !== "python") return;
-      showOutput(`Python Worker 오류: ${event.message}`, true);
+      showOutput(`Python Worker 오류: ${event.message || "실행기 스크립트를 불러오지 못했습니다."}`, true);
       finishRun("Python 실행기를 시작하지 못했습니다", "error");
       destroyPythonWorker();
     });
@@ -584,7 +590,7 @@ public class Main {
         const result = await requestJson(
           `${JUDGE0_ENDPOINT}/submissions/${encodeURIComponent(
             submission.token,
-          )}?base64_encoded=true&fields=stdout,stderr,compile_output,message,status,time,memory`,
+          )}?base64_encoded=true&fields=stdout,stderr,compile_output,message,status,time,memory&_=${Date.now()}`,
           { signal: controller.signal },
         );
 
@@ -772,6 +778,9 @@ public class Main {
   });
 
   root.addEventListener("keydown", (event) => {
+    // 한글 조합 중의 Enter/Escape는 IME가 쓰는 키다.
+    if (event.isComposing) return;
+
     if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
       event.preventDefault();
       execute(event.shiftKey && language === "python" ? "trace" : "run");

@@ -75,6 +75,7 @@
   let panState = null;
   let draggedNode = null;
   let dragMoved = false;
+  let dragStart = null;
 
   function svgEl(name, attrs = {}) {
     const el = document.createElementNS(ns, name);
@@ -349,6 +350,7 @@
   function startNodeDrag(event, node) {
     event.stopPropagation();
     draggedNode = node;
+    dragStart = { x: event.clientX, y: event.clientY };
     dragMoved = false;
     svg.setPointerCapture(event.pointerId);
   }
@@ -458,6 +460,9 @@
 
   svg.addEventListener('pointermove', (event) => {
     if (draggedNode) {
+      // 터치에서는 탭에도 몇 px 흔들린다. 그만큼은 드래그로 보지 않는다.
+      if (!dragMoved && dragStart
+          && Math.hypot(event.clientX - dragStart.x, event.clientY - dragStart.y) < 4) return;
       const p = toGraphPoint(event);
       draggedNode.x = p.x; draggedNode.y = p.y;
       dragMoved = true;
@@ -470,16 +475,26 @@
     setTransform();
   });
 
-  svg.addEventListener('pointerup', (event) => {
+  function endPointer(event, cancelled) {
     if (draggedNode) {
-      if (!dragMoved) selectNode(draggedNode.id);
+      if (!cancelled && !dragMoved) selectNode(draggedNode.id);
       draggedNode = null;
     }
+    dragStart = null;
     panState = null;
     if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
-  });
+  }
 
-  window.addEventListener('resize', fitGraph);
+  svg.addEventListener('pointerup', (event) => endPointer(event, false));
+  svg.addEventListener('pointercancel', (event) => endPointer(event, true));
+
+  // 모바일은 주소창이 접히고 펴질 때마다 resize가 온다. 폭이 바뀔 때만 다시 맞춘다.
+  let fittedWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === fittedWidth) return;
+    fittedWidth = window.innerWidth;
+    fitGraph();
+  });
 
   function truncate(text, max) {
     return text.length > max ? `${text.slice(0, max - 1)}…` : text;
