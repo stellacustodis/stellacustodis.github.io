@@ -21,6 +21,7 @@
   const edgeLayer = document.getElementById('library-edges');
   const nodeLayer = document.getElementById('library-nodes');
   const hullLayer = document.getElementById('library-hulls');
+  const zoomControls = root.querySelector('.graph-zoom');
   const detail = document.getElementById('library-detail');
   const searchInput = document.getElementById('library-search');
   const clusterSelect = document.getElementById('library-cluster');
@@ -68,15 +69,20 @@
   }
 
   fill(familySelect, facets.family, '모든 계열');
-  fill(taskSelect, facets.task, '모든 문제');
+  fill(taskSelect, facets.task, '모든 주제');
   [...new Set(papers.map((p) => p.year).filter(Boolean))].sort().reverse()
     .forEach((y) => yearSelect.add(new Option(y, y)));
 
   let nodes = [];
   let edges = [];
+  let clusters = [];
   let matchedNodes = [];
   let selectedRow = null;
   let selectedId = null;
+  let hoveredNode = null;
+  let focusedNode = null;
+  let visibleLabels = new Set();
+  let labelFrame = null;
   let transform = { x: 0, y: 0, scale: 1 };
   let panState = null;
   let draggedNode = null;
@@ -93,10 +99,7 @@
     return String(v || '').trim().toLocaleLowerCase();
   }
 
-  // ── 배치 ────────────────────────────────────────────────
-  // 473편에 힘 기반 시뮬레이션을 돌리면 매 틱 11만 쌍이라 브라우저가 버티지 못한다.
-  // 라벨이 이미 군집을 정해 주므로 배치는 결정론적으로 계산한다.
-  // 군집끼리는 겹침만 풀고(십여 개뿐이라 싸다), 군집 안은 해바라기 배열로 채운다.
+  // 군집의 겹침을 먼저 풀고, 각 군집 안의 논문은 해바라기 배열로 배치한다.
   function layout(visible) {
     const groups = new Map();
     visible.forEach((p) => {
@@ -127,7 +130,7 @@
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const d = Math.max(Math.hypot(dx, dy), 1);
-          const want = a.radius + b.radius + 56;
+          const want = a.radius + b.radius + 112;
           if (d >= want) continue;
           const push = (want - d) / 2;
           a.x -= (dx / d) * push; a.y -= (dy / d) * push;
@@ -180,23 +183,27 @@
       .filter((p) => !year || p.year === year)
       .filter((p) => !reviewedOnly.checked || p.post);
 
-    const { placed, clusters } = layout(visible);
-    nodes = placed;
+    const placement = layout(visible);
+    nodes = placement.placed;
+    clusters = placement.clusters;
     const byId = new Map(nodes.map((n) => [n.id, n]));
     edges = buildEdges(visible)
       .map((e) => ({ source: byId.get(e.source.id), target: byId.get(e.target.id), author: e.author }))
       .filter((e) => e.source && e.target);
 
     selectedId = nodes.some((n) => n.id === selectedId) ? selectedId : null;
-    render(clusters);
+    render();
     renderLegend(clusters);
     fitGraph();
   }
 
-  function render(clusters) {
+  function render() {
     hullLayer.replaceChildren();
     edgeLayer.replaceChildren();
     nodeLayer.replaceChildren();
+    hoveredNode = null;
+    focusedNode = null;
+    visibleLabels.clear();
 
     clusters.forEach((c) => {
       const color = colorOf(c.key);
@@ -205,10 +212,11 @@
         fill: color, 'fill-opacity': 0.07, stroke: color, 'stroke-opacity': 0.28,
       }));
       const text = svgEl('text', {
-        class: 'library-hull-label', x: c.x, y: c.y - c.radius - 20, fill: color,
+        class: 'library-hull-label', x: c.x, y: c.y - c.radius - 36, fill: color,
       });
       text.textContent = `${label.get(c.key) || c.key} · ${c.list.length}`;
       hullLayer.appendChild(text);
+      c.caption = text;
     });
 
     edges.forEach((edge) => {
@@ -244,11 +252,31 @@
       caption.textContent = truncate(node.title, 28);
       group.appendChild(caption);
       if (multi) group.classList.add('is-multi');
+      group.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'touch') return;
+        hoveredNode = node;
+        scheduleLabelUpdate();
+      });
+      group.addEventListener('pointerleave', () => {
+        if (hoveredNode === node) {
+          hoveredNode = null;
+          scheduleLabelUpdate();
+        }
+      });
+      group.addEventListener('focus', () => {
+        focusedNode = node;
+        scheduleLabelUpdate();
+      });
+      group.addEventListener('blur', () => {
+        focusedNode = null;
+        scheduleLabelUpdate();
+      });
       group.addEventListener('pointerdown', (e) => startNodeDrag(e, node));
       group.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectNode(node.id); }
       });
       node.element = group;
+      node.caption = caption;
       nodeLayer.appendChild(group);
     });
 
@@ -269,6 +297,7 @@
       e.element.setAttribute('y2', e.target.y);
     });
     nodes.forEach((n) => n.element.setAttribute('transform', `translate(${n.x} ${n.y})`));
+    scheduleLabelUpdate();
   }
 
   function selectNode(id) {
@@ -286,6 +315,7 @@
     edges.forEach((e) => e.element.classList.toggle('is-active', linked.includes(e)));
     updateListSelection();
     renderDetail(node, linked);
+    scheduleLabelUpdate();
   }
 
   function chip(id, facet) {
@@ -299,7 +329,7 @@
 
     const rows = [];
     if (node.family.length) rows.push(['계열', node.family.map((x) => chip(x, 'family')).join('')]);
-    if (node.task.length) rows.push(['문제', node.task.map((x) => chip(x, 'task')).join('')]);
+    if (node.task.length) rows.push(['주제', node.task.map((x) => chip(x, 'task')).join('')]);
     if (node.kind) rows.push(['성격', `<span class="graph-tag">${escapeHtml(label.get(node.kind) || node.kind)}</span>`]);
     rows.forEach(([name, html]) => {
       out.push(`<p class="library-facet"><span class="library-facet-name">${name}</span>${html}</p>`);
@@ -329,11 +359,9 @@
   }
 
   function showPlaceholder() {
-    const reviewed = papers.filter((p) => p.post).length;
     detail.innerHTML = `<div class="graph-detail-placeholder">
       <i class="fas fa-book" aria-hidden="true"></i>
-      <p>노드를 선택하면 논문 정보를 볼 수 있습니다.<br>
-      테두리가 있는 노드는 이 블로그에 리뷰가 있는 논문입니다 (${reviewed}편).</p></div>`;
+      <p>논문을 선택하세요.</p></div>`;
     nodes.forEach((n) => n.element.classList.remove('is-dimmed', 'is-selected'));
     edges.forEach((e) => e.element.classList.remove('is-active'));
   }
@@ -348,6 +376,59 @@
       n.element.classList.toggle('is-faded', Boolean(q) && !hit);
     });
     renderPaperList();
+    scheduleLabelUpdate();
+  }
+
+  function scheduleLabelUpdate() {
+    if (labelFrame === null) labelFrame = requestAnimationFrame(updateNodeLabels);
+  }
+
+  function labelCandidates() {
+    if (normalize(searchInput.value)) return matchedNodes.length <= 25 ? matchedNodes : [];
+    if (transform.scale >= 3.2) return nodes;
+    return transform.scale >= 2.2 ? nodes.filter((node) => node.post) : [];
+  }
+
+  function labelOverlaps(a, b) {
+    const gap = 4;
+    return a.left < b.right + gap && a.right + gap > b.left
+      && a.top < b.bottom + gap && a.bottom + gap > b.top;
+  }
+
+  function updateNodeLabels() {
+    labelFrame = null;
+    const selected = nodes.find((node) => node.id === selectedId);
+    const focused = focusedNode?.element.matches(':focus-visible') ? focusedNode : null;
+    const active = new Set([focused, hoveredNode, selected].filter(Boolean));
+    const candidates = new Set([...active, ...labelCandidates()]);
+    const next = new Set();
+    if (candidates.size) {
+      const canvas = svg.getBoundingClientRect();
+      const reserved = [zoomControls.getBoundingClientRect(),
+        ...clusters.map((cluster) => cluster.caption.getBoundingClientRect())];
+      const occupied = [];
+
+      for (const node of candidates) {
+        const isActive = active.has(node);
+        const x = transform.x + node.x * transform.scale;
+        const y = transform.y + node.y * transform.scale;
+        if (!isActive && (x < 0 || x > canvas.width || y < 0 || y > canvas.height)) continue;
+        const bounds = node.caption.getBoundingClientRect();
+        if (!isActive && (bounds.left < canvas.left || bounds.right > canvas.right
+            || bounds.top < canvas.top || bounds.bottom > canvas.bottom
+            || reserved.some((used) => labelOverlaps(bounds, used)))) continue;
+        if (occupied.some((used) => labelOverlaps(bounds, used))) continue;
+        next.add(node);
+        occupied.push(bounds);
+      }
+    }
+    for (const node of visibleLabels) {
+      if (!next.has(node)) node.element.classList.remove('is-label-visible');
+    }
+    for (const node of next) {
+      if (!visibleLabels.has(node)) node.element.classList.add('is-label-visible');
+    }
+    visibleLabels = next;
   }
 
   function updateListSelection() {
@@ -432,8 +513,8 @@
   function setTransform() {
     viewport.setAttribute('transform',
       `translate(${transform.x} ${transform.y}) scale(${transform.scale})`);
-    viewport.classList.toggle('has-all-labels', transform.scale >= 1.45);
-    viewport.style.setProperty('--library-label-size', `${Math.max(10, 8 / transform.scale)}px`);
+    viewport.style.setProperty('--library-label-size', `${Math.min(20, 11 / transform.scale)}px`);
+    scheduleLabelUpdate();
   }
 
   function fitGraph() {
@@ -444,18 +525,31 @@
       setTransform();
       return;
     }
-    const xs = nodes.map((n) => n.x);
-    const ys = nodes.map((n) => n.y);
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-    const pad = 130;
-    const scale = Math.min(rect.width / (maxX - minX + pad * 2),
-                           rect.height / (maxY - minY + pad * 2), 1.6);
-    transform.scale = Number.isFinite(scale) && scale > 0 ? scale : 1;
-    transform.x = rect.width / 2 - ((minX + maxX) / 2) * transform.scale;
-    transform.y = rect.height / 2 - ((minY + maxY) / 2) * transform.scale;
+    const bounds = nodes.map((node) => {
+      const radius = node.radius + 6;
+      return [node.x - radius, node.y - radius, node.x + radius, node.y + radius];
+    });
+    for (const cluster of clusters) {
+      const radius = cluster.radius + 24;
+      const caption = cluster.caption.getBBox();
+      bounds.push([
+        Math.min(cluster.x - radius, caption.x),
+        Math.min(cluster.y - cluster.radius - 40, caption.y),
+        Math.max(cluster.x + radius, caption.x + caption.width),
+        Math.max(cluster.y + radius, caption.y + caption.height),
+      ]);
+    }
+    const minX = Math.min(...bounds.map((bound) => bound[0]));
+    const minY = Math.min(...bounds.map((bound) => bound[1]));
+    const maxX = Math.max(...bounds.map((bound) => bound[2]));
+    const maxY = Math.max(...bounds.map((bound) => bound[3]));
+    const pad = 12;
+    const right = zoomControls.getBoundingClientRect().left - rect.left;
+    const width = Math.max(1, right - pad * 2);
+    const height = Math.max(1, rect.height - pad * 2);
+    transform.scale = Math.min(width / (maxX - minX), height / (maxY - minY), 1.6);
+    transform.x = pad + width / 2 - ((minX + maxX) / 2) * transform.scale;
+    transform.y = pad + height / 2 - ((minY + maxY) / 2) * transform.scale;
     setTransform();
   }
 

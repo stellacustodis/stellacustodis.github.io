@@ -1,15 +1,13 @@
 ---
 layout: page
 title: 학습 로드맵
-description: "인공지능 논문 리뷰와 SKALA 기반의 Python, Transformer, Spring AI, Docker 학습 경로를 한곳에 모았다."
+description: "딥러닝 논문 리뷰와 SKALA 학습 로드맵."
 icon: fas fa-route
 order: 3
 permalink: /learn/
 ---
 
 <link rel="stylesheet" href="{{ '/assets/css/learn.css' | relative_url }}">
-
-아래 순서에 따라 주제별로 읽을 수 있습니다.
 
 <div id="learn-roadmap" data-post-path="{{ '/posts/' | relative_url }}" markdown="1">
 
@@ -28,9 +26,7 @@ permalink: /learn/
 
 <section class="learn-track" markdown="1">
 
-## Transformer·linear attention 논문 읽기
-
-Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linear attention으로 이어지는 경로입니다.
+## Transformer·Linear Attention
 
 - [Attention과 Transformer 기본기]({{ '/posts/paper-review-transformer/' | relative_url }})
 - [Transformer 변형 논문 모음]({{ '/posts/paper-review-transformer-variants/' | relative_url }})
@@ -43,8 +39,8 @@ Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linea
 
 ## 생성 모델·확률 모델
 
-- [DDPM과 확산 모델]({{ '/posts/ddpm/' | relative_url }})
-- [DDIM의 비확률적 샘플링]({{ '/posts/ddim/' | relative_url }})
+- [DDPM과 Diffusion 모델]({{ '/posts/ddpm/' | relative_url }})
+- [DDIM 샘플링]({{ '/posts/ddim/' | relative_url }})
 - [Score-Based Generative Modeling과 SDE]({{ '/posts/score-sde/' | relative_url }})
 - [Flow Matching과 Rectified Flow]({{ '/posts/flow-matching/' | relative_url }})
 - [Classifier-Free Diffusion Guidance]({{ '/posts/cfg/' | relative_url }})
@@ -54,8 +50,6 @@ Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linea
 <section class="learn-track" markdown="1">
 
 ## Image Editing
-
-확산 모델의 역변환과 편집 제어에서 출발해, 텍스트·마스크·포인트 조건으로 실제 이미지를 수정하는 방법을 따라가는 경로입니다.
 
 - [DiffusionCLIP: Text-Guided Diffusion Models for Robust Image Manipulation]({{ '/posts/diffusionclip/' | relative_url }})
 - [Null-text Inversion for Editing Real Images using Guided Diffusion Models]({{ '/posts/null-text-inversion/' | relative_url }})
@@ -94,9 +88,5 @@ Transformer의 기본 구조에서 출발해 효율적인 상태 공간과 linea
 </section>
 
 </div>
-
-## 이 블로그를 읽는 방법
-
-개념을 처음 만났다면 로드맵부터 읽고, 구현이 궁금할 때는 해당 시리즈의 일별 글로 내려가세요. 논문 리뷰에서는 요약만 읽기보다 수식과 실험 한계를 함께 확인하는 것을 권합니다. 각 글의 하단 관련 글에서 다음 주제로 이동할 수 있습니다.
 
 <script src="{{ '/assets/js/learn.js' | relative_url }}" defer></script>

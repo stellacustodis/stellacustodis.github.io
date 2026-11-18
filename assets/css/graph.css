@@ -41,16 +41,12 @@
   margin-bottom: 0.75rem;
 }
 
-.graph-toolbar label {
+#knowledge-graph > .graph-toolbar > label {
   flex: 1 1 8rem;
   min-width: 0;
 }
 
-.graph-toolbar .graph-edge-filter {
-  flex-basis: 11rem;
-}
-
-.graph-toolbar input,
+.graph-toolbar input[type='search'],
 .graph-toolbar select,
 .graph-button {
   background: var(--main-bg, #fff);
@@ -64,7 +60,7 @@
   width: 100%;
 }
 
-.graph-toolbar input:focus,
+.graph-toolbar input[type='search']:focus,
 .graph-toolbar select:focus,
 .graph-button:focus-visible {
   border-color: var(--graph-accent);
@@ -72,8 +68,15 @@
 }
 
 .graph-toolbar .graph-search {
-  flex: 2 1 12rem;
   position: relative;
+}
+
+#knowledge-graph > .graph-toolbar > .graph-edge-filter {
+  flex-basis: 11rem;
+}
+
+#knowledge-graph > .graph-toolbar > .graph-search {
+  flex: 2 1 12rem;
 }
 
 .graph-search i {
@@ -109,6 +112,10 @@
   display: grid;
   gap: 0.75rem;
   grid-template-columns: minmax(0, 1fr) 17rem;
+}
+
+.graph-stage {
+  min-width: 0;
 }
 
 .graph-canvas-wrap,
@@ -160,7 +167,7 @@
   transition: filter 160ms ease, stroke-width 160ms ease;
 }
 
-.graph-node text {
+.graph-node-label {
   fill: var(--text-color, #34343c);
   font-size: 11px;
   font-weight: 600;
@@ -170,6 +177,11 @@
   stroke-linejoin: round;
   stroke-width: 4px;
   text-anchor: middle;
+  visibility: hidden;
+}
+
+.graph-node.has-label .graph-node-label {
+  visibility: visible;
 }
 
 .graph-node:hover circle,
@@ -182,6 +194,10 @@
 .graph-node.is-dimmed,
 .graph-edge.is-dimmed {
   opacity: 0.1;
+}
+
+.graph-node.is-dimmed:is(:hover, :focus) {
+  opacity: 1;
 }
 
 .graph-node.is-match circle {
@@ -314,14 +330,9 @@
 }
 
 .graph-help {
-  bottom: 0.45rem;
   color: var(--graph-muted);
   font-size: 0.68rem;
-  left: 0;
-  margin: 0;
-  padding: 0 3.25rem 0 0.65rem;
-  pointer-events: none;
-  position: absolute;
+  margin: 0.4rem 0 0;
 }
 
 .graph-empty {

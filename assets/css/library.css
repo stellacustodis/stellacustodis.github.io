@@ -4,6 +4,11 @@
   flex-wrap: wrap;
 }
 
+.library-graph .graph-canvas-wrap {
+  height: auto;
+  min-height: 0;
+}
+
 /* graph.css 는 #graph-canvas 를 아이디로 잡는다. 이쪽 캔버스는 별도로 크기를 준다. */
 #library-canvas {
   cursor: grab;
@@ -25,8 +30,6 @@
   pointer-events: none;
 }
 
-/* 뷰포트 전체가 축소돼 들어오므로(전체 보기에서 대략 0.4배) 이름표는
-   그 몫만큼 키워 둔다. 화면에서는 11px 안팎으로 보인다. */
 .library-hull-label {
   font-size: 1.7rem;
   font-weight: 700;
@@ -35,8 +38,6 @@
   letter-spacing: 0.01em;
 }
 
-/* 노드가 495개라 기본 반지름이 작다. 선택·검색 상태를 색이 아니라
-   크기와 불투명도로 알린다 — 색은 이미 주제가 쓰고 있다. */
 .library-node circle {
   transition: r 0.12s ease, opacity 0.12s ease;
 }
@@ -55,14 +56,13 @@
   stroke-width: 1.6;
 }
 
-.library-node.is-selected {
+.library-node:is(.is-selected, :hover, :focus-visible) {
   opacity: 1;
 }
 
-.library-node-label {
-  display: none;
+.library-node > .library-node-label {
   fill: var(--text-color, #1b1b1e);
-  font-size: var(--library-label-size, 10px);
+  font-size: var(--library-label-size, 11px);
   paint-order: stroke;
   pointer-events: none;
   stroke: var(--main-bg, #fff);
@@ -70,11 +70,11 @@
   stroke-width: 0.18em;
   text-anchor: middle;
   transform: translateY(0.8em);
+  visibility: hidden;
 }
 
-.library-node:is(.is-reviewed, .is-match, .is-selected) > .library-node-label,
-.has-all-labels .library-node-label {
-  display: block;
+.library-node.is-label-visible > .library-node-label {
+  visibility: visible;
 }
 
 /* 블로그에 리뷰가 있는 논문 */
@@ -97,10 +97,22 @@
   stroke-width: 2;
 }
 
-.library-toggle {
+.library-graph .graph-toolbar > label {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.library-graph .graph-toolbar > .graph-search {
+  flex: 2 1 12rem;
+}
+
+.library-graph .graph-toolbar > .library-toggle {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 0.4rem;
+  min-height: 2.45rem;
+  width: auto;
   font-size: 0.86rem;
   white-space: nowrap;
 }
@@ -144,11 +156,18 @@
   text-decoration: underline;
 }
 
-.library-cluster-pick {
+.library-graph .graph-toolbar > .library-cluster-pick {
   display: inline-flex;
+  flex: 1 1 9rem;
   align-items: center;
   gap: 0.35rem;
   white-space: nowrap;
+}
+
+.library-graph .library-cluster-pick > select {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
 }
 
 .library-cluster-pick > span {

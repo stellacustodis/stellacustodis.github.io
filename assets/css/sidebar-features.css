@@ -49,3 +49,86 @@
     transition: none;
   }
 }
+
+#archives {
+  --archive-day-width: 2rem;
+  --archive-month-width: 2.75rem;
+  --archive-column-gap: 0.5rem;
+  --archive-line-x: calc(var(--archive-day-width) + var(--archive-month-width) + 2 * var(--archive-column-gap));
+}
+
+#archives .year {
+  left: auto;
+  margin-left: 0;
+}
+
+#archives .year::before,
+#archives ul li::before,
+#archives .year::after,
+#archives ul li > a::before {
+  position: absolute;
+  float: none;
+  left: var(--archive-line-x);
+  transform: translateX(-50%);
+}
+
+#archives .year::before,
+#archives .year:first-child::before {
+  top: 0;
+  bottom: 0;
+  height: auto;
+}
+
+#archives .year:first-child::before {
+  top: 1.25rem;
+}
+
+#archives .year::after {
+  top: 1.25rem;
+  transform: translate(-50%, -50%);
+}
+
+#archives ul li {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--archive-day-width) var(--archive-month-width) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--archive-column-gap);
+  min-height: 3rem;
+  line-height: 1.45;
+}
+
+#archives ul li::before {
+  height: 100%;
+}
+
+#archives ul:last-child li:last-child::before {
+  height: 50%;
+}
+
+#archives .date {
+  right: auto;
+}
+
+#archives .date.day {
+  text-align: end;
+}
+
+#archives .date.month {
+  width: auto;
+  margin-left: 0 !important;
+  text-align: start;
+}
+
+#archives ul li > a {
+  position: static;
+  margin-left: 1rem;
+  padding-block: 0.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#archives ul li > a::before {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

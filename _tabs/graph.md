@@ -11,8 +11,7 @@ permalink: /graph/
 <div class="knowledge-graph" id="knowledge-graph">
   <header class="graph-intro">
     <p>
-      점선은 본문 참조와 관련 글 연결, 실선은 공통 태그를 나타냅니다.
-      같은 색의 노드는 같은 상위 카테고리에 속합니다.
+      점선은 직접 연결, 실선은 공통 태그, 색상은 상위 카테고리입니다.
     </p>
     <div class="graph-stats" aria-label="그래프 통계">
       <span><strong id="graph-post-count">{{ site.posts | size }}</strong> posts</span>
@@ -57,26 +56,26 @@ permalink: /graph/
   </div>
 
   <div class="graph-layout">
-    <section class="graph-canvas-wrap" aria-label="게시글 관계 그래프">
-      <svg id="graph-canvas" role="group" aria-labelledby="graph-title graph-description">
-        <title id="graph-title">게시글 관계 그래프</title>
-        <desc id="graph-description">본문 참조, 관련 글 연결, 공통 태그로 게시글을 연결한 그래프</desc>
-        <g id="graph-viewport">
-          <g id="graph-edges"></g>
-          <g id="graph-nodes"></g>
-        </g>
-      </svg>
+    <section class="graph-stage" aria-label="게시글 관계 그래프">
+      <div class="graph-canvas-wrap">
+        <svg id="graph-canvas" role="group" aria-labelledby="graph-title graph-description">
+          <title id="graph-title">게시글 관계 그래프</title>
+          <desc id="graph-description">본문 참조, 관련 글 연결, 공통 태그로 게시글을 연결한 그래프</desc>
+          <g id="graph-viewport">
+            <g id="graph-edges"></g>
+            <g id="graph-nodes"></g>
+          </g>
+        </svg>
 
-      <div class="graph-zoom" aria-label="그래프 확대 및 축소">
-        <button id="graph-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus"></i></button>
-        <button id="graph-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus"></i></button>
-        <button id="graph-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand"></i></button>
+        <div class="graph-zoom" aria-label="그래프 확대 및 축소">
+          <button id="graph-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus"></i></button>
+          <button id="graph-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus"></i></button>
+          <button id="graph-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand"></i></button>
+        </div>
+
+        <p id="graph-empty" class="graph-empty" hidden>조건에 맞는 글이 없습니다.</p>
       </div>
-
-      <p class="graph-help">
-        노드를 드래그해 이동하고, 빈 공간을 드래그해 화면을 옮기세요. 스크롤로 확대·축소할 수 있습니다.
-      </p>
-      <p id="graph-empty" class="graph-empty" hidden>조건에 맞는 글이 없습니다.</p>
+      <p class="graph-help">드래그로 이동 · 휠로 확대·축소</p>
     </section>
 
     <aside class="graph-detail" id="graph-detail" aria-live="polite">

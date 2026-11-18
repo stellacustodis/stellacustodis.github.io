@@ -1,8 +1,8 @@
 export const EXAMPLE_QUESTIONS = [
-  "종료 신호를 받고 요청을 마무리하는 방법",
-  "컨테이너가 지워지면 데이터는 왜 사라지나",
-  "DDIM 비확률적 샘플링",
-  "Linear Attention Fast Weight",
+  "컨테이너 종료 신호와 PID 1",
+  "컨테이너 삭제 후 볼륨 데이터",
+  "DDIM 결정론적 샘플링과 ODE",
+  "Linear Attention과 Fast Weight",
 ];
 
 const MODEL = "Xenova/multilingual-e5-small";

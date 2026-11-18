@@ -43,12 +43,12 @@ template.innerHTML = `
     </div>
     <div id="sq-body">
       <div id="sq-intro">
-        <p class="sq-note">뜻이 가까운 문단을 찾습니다. 처음 검색할 때 모델을 내려받습니다.</p>
-        <div id="sq-examples" role="group" aria-label="추천 질문"></div>
+        <p class="sq-note">키워드와 문맥으로 블로그 문단을 검색합니다. 첫 검색 시 모델을 불러옵니다.</p>
+        <div id="sq-examples" role="group" aria-label="예시 검색어"></div>
       </div>
       <p id="sq-status" class="sq-note mb-0" role="status" hidden></p>
       <div id="sq-results"></div>
-      <a id="sq-full" class="sq-full" hidden>전체 화면(/ask/)에서 자세히 보기</a>
+      <a id="sq-full" class="sq-full" hidden>전체 결과 보기</a>
     </div>
     <form id="sq-form" role="search">
       <label class="visually-hidden" for="sq-input">블로그 검색어</label>

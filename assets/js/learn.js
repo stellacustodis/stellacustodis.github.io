@@ -4,7 +4,7 @@
 
   const storageKey = 'stellacustodis-learn-progress:v1';
   const postPath = roadmap.dataset.postPath;
-  const buttons = new Map();
+  const checks = new Map();
   const tracks = [];
   let readPosts = loadProgress() ?? new Set();
   let localOnly = false;
@@ -17,7 +17,7 @@
   const note = document.createElement('p');
   note.className = 'learn-progress__note';
   note.setAttribute('role', 'status');
-  note.textContent = '글을 읽은 뒤 읽음 체크를 누르세요. 진행률은 이 브라우저에 저장됩니다.';
+  note.hidden = true;
   summary.append(title, total.element, note);
 
   for (const section of roadmap.querySelectorAll('.learn-track')) {
@@ -31,15 +31,16 @@
       const path = `/posts/${slug}/`;
       paths.add(path);
 
-      const button = document.createElement('button');
-      button.className = 'learn-track__toggle';
-      button.type = 'button';
-      button.setAttribute('aria-label', `${link.textContent.trim()} 읽음 체크`);
-      button.addEventListener('click', () => toggleRead(path));
-      link.after(' ', button);
+      const check = document.createElement('input');
+      check.className = 'learn-track__check';
+      check.type = 'checkbox';
+      check.setAttribute('aria-label', `${link.textContent.trim()} 읽음`);
+      check.addEventListener('change', () => setRead(path, check.checked));
+      link.parentElement.classList.add('learn-track__post');
+      link.before(check);
 
-      if (!buttons.has(path)) buttons.set(path, []);
-      buttons.get(path).push(button);
+      if (!checks.has(path)) checks.set(path, []);
+      checks.get(path).push(check);
     }
 
     if (paths.size === 0 || !heading) continue;
@@ -57,17 +58,18 @@
     }
   }
 
-  function toggleRead(path) {
+  function setRead(path, checked) {
     if (!localOnly) readPosts = loadProgress() ?? readPosts;
-    if (readPosts.has(path)) readPosts.delete(path);
-    else readPosts.add(path);
+    if (checked) readPosts.add(path);
+    else readPosts.delete(path);
 
     if (!localOnly) {
       try {
         localStorage.setItem(storageKey, JSON.stringify([...readPosts]));
       } catch {
         localOnly = true;
-        note.textContent = '브라우저 저장소를 사용할 수 없어 이 페이지가 열려 있는 동안 읽음 상태를 유지합니다.';
+        note.textContent = '읽음 상태는 현재 페이지에만 적용됩니다.';
+        note.hidden = false;
       }
     }
     render();
@@ -95,14 +97,11 @@
   }
 
   function render() {
-    for (const [path, controls] of buttons) {
+    for (const [path, controls] of checks) {
       const isRead = readPosts.has(path);
-      for (const button of controls) {
-        button.setAttribute('aria-pressed', String(isRead));
-        button.textContent = isRead ? '✓ 읽음' : '읽음 체크';
-      }
+      for (const check of controls) check.checked = isRead;
     }
-    renderProgress(total, buttons.keys(), buttons.size);
+    renderProgress(total, checks.keys(), checks.size);
     for (const { paths, progress } of tracks) renderProgress(progress, paths, paths.size);
   }
 

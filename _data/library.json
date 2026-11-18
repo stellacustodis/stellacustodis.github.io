@@ -4,11 +4,11 @@
   "family": [
    {
     "id": "diffusion",
-    "label": "확산"
+    "label": "Diffusion"
    },
    {
     "id": "autoregressive",
-    "label": "자기회귀"
+    "label": "Autoregressive"
    },
    {
     "id": "flow",

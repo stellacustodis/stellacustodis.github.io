@@ -58,6 +58,9 @@
   let draggedNode = null;
   let nodeDragStart = null;
   let dragMoved = false;
+  let hoveredNode = null;
+  let focusedNode = null;
+  let graphSize = { width: 0, height: 0 };
 
   categories.forEach((category) => categorySelect.add(new Option(category, category)));
   tags.forEach((tag) => tagSelect.add(new Option(`#${tag}`, tag)));
@@ -125,6 +128,8 @@
 
   function renderGraph() {
     if (animationFrame) cancelAnimationFrame(animationFrame);
+    hoveredNode = null;
+    focusedNode = null;
     edgeLayer.replaceChildren();
     nodeLayer.replaceChildren();
 
@@ -152,17 +157,37 @@
         'aria-label': `${node.title} 글 선택`,
       });
       const degree = degrees.get(node.id) ?? 0;
+      node.degree = degree;
       node.radius = Math.min(10 + degree * 1.1, 18);
       const circle = createSvgElement('circle', {
         r: node.radius,
         fill: categoryColors.get(node.categories[0] || 'Uncategorized'),
       });
-      const label = createSvgElement('text', { y: node.radius + 15 });
+      const label = createSvgElement('text', { class: 'graph-node-label', y: node.radius + 15, 'aria-hidden': 'true' });
       label.textContent = truncate(node.title, 22);
       const title = createSvgElement('title');
       title.textContent = node.title;
       group.append(circle, label, title);
       group.addEventListener('pointerdown', (event) => startNodeDrag(event, node));
+      group.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'touch') return;
+        hoveredNode = node;
+        updateLabels();
+      });
+      group.addEventListener('pointerleave', () => {
+        if (hoveredNode !== node) return;
+        hoveredNode = null;
+        updateLabels();
+      });
+      group.addEventListener('focus', () => {
+        focusedNode = node;
+        updateLabels();
+      });
+      group.addEventListener('blur', () => {
+        if (focusedNode !== node) return;
+        focusedNode = null;
+        updateLabels();
+      });
       group.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
@@ -170,8 +195,15 @@
         }
       });
       node.element = group;
+      node.label = label;
       nodeLayer.appendChild(group);
     });
+
+    const coreNodes = new Set([...nodes].sort((a, b) => b.degree - a.degree).slice(0, 8));
+    for (const node of nodes) {
+      node.labelBounds = node.label.getBBox();
+      node.isCore = coreNodes.has(node);
+    }
 
     postCount.textContent = nodes.length;
     edgeCount.textContent = edges.length;
@@ -261,6 +293,48 @@
       edge.element.setAttribute('y2', edge.target.y);
     });
     nodes.forEach((node) => node.element.setAttribute('transform', `translate(${node.x} ${node.y})`));
+    updateLabels();
+  }
+
+  function labelPriority(node, dense) {
+    if (node === focusedNode) return 6;
+    if (node === hoveredNode) return 5;
+    if (node.id === selectedId) return 4;
+    if (node.isMatch) return 3;
+    if (node.isNeighbor) return 2;
+    return !node.isDimmed && (!dense || node.isCore) ? 1 : 0;
+  }
+
+  function updateLabels() {
+    const { width, height } = graphSize;
+    if (!width || !height) return;
+
+    const dense = nodes.length > 35 && transform.scale < 1.15;
+    const candidates = [];
+    for (const node of nodes) {
+      const priority = labelPriority(node, dense);
+      if (priority) candidates.push({ node, priority });
+    }
+    candidates.sort((a, b) => b.priority - a.priority || b.node.degree - a.node.degree);
+
+    const { x, y, scale } = transform;
+    const gap = 2 * scale + 2;
+    const shown = new Set();
+    const boxes = [];
+    for (const { node, priority } of candidates) {
+      const bounds = node.labelBounds;
+      const left = x + (node.x + bounds.x) * scale - gap;
+      const top = y + (node.y + bounds.y) * scale - gap;
+      const right = left + bounds.width * scale + 2 * gap;
+      const bottom = top + bounds.height * scale + 2 * gap;
+      if (right < 0 || bottom < 0 || left > width || top > height) continue;
+      if (priority < 4 && (left < 0 || top < 0 || right > width || bottom > height)) continue;
+      if (boxes.some((box) => left < box.right && right > box.left && top < box.bottom && bottom > box.top)) continue;
+      boxes.push({ left, top, right, bottom });
+      shown.add(node);
+    }
+
+    for (const node of nodes) node.element.classList.toggle('has-label', shown.has(node));
   }
 
   function selectNode(id) {
@@ -358,14 +432,18 @@
       const haystack = normalize([node.title, ...node.tags, ...node.categories].join(' '));
       const match = Boolean(query) && haystack.includes(query);
       const selected = node.id === selectedId;
+      node.isMatch = match;
+      node.isNeighbor = !selected && connectedIds.has(node.id);
+      node.isDimmed = Boolean(query || selectedId) && !match && !connectedIds.has(node.id);
       node.element.classList.toggle('is-selected', selected);
       node.element.setAttribute('aria-pressed', String(selected));
       node.element.classList.toggle('is-match', match);
-      node.element.classList.toggle('is-dimmed', Boolean(query || selectedId) && !match && !connectedIds.has(node.id));
+      node.element.classList.toggle('is-dimmed', node.isDimmed);
     });
     edges.forEach((edge) => {
       edge.element.classList.toggle('is-dimmed', Boolean(query || selectedId) && !highlightedEdges.has(edge));
     });
+    updateLabels();
   }
 
   function startNodeDrag(event, node) {
@@ -387,11 +465,13 @@
 
   function setTransform() {
     viewport.setAttribute('transform', `translate(${transform.x} ${transform.y}) scale(${transform.scale})`);
+    updateLabels();
   }
 
   function fitGraph() {
     const rect = svg.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
+    graphSize = { width: rect.width, height: rect.height };
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     if (!nodes.length) {

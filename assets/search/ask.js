@@ -24,7 +24,7 @@ async function search(value) {
   out.replaceChildren();
   out.setAttribute("aria-busy", String(Boolean(query)));
   if (!query) {
-    say("검색어를 입력하거나 예시 질문을 선택하세요.");
+    say("검색어를 입력하세요.");
     return;
   }
 
