@@ -68,6 +68,8 @@
 }
 
 .graph-toolbar .graph-search {
+  align-items: center;
+  display: grid;
   position: relative;
 }
 
@@ -79,15 +81,18 @@
   flex: 2 1 12rem;
 }
 
-.graph-search i {
+.graph-search > i {
   color: var(--graph-muted);
-  left: 0.78rem;
+  inline-size: 1rem;
+  inset-inline-start: 0.78rem;
+  pointer-events: none;
   position: absolute;
-  top: 0.76rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-.graph-search input {
-  padding-left: 2.25rem;
+.graph-toolbar .graph-search > input[type='search'] {
+  padding-inline-start: 2.25rem;
 }
 
 .graph-button {

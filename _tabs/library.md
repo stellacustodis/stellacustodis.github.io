@@ -26,9 +26,8 @@ permalink: /library/
 
   <div class="graph-toolbar" aria-label="라이브러리 필터">
     <label class="graph-search">
-      <span class="visually-hidden">논문 검색</span>
       <i class="fas fa-search" aria-hidden="true"></i>
-      <input id="library-search" type="search" placeholder="제목이나 저자 검색" autocomplete="off">
+      <input id="library-search" type="search" aria-label="논문 검색" placeholder="제목이나 저자 검색" autocomplete="off">
     </label>
 
     <label class="library-cluster-pick">
@@ -41,21 +40,18 @@ permalink: /library/
     </label>
 
     <label>
-      <span class="visually-hidden">계열 필터</span>
       <select id="library-family" aria-label="계열 필터">
         <option value="">모든 계열</option>
       </select>
     </label>
 
     <label>
-      <span class="visually-hidden">주제 필터</span>
       <select id="library-task" aria-label="주제 필터">
         <option value="">모든 주제</option>
       </select>
     </label>
 
     <label>
-      <span class="visually-hidden">연도 필터</span>
       <select id="library-year" aria-label="연도 필터">
         <option value="">모든 연도</option>
       </select>

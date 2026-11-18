@@ -21,28 +21,24 @@ permalink: /graph/
 
   <div class="graph-toolbar" aria-label="그래프 필터">
     <label class="graph-search">
-      <span class="visually-hidden">글 검색</span>
       <i class="fas fa-search" aria-hidden="true"></i>
-      <input id="graph-search" type="search" placeholder="제목이나 태그 검색" autocomplete="off">
+      <input id="graph-search" type="search" aria-label="글 검색" placeholder="제목이나 태그 검색" autocomplete="off">
     </label>
 
     <label>
-      <span class="visually-hidden">카테고리 필터</span>
       <select id="graph-category" aria-label="카테고리 필터">
         <option value="">모든 카테고리</option>
       </select>
     </label>
 
     <label>
-      <span class="visually-hidden">태그 필터</span>
       <select id="graph-tag" aria-label="태그 필터">
         <option value="">모든 태그</option>
       </select>
     </label>
 
     <label class="graph-edge-filter">
-      <span class="visually-hidden">연결 기준</span>
-      <select id="graph-edge-mode">
+      <select id="graph-edge-mode" aria-label="연결 기준">
         <option value="all">전체 연결</option>
         <option value="explicit">본문 참조·직접 연결만</option>
         <option value="tags">공통 태그만</option>
