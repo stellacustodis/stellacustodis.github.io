@@ -6,20 +6,20 @@ order: 5
 permalink: /ask/
 ---
 
-<p id="ai-status" class="text-muted">준비 중…</p>
+<form id="ai-form" class="input-group mb-3" role="search" data-base-url="{{ site.baseurl | escape }}">
+  <label class="visually-hidden" for="ai-q">블로그 검색어</label>
+  <input id="ai-q" type="search" class="form-control" placeholder="찾고 싶은 개념이나 질문을 입력하세요" required>
+  <button class="btn btn-primary" type="submit">검색</button>
+</form>
 
-<div class="input-group mb-3">
-  <input id="ai-q" type="text" class="form-control"
-         placeholder="예: 컨테이너가 지워지면 데이터는 왜 사라지나" disabled>
-  <button id="ai-go" class="btn btn-primary" disabled>검색</button>
-</div>
+<div id="ai-examples" class="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="예시 질문"></div>
 
 <p class="text-muted small">
-  글자가 겹치지 않아도 <strong>뜻이 가까운 문단</strong>을 찾는다.
-  검색은 전부 브라우저 안에서 일어나고 서버로 아무것도 보내지 않는다.
-  처음 한 번은 모델을 내려받느라 시간이 걸리고, 그다음부터는 캐시에서 바로 뜬다.
+  뜻이 가까운 문단을 찾고 제목과 본문에 일치하는 검색어를 강조합니다.
+  검색은 브라우저에서 처리하며, 처음 검색할 때 모델을 내려받습니다.
 </p>
 
+<p id="ai-status" class="text-muted" role="status">검색어를 입력하거나 예시 질문을 선택하세요.</p>
 <div id="ai-results"></div>
 
 <script type="module" src="{{ '/assets/search/ask.js' | relative_url }}"></script>

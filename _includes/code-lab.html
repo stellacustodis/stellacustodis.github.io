@@ -1,5 +1,5 @@
 <div id="code-lab" class="code-lab" lang="ko" hidden>
-  <button class="code-lab__backdrop" type="button" data-code-lab-close aria-label="Code Lab 닫기"></button>
+  <button class="code-lab__backdrop" type="button" data-code-lab-close aria-label="Code Lab 닫기" tabindex="-1"></button>
 
   <section
     class="code-lab__dialog"
@@ -69,9 +69,18 @@
           </div>
           <div class="code-lab__editor-meta">
             <span id="code-lab-position">Ln 1, Col 1</span>
-            <span>Spaces: 4</span>
+          </div>
+          <div class="code-lab__editor-tools">
+            <select id="code-lab-preset" aria-label="예제 불러오기"></select>
+            <button id="code-lab-copy" class="code-lab__text-button" type="button">
+              <span aria-live="polite">코드 복사</span>
+            </button>
           </div>
         </div>
+
+        <p id="code-lab-editor-hint" class="code-lab__editor-hint">
+          <kbd>Tab</kbd> 들여쓰기 · <kbd>Shift</kbd> + <kbd>Tab</kbd> 내어쓰기 · <kbd>Esc</kbd> 다음 컨트롤로 이동
+        </p>
 
         <div class="code-lab__editor">
           <pre id="code-lab-line-numbers" class="code-lab__line-numbers" aria-hidden="true">1</pre>
@@ -79,6 +88,7 @@
             id="code-lab-source"
             class="code-lab__source"
             aria-label="소스 코드 편집기"
+            aria-describedby="code-lab-editor-hint"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
@@ -119,14 +129,21 @@
           <div class="code-lab__trace-toolbar">
             <div>
               <span class="code-lab__pane-kicker">PYTHON TRACE</span>
-              <strong id="code-lab-step-count">0 / 0</strong>
+              <strong id="code-lab-step-count" aria-live="polite" aria-atomic="true">0 / 0</strong>
             </div>
             <div class="code-lab__trace-actions">
+              <button id="code-lab-step-first" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="처음 단계">
+                <i class="fas fa-backward-step" aria-hidden="true"></i>
+              </button>
               <button id="code-lab-step-prev" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="이전 단계">
                 <i class="fas fa-chevron-left" aria-hidden="true"></i>
               </button>
+              <input id="code-lab-step-slider" type="range" min="1" max="1" value="1" aria-label="실행 단계">
               <button id="code-lab-step-next" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="다음 단계">
                 <i class="fas fa-chevron-right" aria-hidden="true"></i>
+              </button>
+              <button id="code-lab-step-last" class="code-lab__icon-button code-lab__icon-button--small" type="button" aria-label="마지막 단계">
+                <i class="fas fa-forward-step" aria-hidden="true"></i>
               </button>
             </div>
           </div>
@@ -134,7 +151,7 @@
           <div class="code-lab__trace-grid">
             <div>
               <div class="code-lab__trace-label">실행 위치</div>
-              <pre id="code-lab-trace-source" class="code-lab__trace-source" aria-live="polite"></pre>
+              <pre id="code-lab-trace-source" class="code-lab__trace-source" aria-label="실행된 코드 줄로 이동"></pre>
             </div>
             <div class="code-lab__trace-state">
               <div class="code-lab__trace-label">호출 스택</div>

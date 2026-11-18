@@ -32,6 +32,10 @@
   const paperCount = document.getElementById('library-paper-count');
   const edgeCount = document.getElementById('library-edge-count');
   const legend = document.getElementById('library-legend');
+  const paperList = document.getElementById('library-paper-list');
+  const listCount = document.getElementById('library-list-count');
+  const listEmpty = document.getElementById('library-list-empty');
+  const listSort = document.getElementById('library-list-sort');
   const ns = 'http://www.w3.org/2000/svg';
 
   const palette = ['#4c78a8', '#f58518', '#54a24b', '#e45756', '#72b7b2',
@@ -70,6 +74,8 @@
 
   let nodes = [];
   let edges = [];
+  let matchedNodes = [];
+  let selectedRow = null;
   let selectedId = null;
   let transform = { x: 0, y: 0, scale: 1 };
   let panState = null;
@@ -232,6 +238,11 @@
       const tags = [...node.family, ...node.task].map((x) => label.get(x) || x).join(', ');
       t.textContent = `${node.title}${node.year ? ` (${node.year})` : ''}\n${tags}`;
       group.appendChild(t);
+      const caption = svgEl('text', {
+        class: 'library-node-label', y: node.radius + (node.post ? 7 : 3), 'aria-hidden': 'true',
+      });
+      caption.textContent = truncate(node.title, 28);
+      group.appendChild(caption);
       if (multi) group.classList.add('is-multi');
       group.addEventListener('pointerdown', (e) => startNodeDrag(e, node));
       group.addEventListener('keydown', (e) => {
@@ -261,9 +272,9 @@
   }
 
   function selectNode(id) {
-    selectedId = id;
     const node = nodes.find((n) => n.id === id);
     if (!node) return;
+    selectedId = id;
     const linked = edges.filter((e) => e.source === node || e.target === node);
     const near = new Set([id]);
     linked.forEach((e) => { near.add(e.source.id); near.add(e.target.id); });
@@ -273,6 +284,7 @@
       n.element.classList.toggle('is-selected', n.id === id);
     });
     edges.forEach((e) => e.element.classList.toggle('is-active', linked.includes(e)));
+    updateListSelection();
     renderDetail(node, linked);
   }
 
@@ -328,11 +340,65 @@
 
   function updateSearchHighlight() {
     const q = normalize(searchInput.value);
+    matchedNodes = [];
     nodes.forEach((n) => {
-      const hit = q && (normalize(n.title).includes(q) || normalize(n.author).includes(q));
-      n.element.classList.toggle('is-match', Boolean(hit));
+      const hit = !q || normalize(n.title).includes(q) || normalize(n.author).includes(q);
+      if (hit) matchedNodes.push(n);
+      n.element.classList.toggle('is-match', Boolean(q) && hit);
       n.element.classList.toggle('is-faded', Boolean(q) && !hit);
     });
+    renderPaperList();
+  }
+
+  function updateListSelection() {
+    selectedRow?.removeAttribute('aria-current');
+    selectedRow = selectedId ? document.getElementById(`library-row-${selectedId}`) : null;
+    selectedRow?.setAttribute('aria-current', 'true');
+  }
+
+  function renderPaperList() {
+    const reviewsFirst = listSort.value === 'reviewed';
+    const sorted = [...matchedNodes].sort((a, b) => {
+      const reviewOrder = reviewsFirst ? Number(Boolean(b.post)) - Number(Boolean(a.post)) : 0;
+      return reviewOrder || (Number(b.year) || 0) - (Number(a.year) || 0)
+        || a.title.localeCompare(b.title);
+    });
+
+    const rows = document.createDocumentFragment();
+    for (const paper of sorted) {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'library-list__paper';
+      button.id = `library-row-${paper.id}`;
+      button.dataset.paperId = paper.id;
+
+      const year = document.createElement('span');
+      year.className = 'library-list__year';
+      year.textContent = paper.year || '미상';
+      const title = document.createElement('span');
+      title.className = 'library-list__title';
+      title.textContent = paper.title;
+      if (paper.author) {
+        const author = document.createElement('small');
+        author.textContent = paper.author;
+        title.append(author);
+      }
+      button.append(year, title);
+      if (paper.post) {
+        const review = document.createElement('span');
+        review.className = 'library-list__review';
+        review.textContent = '리뷰 있음';
+        button.append(review);
+      }
+      item.append(button);
+      rows.append(item);
+    }
+    paperList.replaceChildren(rows);
+    paperList.scrollTop = 0;
+    listCount.textContent = `${sorted.length}편`;
+    listEmpty.hidden = sorted.length > 0;
+    updateListSelection();
   }
 
   function renderLegend(clusters) {
@@ -366,6 +432,8 @@
   function setTransform() {
     viewport.setAttribute('transform',
       `translate(${transform.x} ${transform.y}) scale(${transform.scale})`);
+    viewport.classList.toggle('has-all-labels', transform.scale >= 1.45);
+    viewport.style.setProperty('--library-label-size', `${Math.max(10, 8 / transform.scale)}px`);
   }
 
   function fitGraph() {
@@ -435,6 +503,18 @@
   }
 
   searchInput.addEventListener('input', () => { writeParams(); updateSearchHighlight(); });
+  listSort.addEventListener('change', renderPaperList);
+  paperList.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-paper-id]');
+    if (!button) return;
+    selectNode(button.dataset.paperId);
+    const heading = detail.querySelector('.graph-detail-title');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+      detail.scrollIntoView({ block: 'nearest' });
+    }
+  });
   [clusterSelect, familySelect, taskSelect, yearSelect, reviewedOnly]
     .forEach((el) => el.addEventListener('change', onFilterChange));
   document.getElementById('library-reset').addEventListener('click', () => {
@@ -507,4 +587,5 @@
 
   readParams();
   applyFilters();
+  paperList.closest('.library-list').hidden = false;
 })();

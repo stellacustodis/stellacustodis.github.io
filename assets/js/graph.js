@@ -5,13 +5,20 @@
   const dataElement = document.getElementById('graph-data');
   if (!root || !dataElement) return;
 
-  const allPosts = JSON.parse(dataElement.textContent).map((post, index) => ({
-    ...post,
-    index,
-    categories: Array.isArray(post.categories) ? post.categories : [],
-    tags: Array.isArray(post.tags) ? post.tags : [],
-    related: Array.isArray(post.related) ? post.related : [],
-  }));
+  const allPosts = JSON.parse(dataElement.textContent).map((post) => {
+    const slug = post.id.split('/').filter(Boolean).at(-1);
+    return {
+      ...post,
+      slug,
+      categories: Array.isArray(post.categories) ? post.categories : [],
+      tags: [...new Set(Array.isArray(post.tags) ? post.tags : [])],
+      related: new Set(Array.isArray(post.related) ? post.related.map(normalize) : []),
+      links: new Set(Array.isArray(post.links) ? post.links : []),
+      aliases: [post.id, post.url, post.title, slug].map(normalize),
+    };
+  });
+  const postsById = new Map(allPosts.map((post) => [post.id, post]));
+  const idsBySlug = new Map(allPosts.map((post) => [post.slug, post.id]));
 
   const svg = document.getElementById('graph-canvas');
   const viewport = document.getElementById('graph-viewport');
@@ -21,6 +28,7 @@
   const searchInput = document.getElementById('graph-search');
   const categorySelect = document.getElementById('graph-category');
   const tagSelect = document.getElementById('graph-tag');
+  const edgeModeSelect = document.getElementById('graph-edge-mode');
   const emptyMessage = document.getElementById('graph-empty');
   const postCount = document.getElementById('graph-post-count');
   const edgeCount = document.getElementById('graph-edge-count');
@@ -31,6 +39,15 @@
   const categories = [...new Set(allPosts.map((post) => post.categories[0] || 'Uncategorized'))].sort();
   const tags = [...new Set(allPosts.flatMap((post) => post.tags))].sort((a, b) => a.localeCompare(b));
   const categoryColors = new Map(categories.map((category, index) => [category, palette[index % palette.length]]));
+  const tagFrequency = new Map();
+  for (const post of allPosts) {
+    for (const tag of post.tags) tagFrequency.set(tag, (tagFrequency.get(tag) ?? 0) + 1);
+  }
+  const tagWeights = new Map(tags.map((tag) => [tag, Math.log((allPosts.length + 1) / (tagFrequency.get(tag) + 1))]));
+  const categoryCenters = new Map(categories.map((category, index) => {
+    const angle = (Math.PI * 2 * index) / categories.length - Math.PI / 2;
+    return [category, { x: Math.cos(angle) * 120, y: Math.sin(angle) * 90 }];
+  }));
 
   let nodes = [];
   let edges = [];
@@ -56,28 +73,23 @@
     return element;
   }
 
-  function buildEdges(visibleNodes) {
+  function buildEdges(visibleNodes, mode) {
     const result = [];
 
     for (let i = 0; i < visibleNodes.length; i += 1) {
       for (let j = i + 1; j < visibleNodes.length; j += 1) {
         const source = visibleNodes[i];
         const target = visibleNodes[j];
-        const targetAliases = new Set([target.id, target.url, target.title, target.id.split('/').filter(Boolean).pop()].map(normalize));
-        const sourceAliases = new Set([source.id, source.url, source.title, source.id.split('/').filter(Boolean).pop()].map(normalize));
-        const explicit = source.related.some((value) => targetAliases.has(normalize(value)))
-          || target.related.some((value) => sourceAliases.has(normalize(value)));
-        const sharedTags = source.tags.filter((tag) => target.tags.includes(tag));
-
-        if (explicit || sharedTags.length) {
-          result.push({
-            source,
-            target,
-            explicit,
-            sharedTags,
-            weight: Math.max(1, sharedTags.length + (explicit ? 2 : 0)),
-          });
-        }
+        const sourceLinks = mode !== 'tags' && source.links.has(target.id);
+        const targetLinks = mode !== 'tags' && target.links.has(source.id);
+        const related = mode !== 'tags' && (
+          target.aliases.some((alias) => source.related.has(alias)) || source.aliases.some((alias) => target.related.has(alias))
+        );
+        const explicit = sourceLinks || targetLinks || related;
+        const sharedTags = mode === 'explicit' ? [] : source.tags.filter((tag) => target.tags.includes(tag));
+        if (!explicit && !sharedTags.length) continue;
+        const tagWeight = sharedTags.reduce((sum, tag) => sum + tagWeights.get(tag), 0);
+        result.push({ source, target, sourceLinks, targetLinks, related, explicit, sharedTags, weight: explicit ? 4 + tagWeight : tagWeight });
       }
     }
 
@@ -105,7 +117,7 @@
         };
       });
 
-    edges = buildEdges(nodes);
+    edges = buildEdges(nodes, edgeModeSelect.value);
     selectedId = nodes.some((node) => node.id === selectedId) ? selectedId : null;
     renderGraph();
     fitGraph();
@@ -116,10 +128,13 @@
     edgeLayer.replaceChildren();
     nodeLayer.replaceChildren();
 
+    const degrees = new Map();
     edges.forEach((edge) => {
+      degrees.set(edge.source.id, (degrees.get(edge.source.id) ?? 0) + 1);
+      degrees.set(edge.target.id, (degrees.get(edge.target.id) ?? 0) + 1);
       edge.element = createSvgElement('line', {
         class: `graph-edge${edge.explicit ? ' is-related' : ''}`,
-        'stroke-width': Math.min(1 + edge.weight * 0.7, 4.5),
+        'stroke-width': edge.explicit ? 3.5 : Math.min(0.65 + edge.weight * 0.55, 3.2),
       });
       const description = createSvgElement('title');
       description.textContent = edge.explicit
@@ -136,7 +151,7 @@
         tabindex: '0',
         'aria-label': `${node.title} 글 선택`,
       });
-      const degree = edges.filter((edge) => edge.source === node || edge.target === node).length;
+      const degree = degrees.get(node.id) ?? 0;
       node.radius = Math.min(10 + degree * 1.1, 18);
       const circle = createSvgElement('circle', {
         r: node.radius,
@@ -162,21 +177,24 @@
     edgeCount.textContent = edges.length;
     emptyMessage.hidden = nodes.length !== 0;
     updatePositions();
-    updateSearchHighlight();
-    startSimulation();
-
-    if (selectedId) selectNode(selectedId);
-    else showPlaceholder();
+    if (nodes.length > 1) startSimulation();
+    renderSelection();
   }
 
   function startSimulation() {
     let iterations = 0;
     const tick = () => {
-      if (iterations > 420) return;
-      simulate(iterations);
+      for (let step = 0; step < 3; step += 1) {
+        simulate(iterations);
+        iterations += 1;
+      }
       updatePositions();
-      iterations += 1;
-      animationFrame = requestAnimationFrame(tick);
+      if (iterations < 420) {
+        animationFrame = requestAnimationFrame(tick);
+      } else {
+        animationFrame = null;
+        fitGraph();
+      }
     };
     animationFrame = requestAnimationFrame(tick);
   }
@@ -211,7 +229,8 @@
       const dy = edge.target.y - edge.source.y;
       const distance = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
       const ideal = edge.explicit ? 76 : Math.max(82, 118 - edge.weight * 8);
-      const force = (distance - ideal) * 0.006 * alpha;
+      const strength = edge.explicit ? 1 : Math.min(0.15 + edge.weight * 0.15, 0.8);
+      const force = (distance - ideal) * 0.006 * alpha * strength;
       if (!edge.source.fixed) {
         edge.source.vx += (dx / distance) * force;
         edge.source.vy += (dy / distance) * force;
@@ -221,11 +240,6 @@
         edge.target.vy -= (dy / distance) * force;
       }
     });
-
-    const categoryCenters = new Map(categories.map((category, index) => {
-      const angle = (Math.PI * 2 * index) / Math.max(categories.length, 1) - Math.PI / 2;
-      return [category, { x: Math.cos(angle) * 120, y: Math.sin(angle) * 90 }];
-    }));
 
     nodes.forEach((node) => {
       if (node.fixed) return;
@@ -250,64 +264,78 @@
   }
 
   function selectNode(id) {
+    if (!nodes.some((node) => node.id === id)) return;
     selectedId = id;
-    const node = nodes.find((item) => item.id === id);
-    if (!node) return;
+    renderSelection();
+    writeParams();
+  }
 
-    const connectedEdges = edges.filter((edge) => edge.source === node || edge.target === node);
-    const connectedIds = new Set([id]);
-    connectedEdges.forEach((edge) => {
-      connectedIds.add(edge.source.id);
-      connectedIds.add(edge.target.id);
-    });
+  function selectedEdges() {
+    return edges.filter((edge) => edge.source.id === selectedId || edge.target.id === selectedId);
+  }
 
-    nodes.forEach((item) => {
-      item.element.classList.toggle('is-selected', item.id === id);
-      item.element.classList.toggle('is-dimmed', !connectedIds.has(item.id));
-    });
-    edges.forEach((edge) => edge.element.classList.toggle('is-dimmed', !connectedEdges.includes(edge)));
-    renderDetail(node, connectedEdges);
+  function renderSelection() {
+    const node = postsById.get(selectedId);
+    const connectedEdges = selectedEdges();
+    updateSearchHighlight(connectedEdges);
+    if (node) renderDetail(node, connectedEdges);
+    else showPlaceholder();
   }
 
   function renderDetail(node, connectedEdges) {
-    const neighbors = connectedEdges
-      .map((edge) => ({
-        node: edge.source === node ? edge.target : edge.source,
-        tags: edge.sharedTags,
+    const neighbors = connectedEdges.map((edge) => {
+      const isSource = edge.source.id === node.id;
+      const references = [];
+      if (isSource ? edge.sourceLinks : edge.targetLinks) references.push('본문 참조');
+      if (isSource ? edge.targetLinks : edge.sourceLinks) references.push('백링크');
+      if (edge.related) references.push('관련 글 지정');
+      const tags = edge.sharedTags.map((tag) => `#${tag}`);
+      return {
+        node: isSource ? edge.target : edge.source,
         explicit: edge.explicit,
         weight: edge.weight,
-      }))
-      .sort((a, b) => b.weight - a.weight || a.node.title.localeCompare(b.node.title));
+        subtitle: (edge.explicit ? references : tags).join(' · '),
+      };
+    }).sort((a, b) => b.weight - a.weight || a.node.title.localeCompare(b.node.title));
 
     const tagButtons = node.tags
       .map((tag) => `<button type="button" class="graph-tag" data-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`)
       .join('');
-    const neighborItems = neighbors.length
-      ? neighbors.map((item) => `
-          <li>
-            <button type="button" data-node-id="${escapeHtml(item.node.id)}">${escapeHtml(item.node.title)}</button>
-            <small>${item.explicit ? '직접 연결' : item.tags.map((tag) => `#${escapeHtml(tag)}`).join(' · ')}</small>
-          </li>`).join('')
-      : '<li><small>현재 필터에서 연결된 글이 없습니다.</small></li>';
+    const direct = neighbors.filter((neighbor) => neighbor.explicit);
+    const byTags = neighbors.filter((neighbor) => !neighbor.explicit);
 
     detail.innerHTML = `
       <h2><a href="${escapeHtml(node.url)}">${escapeHtml(node.title)}</a></h2>
       <p class="graph-detail-meta">${escapeHtml(node.categories.join(' / '))} · ${escapeHtml(node.date)}</p>
       <p class="graph-detail-excerpt">${escapeHtml(node.excerpt)}</p>
-      <h3>Tags</h3>
+      <h3>태그</h3>
       <div class="graph-tag-list">${tagButtons}</div>
-      <h3>Connected posts · ${neighbors.length}</h3>
-      <ul class="graph-neighbor-list">${neighborItems}</ul>`;
+      ${edgeModeSelect.value === 'tags' ? '' : renderNeighborList('직접 연결된 글', direct)}
+      ${edgeModeSelect.value === 'explicit' ? '' : renderNeighborList('공통 태그로 연결된 글', byTags)}`;
 
     detail.querySelectorAll('[data-tag]').forEach((button) => {
       button.addEventListener('click', () => {
         tagSelect.value = button.dataset.tag;
-        applyFilters();
+        onFilterChange();
+        tagSelect.focus();
       });
     });
     detail.querySelectorAll('[data-node-id]').forEach((button) => {
-      button.addEventListener('click', () => selectNode(button.dataset.nodeId));
+      button.addEventListener('click', () => {
+        selectNode(button.dataset.nodeId);
+        detail.querySelector('h2 a').focus({ preventScroll: true });
+      });
     });
+  }
+
+  function renderNeighborList(title, neighbors) {
+    const items = neighbors.map((item) => `
+      <li>
+        <button type="button" data-node-id="${escapeHtml(item.node.id)}">${escapeHtml(item.node.title)}</button>
+        <small>${escapeHtml(item.subtitle)}</small>
+      </li>`).join('');
+    return `<h3>${title} · ${neighbors.length}</h3>
+      <ul class="graph-neighbor-list">${items || '<li><small>현재 조건에서 연결된 글이 없습니다.</small></li>'}</ul>`;
   }
 
   function showPlaceholder() {
@@ -318,14 +346,26 @@
       </div>`;
   }
 
-  function updateSearchHighlight() {
+  function updateSearchHighlight(connectedEdges = selectedEdges()) {
     const query = normalize(searchInput.value);
+    const highlightedEdges = new Set(connectedEdges);
+    const connectedIds = new Set([selectedId]);
+    connectedEdges.forEach((edge) => {
+      connectedIds.add(edge.source.id);
+      connectedIds.add(edge.target.id);
+    });
     nodes.forEach((node) => {
       const haystack = normalize([node.title, ...node.tags, ...node.categories].join(' '));
-      node.element.classList.toggle('is-match', Boolean(query) && haystack.includes(query));
-      node.element.classList.toggle('is-dimmed', Boolean(query) && !haystack.includes(query));
+      const match = Boolean(query) && haystack.includes(query);
+      const selected = node.id === selectedId;
+      node.element.classList.toggle('is-selected', selected);
+      node.element.setAttribute('aria-pressed', String(selected));
+      node.element.classList.toggle('is-match', match);
+      node.element.classList.toggle('is-dimmed', Boolean(query || selectedId) && !match && !connectedIds.has(node.id));
     });
-    edges.forEach((edge) => edge.element.classList.toggle('is-dimmed', Boolean(query)));
+    edges.forEach((edge) => {
+      edge.element.classList.toggle('is-dimmed', Boolean(query || selectedId) && !highlightedEdges.has(edge));
+    });
   }
 
   function startNodeDrag(event, node) {
@@ -352,7 +392,22 @@
   function fitGraph() {
     const rect = svg.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    transform = { x: rect.width / 2, y: rect.height / 2, scale: 1 };
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    if (!nodes.length) {
+      transform = { x: centerX, y: centerY, scale: 1 };
+      setTransform();
+      return;
+    }
+
+    const bounds = nodeLayer.getBBox();
+    const pad = Math.min(36, rect.width / 8, rect.height / 8);
+    const scale = Math.min(1.6, (rect.width - 2 * pad) / bounds.width, (rect.height - 2 * pad) / bounds.height);
+    transform = {
+      x: centerX - (bounds.x + bounds.width / 2) * scale,
+      y: centerY - (bounds.y + bounds.height / 2) * scale,
+      scale,
+    };
     setTransform();
   }
 
@@ -360,7 +415,7 @@
     const rect = svg.getBoundingClientRect();
     const px = clientX == null ? rect.width / 2 : clientX - rect.left;
     const py = clientY == null ? rect.height / 2 : clientY - rect.top;
-    const nextScale = Math.min(3, Math.max(0.35, transform.scale * factor));
+    const nextScale = Math.min(3, Math.max(0.08, transform.scale * factor));
     const ratio = nextScale / transform.scale;
     transform.x = px - (px - transform.x) * ratio;
     transform.y = py - (py - transform.y) * ratio;
@@ -386,15 +441,53 @@
       .replaceAll("'", '&#039;');
   }
 
-  searchInput.addEventListener('input', updateSearchHighlight);
-  categorySelect.addEventListener('change', applyFilters);
-  tagSelect.addEventListener('change', applyFilters);
+  function readParams() {
+    const params = new URLSearchParams(window.location.search);
+    const restoreSelect = (select, key, fallback) => {
+      const value = params.get(key);
+      select.value = [...select.options].some((option) => option.value === value) ? value : fallback;
+    };
+    restoreSelect(categorySelect, 'category', '');
+    restoreSelect(tagSelect, 'tag', '');
+    restoreSelect(edgeModeSelect, 'mode', 'all');
+    searchInput.value = params.get('q') ?? '';
+    const node = params.get('node');
+    selectedId = postsById.has(node) ? node : idsBySlug.get(node) ?? null;
+  }
+
+  function writeParams() {
+    const url = new URL(window.location.href);
+    const state = {
+      category: categorySelect.value,
+      tag: tagSelect.value,
+      mode: edgeModeSelect.value === 'all' ? '' : edgeModeSelect.value,
+      q: searchInput.value.trim(),
+      node: postsById.get(selectedId)?.slug,
+    };
+    for (const [key, value] of Object.entries(state)) {
+      if (value) url.searchParams.set(key, value);
+      else url.searchParams.delete(key);
+    }
+    if (url.href !== window.location.href) window.history.replaceState(window.history.state, '', url);
+  }
+
+  function onFilterChange() {
+    applyFilters();
+    writeParams();
+  }
+
+  searchInput.addEventListener('input', () => {
+    updateSearchHighlight();
+    writeParams();
+  });
+  [categorySelect, tagSelect, edgeModeSelect].forEach((select) => select.addEventListener('change', onFilterChange));
   document.getElementById('graph-reset').addEventListener('click', () => {
     searchInput.value = '';
     categorySelect.value = '';
     tagSelect.value = '';
+    edgeModeSelect.value = 'all';
     selectedId = null;
-    applyFilters();
+    onFilterChange();
   });
   document.getElementById('graph-zoom-in').addEventListener('click', () => zoomAt(1.25));
   document.getElementById('graph-zoom-out').addEventListener('click', () => zoomAt(0.8));
@@ -458,12 +551,11 @@
     if (nodes[index]) window.location.href = nodes[index].url;
   });
 
-  // 모바일은 주소창이 접히고 펴질 때마다 resize가 온다. 폭이 바뀔 때만 다시 맞춘다.
-  let fittedWidth = window.innerWidth;
-  window.addEventListener('resize', () => {
-    if (window.innerWidth === fittedWidth) return;
-    fittedWidth = window.innerWidth;
-    fitGraph();
+  window.addEventListener('popstate', () => {
+    readParams();
+    applyFilters();
   });
+  new ResizeObserver(fitGraph).observe(svg);
+  readParams();
   applyFilters();
 })();

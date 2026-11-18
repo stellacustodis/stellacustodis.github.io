@@ -109,15 +109,33 @@ permalink: /library/
 
   <div id="library-legend" class="graph-legend" aria-label="주제 색상 범례"></div>
 
+  <section class="library-list" aria-labelledby="library-list-title" hidden>
+    <div class="library-list__header">
+      <div>
+        <h2 id="library-list-title">논문 목록</h2>
+        <p id="library-list-count" role="status"></p>
+      </div>
+      <label for="library-list-sort">
+        정렬
+        <select id="library-list-sort">
+          <option value="year">최신 연도순</option>
+          <option value="reviewed">리뷰 우선 · 최신 연도순</option>
+        </select>
+      </label>
+    </div>
+    <p id="library-list-empty" hidden>조건에 맞는 논문이 없습니다.</p>
+    <ul id="library-paper-list" role="list"></ul>
+  </section>
+
   <p class="library-note">
     Zotero 라이브러리를 주제별로 자동 분류해 만든 데이터입니다.
     {% if lib.generated %}마지막 갱신 {{ lib.generated }}.{% endif %}
   </p>
 
   <noscript>
-    <p class="prompt-warning">그래프를 보려면 브라우저에서 JavaScript를 활성화해야 합니다.</p>
+    <p class="prompt-warning">그래프와 목록을 보려면 브라우저에서 JavaScript를 활성화해야 합니다.</p>
   </noscript>
 </div>
 
-<script id="library-data" type="application/json">{{ lib | jsonify }}</script>
+<script id="library-data" type="application/json">{{ lib | jsonify | replace: '<', '\u003c' }}</script>
 <script src="{{ '/assets/js/library-graph.js' | relative_url }}"></script>

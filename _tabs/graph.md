@@ -11,7 +11,7 @@ permalink: /graph/
 <div class="knowledge-graph" id="knowledge-graph">
   <header class="graph-intro">
     <p>
-      글 사이의 연결을 탐색하는 공간입니다. 같은 태그를 가진 글은 선으로 연결되고,
+      점선은 본문 참조와 관련 글 연결, 실선은 공통 태그를 나타냅니다.
       같은 색의 노드는 같은 상위 카테고리에 속합니다.
     </p>
     <div class="graph-stats" aria-label="그래프 통계">
@@ -41,6 +41,15 @@ permalink: /graph/
       </select>
     </label>
 
+    <label class="graph-edge-filter">
+      <span class="visually-hidden">연결 기준</span>
+      <select id="graph-edge-mode">
+        <option value="all">전체 연결</option>
+        <option value="explicit">본문 참조·직접 연결만</option>
+        <option value="tags">공통 태그만</option>
+      </select>
+    </label>
+
     <button id="graph-reset" type="button" class="graph-button">
       <i class="fas fa-rotate-left" aria-hidden="true"></i>
       초기화
@@ -49,9 +58,9 @@ permalink: /graph/
 
   <div class="graph-layout">
     <section class="graph-canvas-wrap" aria-label="게시글 관계 그래프">
-      <svg id="graph-canvas" role="img" aria-labelledby="graph-title graph-description">
+      <svg id="graph-canvas" role="group" aria-labelledby="graph-title graph-description">
         <title id="graph-title">게시글 관계 그래프</title>
-        <desc id="graph-description">공통 태그가 있는 게시글을 선으로 연결한 인터랙티브 그래프</desc>
+        <desc id="graph-description">본문 참조, 관련 글 연결, 공통 태그로 게시글을 연결한 그래프</desc>
         <g id="graph-viewport">
           <g id="graph-edges"></g>
           <g id="graph-nodes"></g>
@@ -85,9 +94,49 @@ permalink: /graph/
   </noscript>
 </div>
 
-<script id="graph-data" type="application/json">
+{%- assign graph_post_urls = site.posts | map: 'url' -%}
+{%- assign graph_decoded_urls = '' | split: ',' -%}
+{%- for graph_post_url in graph_post_urls -%}
+  {%- assign graph_decoded_url = graph_post_url | replace: '+', '%2B' | url_decode -%}
+  {%- assign graph_decoded_urls = graph_decoded_urls | push: graph_decoded_url -%}
+{%- endfor -%}
+{%- assign graph_base_prefix = '/posts/' | relative_url -%}
+{%- assign graph_base_size = graph_base_prefix | size -%}
+{%- capture graph_payload -%}
 [
   {% for post in site.posts %}
+    {%- assign graph_links = '' | split: ',' -%}
+    {%- assign graph_anchors = post.content | split: '<a ' -%}
+    {%- for graph_anchor in graph_anchors offset: 1 -%}
+      {%- assign graph_attributes = graph_anchor | split: '>' | first | prepend: ' ' | split: ' href=' -%}
+      {%- if graph_attributes.size > 1 -%}
+        {%- assign graph_href = graph_attributes[1] -%}
+        {%- assign graph_quote = graph_href | slice: 0, 1 -%}
+        {%- if graph_quote == '"' or graph_quote == "'" -%}
+          {%- assign graph_href = graph_href | remove_first: graph_quote | split: graph_quote | first | split: '#' | first | split: '?' | first -%}
+          {%- assign graph_base_test = graph_href | slice: 0, graph_base_size -%}
+          {%- if graph_base_prefix != '/posts/' and graph_base_test == graph_base_prefix -%}
+            {%- assign graph_href = graph_href | remove_first: graph_base_prefix | prepend: '/posts/' -%}
+          {%- endif -%}
+          {%- assign graph_prefix = graph_href | slice: 0, 7 -%}
+          {%- if graph_prefix == '/posts/' -%}
+            {%- unless graph_post_urls contains graph_href -%}
+              {%- assign graph_decoded_href = graph_href | replace: '+', '%2B' | url_decode -%}
+              {%- assign graph_href = '' -%}
+              {%- for graph_decoded_url in graph_decoded_urls -%}
+                {%- if graph_decoded_url == graph_decoded_href -%}
+                  {%- assign graph_href = graph_post_urls[forloop.index0] -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endunless -%}
+            {%- if graph_href != '' and graph_href != post.url -%}
+              {%- assign graph_links = graph_links | push: graph_href -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
     {
       "id": {{ post.url | jsonify }},
       "title": {{ post.title | jsonify }},
@@ -96,9 +145,11 @@ permalink: /graph/
       "categories": {{ post.categories | default: empty | jsonify }},
       "tags": {{ post.tags | default: empty | jsonify }},
       "related": {{ post.related | default: empty | jsonify }},
+      "links": {{ graph_links | uniq | jsonify }},
       "excerpt": {{ post.excerpt | strip_html | strip_newlines | truncate: 180 | jsonify }}
     }{% unless forloop.last %},{% endunless %}
   {% endfor %}
 ]
-</script>
+{%- endcapture -%}
+<script id="graph-data" type="application/json">{{ graph_payload | replace: '<', '\u003c' }}</script>
 <script src="{{ '/assets/js/graph.js' | relative_url }}"></script>

@@ -100,6 +100,32 @@ body.code-lab-is-open {
   border: 0 !important;
 }
 
+.code-lab__snippet-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.code-lab__snippet-button,
+.code-header .code-lab__snippet-button {
+  width: auto;
+  height: auto;
+  min-height: 1.9rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--main-border-color, currentColor);
+  border-radius: 0.35rem;
+  color: var(--text-color, inherit);
+  background: transparent;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.code-lab__snippet-button:focus-visible,
+.code-header .code-lab__snippet-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
 .code-lab__backdrop {
   position: absolute;
   inset: 0;
@@ -395,12 +421,45 @@ body.code-lab-is-open {
   font-weight: 650;
 }
 
-.code-lab__editor-meta {
-  flex-direction: row !important;
-  gap: 0.75rem !important;
+.code-lab__pane-heading > .code-lab__editor-meta {
   color: var(--lab-muted);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.66rem;
+}
+
+.code-lab__pane-heading > .code-lab__editor-tools {
+  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.code-lab__editor-tools select {
+  min-width: 0;
+  max-width: 11rem;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--lab-border-strong);
+  border-radius: 0.35rem;
+  color: var(--lab-text);
+  background: var(--lab-surface-raised);
+  font-size: 0.75rem;
+}
+
+.code-lab__editor-tools .code-lab__text-button {
+  white-space: nowrap;
+}
+
+.code-lab__editor-hint {
+  margin: 0;
+  padding: 0.35rem 1rem;
+  color: var(--lab-soft);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.code-lab__editor-hint kbd {
+  color: var(--lab-text);
+  background: var(--lab-surface-raised);
 }
 
 .code-lab__editor {
@@ -450,6 +509,10 @@ body.code-lab-is-open {
   caret-color: #aeb6ff;
   background: transparent;
   white-space: pre;
+}
+
+.code-lab__source:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--lab-accent-bright);
 }
 
 .code-lab__source::selection {
@@ -587,18 +650,32 @@ body.code-lab-is-open {
   background: var(--lab-surface);
 }
 
-.code-lab__trace-toolbar {
-  min-height: 2.9rem;
+.code-lab__trace:not([hidden]) {
+  display: flex;
+  flex-direction: column;
 }
 
-.code-lab__trace-actions {
-  flex-direction: row !important;
-  gap: 0.35rem !important;
+.code-lab__trace-toolbar {
+  min-height: 2.9rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.85rem;
+}
+
+.code-lab__trace-toolbar > .code-lab__trace-actions {
+  flex: 1 0 auto;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+#code-lab-step-slider {
+  width: clamp(3.5rem, 12vw, 8rem);
+  accent-color: var(--lab-accent-bright);
 }
 
 .code-lab__trace-grid {
   display: grid;
-  height: calc(100% - 2.9rem);
+  min-height: 0;
+  flex: 1;
   grid-template-columns: minmax(0, 1.2fr) minmax(11rem, 0.8fr);
   overflow: auto;
 }
@@ -629,6 +706,26 @@ body.code-lab-is-open {
   border-left: 2px solid transparent;
 }
 
+.code-lab button.code-lab__trace-line {
+  width: 100%;
+  border: 0;
+  border-left: 2px solid transparent;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  white-space: pre;
+}
+
+.code-lab button.code-lab__trace-line:hover {
+  background: var(--lab-surface-raised);
+}
+
+.code-lab button.code-lab__trace-line:focus-visible {
+  outline: 1px dashed var(--lab-accent-bright);
+  outline-offset: -2px;
+}
+
 .code-lab__trace-line::before {
   content: attr(data-line);
   display: inline-block;
@@ -638,7 +735,8 @@ body.code-lab-is-open {
   text-align: right;
 }
 
-.code-lab__trace-line.is-current {
+.code-lab__trace-line.is-current,
+.code-lab button.code-lab__trace-line.is-current {
   border-left-color: var(--lab-accent-bright);
   color: #e5e9ff;
   background: rgba(108, 124, 255, 0.15);
@@ -685,6 +783,15 @@ body.code-lab-is-open {
   background: rgba(255, 255, 255, 0.024);
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 0.62rem;
+}
+
+.code-lab__variable.is-changed {
+  border-inline-start: 2px solid var(--lab-yellow);
+  background: rgba(255, 200, 87, 0.09);
+}
+
+.code-lab__variable.is-changed .code-lab__variable-value {
+  font-weight: 700;
 }
 
 .code-lab__variable-name {
@@ -892,10 +999,19 @@ body.code-lab-is-open {
     display: none;
   }
 
-  .code-lab__editor-meta,
+  .code-lab__pane-heading > .code-lab__editor-meta,
   .code-lab__status-wrap,
   .code-lab__button--ghost {
     display: none;
+  }
+
+  .code-lab__pane-heading {
+    gap: 0.5rem;
+    padding-inline: 0.7rem;
+  }
+
+  .code-lab__editor-tools select {
+    max-width: 8rem;
   }
 
   .code-lab__trace-grid {

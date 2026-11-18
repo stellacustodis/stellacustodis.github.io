@@ -17,13 +17,19 @@ if (root) {
   const traceLocals = $("#code-lab-locals");
   const traceStack = $("#code-lab-stack");
   const stepCount = $("#code-lab-step-count");
+  const firstStep = $("#code-lab-step-first");
   const prevStep = $("#code-lab-step-prev");
+  const stepSlider = $("#code-lab-step-slider");
   const nextStep = $("#code-lab-step-next");
+  const lastStep = $("#code-lab-step-last");
   const runButton = $("#code-lab-run");
   const traceButton = $("#code-lab-trace-run");
   const stopButton = $("#code-lab-stop");
   const resetButton = $("#code-lab-reset");
   const clearButton = $("#code-lab-clear-output");
+  const copyButton = $("#code-lab-copy");
+  const copyLabel = copyButton.querySelector("span");
+  const preset = $("#code-lab-preset");
   const status = $("#code-lab-status");
   const statusIcon = $("#code-lab-status-icon");
   const runtimeDot = $("#code-lab-runtime-dot");
@@ -38,11 +44,13 @@ if (root) {
   const MAX_OUTPUT_CHARS = 64 * 1024;
   const MAX_TRACE_LINES = 1_000;
   const PYTHON_IDLE_TIMEOUT = 45_000;
+  const INDENT = "    ";
 
   const languageConfig = {
     python: {
       filename: "main.py",
       runtime: "Pyodide · 브라우저 로컬 · 표준 라이브러리",
+      sampleLabel: "재귀 팩토리얼",
       sample: `def factorial(n):
     if n <= 1:
         return 1
@@ -52,11 +60,56 @@ numbers = [3, 5, 7]
 for number in numbers:
     print(f"{number}! = {factorial(number)}")
 `,
+      examples: [
+        {
+          label: "Scaled Dot-Product Attention",
+          source: `from math import exp, sqrt
+
+def attention(query, keys, values):
+    scale = sqrt(len(query))
+    scores = [sum(q * k for q, k in zip(query, key)) / scale for key in keys]
+    peak = max(scores)
+    weights = [exp(score - peak) for score in scores]
+    total = sum(weights)
+    return [sum(w * v for w, v in zip(weights, column)) / total
+            for column in zip(*values)]
+
+print(attention([1, 0], [[1, 0], [0, 1]], [[2, 4], [6, 8]]))
+`,
+        },
+        {
+          label: "이진 탐색",
+          source: `def binary_search(values, target):
+    low, high = 0, len(values)
+    while low < high:
+        mid = (low + high) // 2
+        if values[mid] < target:
+            low = mid + 1
+        else:
+            high = mid
+    return low if low < len(values) and values[low] == target else -1
+
+print(binary_search([1, 3, 5, 7, 9], 7))
+`,
+        },
+        {
+          label: "동적 계획법 · 계단 오르기",
+          source: `def count_paths(steps):
+    previous, current = 1, 1
+    for _ in range(steps):
+        previous, current = current, previous + current
+    return previous
+
+print(count_paths(5))
+`,
+        },
+      ],
     },
     c: {
       filename: "main.c",
       runtime: "Judge0 · GCC 14 · 서버 격리 실행",
       judge0LanguageId: 103,
+      sampleLabel: "정수 입력과 합계",
       sample: `#include <stdio.h>
 
 int main(void) {
@@ -78,11 +131,49 @@ int main(void) {
 }
 `,
       stdin: "10",
+      examples: [
+        {
+          label: "유클리드 최대공약수",
+          source: `#include <stdio.h>
+
+int gcd(int a, int b) {
+    while (b != 0) {
+        int remainder = a % b;
+        a = b;
+        b = remainder;
+    }
+    return a;
+}
+
+int main(void) {
+    printf("%d\\n", gcd(48, 18));
+    return 0;
+}
+`,
+        },
+        {
+          label: "누적 합 · 구간 합",
+          source: `#include <stdio.h>
+
+int main(void) {
+    int values[] = {3, 1, 4, 1, 5};
+    int prefix[6] = {0};
+    for (int i = 0; i < 5; ++i) {
+        prefix[i + 1] = prefix[i] + values[i];
+    }
+    // Sum of indices 1, 2, and 3.
+    printf("%d\\n", prefix[4] - prefix[1]);
+    return 0;
+}
+`,
+        },
+      ],
     },
     cpp: {
       filename: "main.cpp",
       runtime: "Judge0 · G++ 14 · 서버 격리 실행",
       judge0LanguageId: 105,
+      sampleLabel: "벡터 정렬과 합계",
       sample: `#include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -108,6 +199,46 @@ int main() {
 }
 `,
       stdin: "5\n8 3 5 1 2",
+      examples: [
+        {
+          label: "이진 탐색 · lower_bound",
+          source: `#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+    const std::vector<int> sorted{1, 3, 3, 5, 7};
+    const auto first = std::lower_bound(sorted.begin(), sorted.end(), 3);
+    std::cout << first - sorted.begin() << '\\n';
+}
+`,
+        },
+        {
+          label: "너비 우선 탐색",
+          source: `#include <iostream>
+#include <queue>
+#include <vector>
+
+int main() {
+    const std::vector<std::vector<int>> graph{{1, 2}, {0, 3}, {0}, {1}};
+    std::vector<int> distance(graph.size(), -1);
+    std::queue<int> pending;
+    distance[0] = 0;
+    pending.push(0);
+    while (!pending.empty()) {
+        int node = pending.front();
+        pending.pop();
+        for (int neighbor : graph[node]) {
+            if (distance[neighbor] != -1) continue;
+            distance[neighbor] = distance[node] + 1;
+            pending.push(neighbor);
+        }
+    }
+    std::cout << distance[3] << '\\n';
+}
+`,
+        },
+      ],
     },
     java: {
       filename: "Main.java",
@@ -115,6 +246,7 @@ int main() {
       judge0LanguageId: 91,
       judge0MemoryLimit: 256_000,
       judge0ThreadLimit: 64,
+      sampleLabel: "리스트 정렬과 합계",
       sample: `import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -139,6 +271,47 @@ public class Main {
 }
 `,
       stdin: "5\n8 3 5 1 2",
+      examples: [
+        {
+          label: "Map으로 빈도 세기",
+          source: `import java.util.Map;
+import java.util.TreeMap;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, Integer> counts = new TreeMap<>();
+        for (String token : "cat dog cat bird".split(" ")) {
+            counts.merge(token, 1, Integer::sum);
+        }
+        System.out.println(counts);
+    }
+}
+`,
+        },
+        {
+          label: "동적 계획법 · 최소 동전 수",
+          source: `import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        int amount = 6;
+        int[] coins = {1, 3, 4};
+        int[] best = new int[amount + 1];
+        Arrays.fill(best, amount + 1);
+        best[0] = 0;
+        for (int value = 1; value <= amount; value++) {
+            for (int coin : coins) {
+                if (coin <= value) {
+                    best[value] = Math.min(best[value], best[value - coin] + 1);
+                }
+            }
+        }
+        System.out.println(best[amount]);
+    }
+}
+`,
+        },
+      ],
     },
   };
 
@@ -151,8 +324,12 @@ public class Main {
   let runSequence = 0;
   let traceSteps = [];
   let traceIndex = 0;
-  let traceSourceText = "";
+  let traceLines = [];
+  let traceJumpLines = [];
+  let traceNavigationLine = null;
+  let traceCurrentLine = null;
   let lastFocused = null;
+  let copyTimer;
 
   function storageGet(key) {
     try {
@@ -224,6 +401,106 @@ public class Main {
     position.textContent = `Ln ${lines.length}, Col ${lines.at(-1).length + 1}`;
   }
 
+  function syncSource() {
+    storageSet(codeKey(language), source.value);
+    updateLineNumbers();
+    updatePosition();
+    preset.selectedIndex = 0;
+  }
+
+  function lineStartAt(text, offset) {
+    return offset ? text.lastIndexOf("\n", offset - 1) + 1 : 0;
+  }
+
+  function editSource(start, end, text, nextStart, nextEnd = nextStart) {
+    if (source.value.length - (end - start) + text.length > source.maxLength) return;
+    const direction = source.selectionDirection;
+    source.setRangeText(text, start, end);
+    source.setSelectionRange(nextStart, nextEnd, direction);
+    syncSource();
+  }
+
+  function indentSource(outdent) {
+    const { value, selectionStart: start, selectionEnd: end } = source;
+    if (!outdent && start === end) {
+      editSource(start, end, INDENT, start + INDENT.length);
+      return;
+    }
+
+    const firstLine = lineStartAt(value, start);
+    const nextBreak = value.indexOf("\n", Math.max(start, end - 1));
+    const lastLine = nextBreak < 0 ? value.length : nextBreak;
+    let lineStart = firstLine;
+    let nextStart = start;
+    let nextEnd = end;
+    const replacement = value.slice(firstLine, lastLine).split("\n").map((line) => {
+      const removed = outdent ? line.match(/^(?:\t| {1,4})/)?.[0].length ?? 0 : 0;
+      const added = outdent ? "" : INDENT;
+      const offset = (point) => point < lineStart ? 0 : added.length - Math.min(removed, point - lineStart);
+      nextStart += offset(start);
+      nextEnd += offset(end);
+      lineStart += line.length + 1;
+      return added + line.slice(removed);
+    }).join("\n");
+    editSource(firstLine, lastLine, replacement, nextStart, nextEnd);
+  }
+
+  function endsWithPythonColon(line) {
+    let quote = "";
+    for (let index = 0; index < line.length; index += 1) {
+      const character = line[index];
+      if (quote) {
+        if (character === "\\") {
+          index += 1;
+        } else if (line.startsWith(quote, index)) {
+          index += quote.length - 1;
+          quote = "";
+        }
+      } else if (character === "#") {
+        return line.slice(0, index).trimEnd().endsWith(":");
+      } else if (character === '"' || character === "'") {
+        const triple = character.repeat(3);
+        quote = line.startsWith(triple, index) ? triple : character;
+        index += quote.length - 1;
+      }
+    }
+    return !quote && line.trimEnd().endsWith(":");
+  }
+
+  function insertNewline() {
+    const { value, selectionStart: start, selectionEnd: end } = source;
+    const before = value.slice(lineStartAt(value, start), start);
+    const indent = before.match(/^[ \t]*/)[0];
+    const extra = language === "python" && endsWithPythonColon(before) ? INDENT : "";
+    const text = `\n${indent}${extra}`;
+    editSource(start, end, text, start + text.length);
+  }
+
+  function languageExamples() {
+    const config = languageConfig[language];
+    return [{ label: config.sampleLabel, source: config.sample, stdin: config.stdin }, ...config.examples];
+  }
+
+  function applyExample(example) {
+    source.value = example.source;
+    stdin.value = example.stdin ?? "";
+    syncSource();
+    storageSet(stdinKey(language), stdin.value);
+    clearOutput();
+  }
+
+  async function copyCode() {
+    clearTimeout(copyTimer);
+    try {
+      await navigator.clipboard.writeText(currentCode());
+      copyLabel.textContent = "복사 완료";
+    } catch {
+      copyLabel.textContent = "복사 실패";
+    }
+    clearTimeout(copyTimer);
+    copyTimer = window.setTimeout(() => { copyLabel.textContent = "코드 복사"; }, 2000);
+  }
+
   function setRuntimeDisplay() {
     runtimeLabel.textContent = languageConfig[language].runtime;
     runtimeDot.classList.toggle("is-ready", runtimeReady[language]);
@@ -258,7 +535,11 @@ public class Main {
     tracePanel.hidden = true;
     traceSteps = [];
     traceIndex = 0;
-    traceSourceText = "";
+    traceLines = [];
+    traceJumpLines = [];
+    traceNavigationLine = null;
+    traceCurrentLine = null;
+    traceSource.replaceChildren();
   }
 
   function loadLanguage(lang) {
@@ -271,6 +552,10 @@ public class Main {
     source.value = savedCode ?? config.sample;
     stdin.value = savedStdin ?? config.stdin ?? "";
     filename.textContent = config.filename;
+    preset.replaceChildren(new Option("예제 불러오기", ""));
+    for (const [index, example] of languageExamples().entries()) {
+      preset.add(new Option(example.label, String(index)));
+    }
     $("#code-lab-editor-panel").setAttribute("aria-labelledby", `code-lab-tab-${lang}`);
 
     for (const tab of tabs) {
@@ -288,8 +573,8 @@ public class Main {
     setStatus("준비됨");
   }
 
-  function openLab() {
-    lastFocused = document.activeElement;
+  function openLab(trigger = document.activeElement) {
+    if (root.hidden) lastFocused = trigger;
     root.hidden = false;
     document.body.classList.add("code-lab-is-open");
     launcher?.setAttribute("aria-expanded", "true");
@@ -312,6 +597,7 @@ public class Main {
     traceButton.disabled = busy;
     resetButton.disabled = busy;
     clearButton.disabled = busy;
+    preset.disabled = busy;
     source.readOnly = busy;
     stdin.readOnly = busy;
     for (const tab of tabs) tab.disabled = busy;
@@ -359,8 +645,7 @@ public class Main {
       executionStarted: false,
     };
     setBusy(true);
-    tracePanel.hidden = true;
-    traceSteps = [];
+    clearOutput();
     showOutput(mode === "trace" ? "실행 흐름을 준비하고 있습니다…" : "실행을 준비하고 있습니다…");
     setStatus("실행 준비 중…", "busy");
     return activeRun;
@@ -651,31 +936,66 @@ public class Main {
   function showTrace(steps, truncated, executedSource) {
     traceSteps = steps;
     traceIndex = 0;
-    traceSourceText = executedSource;
+    const executedLines = new Set(steps.map((step) => step.line));
+    traceJumpLines = [];
+    traceNavigationLine = null;
+    traceCurrentLine = null;
+    traceLines = executedSource.split("\n").map((text, index) => {
+      const number = index + 1;
+      const canJump = executedLines.has(number);
+      const line = document.createElement(canJump ? "button" : "span");
+      line.className = "code-lab__trace-line";
+      line.dataset.line = String(number);
+      line.textContent = text || " ";
+      if (canJump) {
+        line.type = "button";
+        line.tabIndex = -1;
+        line.setAttribute("aria-label", `${number}줄 ${text.trim()}`);
+        traceJumpLines.push(line);
+      }
+      return line;
+    });
+    traceSource.replaceChildren(...traceLines);
     tracePanel.hidden = false;
     tracePanel.dataset.truncated = String(truncated);
+    renderTraceStep();
+  }
+
+  function setTraceNavigationLine(line) {
+    if (traceNavigationLine) traceNavigationLine.tabIndex = -1;
+    traceNavigationLine = line;
+    if (line) line.tabIndex = 0;
+  }
+
+  function goToTraceStep(index) {
+    if (index < 0 || index >= traceSteps.length || index === traceIndex) return;
+    traceIndex = index;
     renderTraceStep();
   }
 
   function renderTraceStep() {
     if (!traceSteps.length) return;
     const step = traceSteps[traceIndex];
-    const lines = traceSourceText.split("\n");
-    traceSource.replaceChildren();
-
-    lines.forEach((text, index) => {
-      const line = document.createElement("span");
-      line.className = "code-lab__trace-line";
-      line.dataset.line = String(index + 1);
-      line.textContent = text || " ";
-      if (index + 1 === step.line) line.classList.add("is-current");
-      traceSource.append(line);
-    });
-
-    traceSource.querySelector(".is-current")?.scrollIntoView({ block: "center" });
+    const previousLocals = traceSteps[traceIndex - 1]?.locals ?? {};
+    traceCurrentLine?.classList.remove("is-current");
+    traceCurrentLine?.removeAttribute("aria-current");
+    traceCurrentLine = traceLines[step.line - 1];
+    traceCurrentLine?.classList.add("is-current");
+    traceCurrentLine?.setAttribute("aria-current", "step");
+    traceCurrentLine?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (!traceSource.contains(document.activeElement)) {
+      setTraceNavigationLine(traceCurrentLine ?? traceJumpLines[0]);
+    }
     stepCount.textContent = `${traceIndex + 1} / ${traceSteps.length} · ${step.event}${step.note ? ` · ${step.note}` : ""}`;
-    prevStep.disabled = traceIndex === 0;
-    nextStep.disabled = traceIndex === traceSteps.length - 1;
+    stepSlider.max = String(traceSteps.length);
+    stepSlider.value = String(traceIndex + 1);
+    stepSlider.setAttribute("aria-valuetext", `${traceSteps.length}단계 중 ${traceIndex + 1}단계`);
+    const focusedControl = document.activeElement;
+    firstStep.disabled = prevStep.disabled = traceIndex === 0;
+    lastStep.disabled = nextStep.disabled = traceIndex === traceSteps.length - 1;
+    if ([firstStep, prevStep, nextStep, lastStep].includes(focusedControl) && focusedControl.disabled) {
+      stepSlider.focus();
+    }
 
     traceStack.replaceChildren();
     if (step.stack?.length) {
@@ -697,12 +1017,20 @@ public class Main {
       for (const [name, value] of variables) {
         const row = document.createElement("div");
         row.className = "code-lab__variable";
+        const changed = !Object.hasOwn(previousLocals, name) || previousLocals[name] !== value;
+        row.classList.toggle("is-changed", changed);
         const key = document.createElement("span");
         const val = document.createElement("span");
         key.className = "code-lab__variable-name";
         val.className = "code-lab__variable-value";
         key.textContent = name;
         val.textContent = value;
+        if (changed) {
+          const change = document.createElement("span");
+          change.className = "code-lab__sr-only";
+          change.textContent = "변경된 값: ";
+          val.prepend(change);
+        }
         row.append(key, val);
         traceLocals.append(row);
       }
@@ -711,22 +1039,58 @@ public class Main {
     traceOutput.textContent = step.stdout || "(아직 출력 없음)";
   }
 
-  launcher?.addEventListener("click", openLab);
+  function addCodeBlockActions() {
+    const content = document.querySelector(".post-content, #main-wrapper article .content");
+    if (!content) return;
+
+    const languages = Object.keys(languageConfig);
+    const selector = languages.map((lang) => `div.language-${lang}`).join(", ");
+    for (const block of content.querySelectorAll(selector)) {
+      const code = block.querySelector("td.rouge-code pre, pre code");
+      if (!code) continue;
+      const lang = languages.find((name) => block.classList.contains(`language-${name}`));
+      const actions = document.createElement("div");
+      actions.className = "code-lab__snippet-actions";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-lab__snippet-button";
+      button.textContent = "Code Lab에서 열기";
+      button.addEventListener("click", () => {
+        if (activeRun) return;
+        loadLanguage(lang);
+        source.value = code.textContent;
+        stdin.value = "";
+        updateLineNumbers();
+        updatePosition();
+        openLab(button);
+      });
+      actions.append(button);
+
+      const header = block.querySelector(":scope > .code-header");
+      if (header) {
+        // Chirpy delegates clipboard clicks to direct button children of the header.
+        header.insertBefore(actions, header.querySelector(":scope > button"));
+      } else {
+        block.prepend(actions);
+      }
+    }
+  }
+
+  launcher?.addEventListener("click", () => openLab(launcher));
   root.querySelectorAll("[data-code-lab-close]").forEach((button) => button.addEventListener("click", closeLab));
   runButton.addEventListener("click", () => execute("run"));
   traceButton.addEventListener("click", () => execute("trace"));
   stopButton.addEventListener("click", () => stopExecution(false));
   clearButton.addEventListener("click", clearOutput);
+  copyButton.addEventListener("click", copyCode);
+  preset.addEventListener("change", () => {
+    const example = languageExamples()[preset.selectedIndex - 1];
+    if (example) applyExample(example);
+  });
 
   resetButton.addEventListener("click", () => {
     if (!window.confirm(`${languageConfig[language].filename}을(를) 기본 예제로 되돌릴까요? 현재 편집 내용은 사라집니다.`)) return;
-    source.value = languageConfig[language].sample;
-    stdin.value = languageConfig[language].stdin || "";
-    storageSet(codeKey(language), source.value);
-    storageSet(stdinKey(language), stdin.value);
-    updateLineNumbers();
-    updatePosition();
-    clearOutput();
+    applyExample(languageExamples()[0]);
     source.focus();
   });
 
@@ -752,11 +1116,7 @@ public class Main {
     });
   }
 
-  source.addEventListener("input", () => {
-    storageSet(codeKey(language), source.value);
-    updateLineNumbers();
-    updatePosition();
-  });
+  source.addEventListener("input", syncSource);
   source.addEventListener("scroll", () => {
     lineNumbers.scrollTop = source.scrollTop;
   });
@@ -764,17 +1124,36 @@ public class Main {
   source.addEventListener("keyup", updatePosition);
   stdin.addEventListener("input", () => storageSet(stdinKey(language), stdin.value));
 
-  prevStep.addEventListener("click", () => {
-    if (traceIndex > 0) {
-      traceIndex -= 1;
-      renderTraceStep();
-    }
+  firstStep.addEventListener("click", () => goToTraceStep(0));
+  prevStep.addEventListener("click", () => goToTraceStep(traceIndex - 1));
+  stepSlider.addEventListener("input", () => goToTraceStep(stepSlider.valueAsNumber - 1));
+  nextStep.addEventListener("click", () => goToTraceStep(traceIndex + 1));
+  lastStep.addEventListener("click", () => goToTraceStep(traceSteps.length - 1));
+
+  traceSource.addEventListener("click", (event) => {
+    const target = event.target.closest("button[data-line]");
+    if (!target) return;
+    const line = Number(target.dataset.line);
+    const next = traceSteps.findIndex((step, index) => index > traceIndex && step.line === line);
+    setTraceNavigationLine(target);
+    target.focus({ preventScroll: true });
+    goToTraceStep(next === -1 ? traceSteps.findIndex((step) => step.line === line) : next);
   });
-  nextStep.addEventListener("click", () => {
-    if (traceIndex < traceSteps.length - 1) {
-      traceIndex += 1;
-      renderTraceStep();
+  traceSource.addEventListener("keydown", (event) => {
+    const current = traceJumpLines.indexOf(document.activeElement);
+    if (current < 0) return;
+    let next;
+    switch (event.key) {
+      case "ArrowUp": next = Math.max(0, current - 1); break;
+      case "ArrowDown": next = Math.min(traceJumpLines.length - 1, current + 1); break;
+      case "Home": next = 0; break;
+      case "End": next = traceJumpLines.length - 1; break;
+      default: return;
     }
+    event.preventDefault();
+    const line = traceJumpLines[next];
+    setTraceNavigationLine(line);
+    line.focus();
   });
 
   root.addEventListener("keydown", (event) => {
@@ -789,13 +1168,26 @@ public class Main {
 
     if (event.key === "Escape") {
       event.preventDefault();
-      closeLab();
+      if (document.activeElement === source) {
+        $(".code-lab__stdin summary").focus();
+      } else {
+        closeLab();
+      }
       return;
     }
 
+    if (document.activeElement === source && !source.readOnly && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      if (event.key === "Tab" || event.key === "Enter") {
+        event.preventDefault();
+        if (event.key === "Tab") indentSource(event.shiftKey);
+        else insertNewline();
+        return;
+      }
+    }
+
     if (event.key === "Tab") {
-      const focusable = [...dialog.querySelectorAll('button:not([disabled]):not([hidden]), textarea, summary, [tabindex]:not([tabindex="-1"])')].filter(
-        (element) => !element.closest("[hidden]"),
+      const focusable = [...dialog.querySelectorAll("button, input, select, textarea, summary, [tabindex]")].filter(
+        (element) => element.tabIndex >= 0 && !element.disabled && element.getClientRects().length,
       );
       const first = focusable[0];
       const last = focusable.at(-1);
@@ -815,4 +1207,5 @@ public class Main {
   });
 
   loadLanguage("python");
+  addCodeBlockActions();
 }

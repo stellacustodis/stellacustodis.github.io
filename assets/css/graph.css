@@ -35,10 +35,19 @@
 }
 
 .graph-toolbar {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
-  grid-template-columns: minmax(12rem, 2fr) minmax(9rem, 1fr) minmax(9rem, 1fr) auto;
   margin-bottom: 0.75rem;
+}
+
+.graph-toolbar label {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.graph-toolbar .graph-edge-filter {
+  flex-basis: 11rem;
 }
 
 .graph-toolbar input,
@@ -62,7 +71,8 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--graph-accent) 20%, transparent);
 }
 
-.graph-search {
+.graph-toolbar .graph-search {
+  flex: 2 1 12rem;
   position: relative;
 }
 
@@ -84,6 +94,10 @@
   gap: 0.4rem;
   justify-content: center;
   white-space: nowrap;
+}
+
+.graph-toolbar > .graph-button {
+  width: auto;
 }
 
 .graph-button:hover {
@@ -176,7 +190,9 @@
 }
 
 .graph-detail {
+  max-height: 34rem;
   min-height: 34rem;
+  overflow: auto;
   overflow-wrap: anywhere;
   padding: 1rem;
 }
@@ -262,6 +278,12 @@
   text-align: left;
 }
 
+.graph-neighbor-list button:hover,
+.graph-neighbor-list button:focus-visible {
+  color: var(--graph-accent);
+  text-decoration: underline;
+}
+
 .graph-neighbor-list small {
   color: var(--graph-muted);
   display: block;
@@ -338,6 +360,7 @@
   }
 
   .graph-detail {
+    max-height: none;
     min-height: 0;
   }
 
@@ -356,7 +379,12 @@
   }
 
   .graph-toolbar {
+    display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .graph-toolbar > .graph-button {
+    width: 100%;
   }
 
   .graph-search {
