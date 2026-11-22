@@ -38,6 +38,7 @@
   const listEmpty = document.getElementById('library-list-empty');
   const listSort = document.getElementById('library-list-sort');
   const ns = 'http://www.w3.org/2000/svg';
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const palette = ['#4c78a8', '#f58518', '#54a24b', '#e45756', '#72b7b2',
                    '#b279a2', '#ff9da6', '#9d755d', '#8c6bb1', '#3182bd', '#bab0ac'];
@@ -83,6 +84,7 @@
   let focusedNode = null;
   let visibleLabels = new Set();
   let labelFrame = null;
+  let centerFrame = null;
   let transform = { x: 0, y: 0, scale: 1 };
   let panState = null;
   let draggedNode = null;
@@ -212,7 +214,7 @@
         fill: color, 'fill-opacity': 0.07, stroke: color, 'stroke-opacity': 0.28,
       }));
       const text = svgEl('text', {
-        class: 'library-hull-label', x: c.x, y: c.y - c.radius - 36, fill: color,
+        class: 'library-hull-label', x: c.x, y: c.y - c.radius - 36,
       });
       text.textContent = `${label.get(c.key) || c.key} · ${c.list.length}`;
       hullLayer.appendChild(text);
@@ -233,13 +235,14 @@
         class: `graph-node library-node${node.post ? ' is-reviewed' : ''}`,
         role: 'button', tabindex: '0',
         'aria-label': `${node.title}${node.post ? ' (리뷰 있음)' : ''}`,
+        'aria-pressed': 'false',
       });
       node.radius = node.post ? 8 : 5;
       const color = colorOf(clusterKey(node));
       group.appendChild(svgEl('circle', { r: node.radius, fill: color }));
       if (node.post) {
         group.appendChild(svgEl('circle', {
-          class: 'library-ring', r: node.radius + 4, fill: 'none', stroke: color,
+          class: 'library-ring', r: node.radius + 4, fill: 'none',
         }));
       }
       const t = svgEl('title');
@@ -273,8 +276,15 @@
       });
       group.addEventListener('pointerdown', (e) => startNodeDrag(e, node));
       group.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectNode(node.id); }
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        selectNode(node.id, { revealRow: true });
       });
+      if (node.post) {
+        group.addEventListener('dblclick', () => {
+          if (!dragMoved) window.location.assign(node.post);
+        });
+      }
       node.element = group;
       node.caption = caption;
       nodeLayer.appendChild(group);
@@ -300,7 +310,7 @@
     scheduleLabelUpdate();
   }
 
-  function selectNode(id) {
+  function selectNode(id, { center = false, revealRow = false } = {}) {
     const node = nodes.find((n) => n.id === id);
     if (!node) return;
     selectedId = id;
@@ -311,11 +321,15 @@
     nodes.forEach((n) => {
       n.element.classList.toggle('is-dimmed', !near.has(n.id));
       n.element.classList.toggle('is-selected', n.id === id);
+      n.element.setAttribute('aria-pressed', String(n.id === id));
     });
     edges.forEach((e) => e.element.classList.toggle('is-active', linked.includes(e)));
     updateListSelection();
     renderDetail(node, linked);
     scheduleLabelUpdate();
+    if (center) centerNode(node);
+    if (revealRow) revealSelectedRow();
+    writeParams();
   }
 
   function chip(id, facet) {
@@ -347,7 +361,7 @@
     }
     detail.innerHTML = out.join('');
     detail.querySelectorAll('button[data-node-id]').forEach((b) => {
-      b.addEventListener('click', () => selectNode(b.dataset.nodeId));
+      b.addEventListener('click', () => selectNode(b.dataset.nodeId, { center: true, revealRow: true }));
     });
     // 라벨을 누르면 그 라벨로 걸러진다 — 여러 특성을 타고 넘어가는 통로다.
     detail.querySelectorAll('button[data-facet]').forEach((b) => {
@@ -437,6 +451,15 @@
     selectedRow?.setAttribute('aria-current', 'true');
   }
 
+  function revealSelectedRow() {
+    if (!selectedRow) return;
+    // 목록만 이동해야 그래프가 화면에 남아 리뷰 노드를 더블클릭할 수 있다.
+    const row = selectedRow.getBoundingClientRect();
+    const list = paperList.getBoundingClientRect();
+    if (row.top < list.top) paperList.scrollTop += row.top - list.top;
+    else if (row.bottom > list.bottom) paperList.scrollTop += row.bottom - list.bottom;
+  }
+
   function renderPaperList() {
     const reviewsFirst = listSort.value === 'reviewed';
     const sorted = [...matchedNodes].sort((a, b) => {
@@ -496,10 +519,12 @@
   // 계산하므로, 화면 중앙으로 옮기는 몫까지 transform 이 들고 있는다.
   function startNodeDrag(event, node) {
     event.stopPropagation();
+    if (!event.isPrimary || event.button !== 0) return;
+    cancelCenter();
     draggedNode = node;
     dragStart = { x: event.clientX, y: event.clientY };
     dragMoved = false;
-    svg.setPointerCapture(event.pointerId);
+    node.element.setPointerCapture(event.pointerId);
   }
 
   function toGraphPoint(event) {
@@ -517,7 +542,50 @@
     scheduleLabelUpdate();
   }
 
+  function cancelCenter() {
+    if (centerFrame === null) return;
+    cancelAnimationFrame(centerFrame);
+    centerFrame = null;
+  }
+
+  function centerNode(node, animate = true) {
+    cancelCenter();
+    const { width, height, left, top } = svg.getBoundingClientRect();
+    if (!width || !height) return;
+
+    const minScale = 1.2;
+    const margin = 24;
+    const x = transform.x + node.x * transform.scale;
+    const y = transform.y + node.y * transform.scale;
+    const controls = zoomControls.getBoundingClientRect();
+    const overlapsControls = x > controls.left - left - margin && y < controls.bottom - top + margin;
+    if (transform.scale >= minScale && !overlapsControls
+        && x >= margin && x <= width - margin && y >= margin && y <= height - margin) return;
+
+    const scale = Math.max(transform.scale, minScale);
+    const target = { x: width / 2 - node.x * scale, y: height / 2 - node.y * scale, scale };
+    if (!animate || reducedMotion.matches) {
+      transform = target;
+      setTransform();
+      return;
+    }
+
+    const start = { ...transform };
+    const startedAt = performance.now();
+    const move = (now) => {
+      const progress = Math.min(1, (now - startedAt) / 260);
+      const eased = 1 - (1 - progress) ** 3;
+      transform.x = start.x + (target.x - start.x) * eased;
+      transform.y = start.y + (target.y - start.y) * eased;
+      transform.scale = start.scale + (target.scale - start.scale) * eased;
+      setTransform();
+      centerFrame = progress < 1 ? requestAnimationFrame(move) : null;
+    };
+    centerFrame = requestAnimationFrame(move);
+  }
+
   function fitGraph() {
+    cancelCenter();
     const rect = svg.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     if (!nodes.length) {
@@ -554,6 +622,7 @@
   }
 
   function zoomAt(factor) {
+    cancelCenter();
     const rect = svg.getBoundingClientRect();
     const px = rect.width / 2;
     const py = rect.height / 2;
@@ -567,33 +636,51 @@
 
   // ── 주소에 상태 남기기 ──────────────────────────────────
   function readParams() {
-    const q = new URLSearchParams(window.location.search);
-    const set = (el, v) => {
-      if (v && [...el.options].some((o) => o.value === v)) el.value = v;
+    const params = new URLSearchParams(window.location.search);
+    const restoreSelect = (select, name, fallback = '') => {
+      const value = params.get(name);
+      select.value = [...select.options].some((option) => option.value === value) ? value : fallback;
     };
-    set(clusterSelect, q.get('cluster'));
-    set(familySelect, q.get('family'));
-    set(taskSelect, q.get('task'));
-    set(yearSelect, q.get('year'));
-    reviewedOnly.checked = q.get('reviewed') === '1';
-    if (q.get('q')) searchInput.value = q.get('q');
+    restoreSelect(clusterSelect, 'cluster', 'family');
+    restoreSelect(familySelect, 'family');
+    restoreSelect(taskSelect, 'task');
+    restoreSelect(yearSelect, 'year');
+    reviewedOnly.checked = params.get('reviewed') === '1';
+    searchInput.value = params.get('q') ?? '';
+    selectedId = params.get('paper');
   }
 
   function writeParams() {
-    const q = new URLSearchParams();
-    if (clusterSelect.value !== 'family') q.set('cluster', clusterSelect.value);
-    if (familySelect.value) q.set('family', familySelect.value);
-    if (taskSelect.value) q.set('task', taskSelect.value);
-    if (yearSelect.value) q.set('year', yearSelect.value);
-    if (reviewedOnly.checked) q.set('reviewed', '1');
-    if (searchInput.value.trim()) q.set('q', searchInput.value.trim());
-    const s = q.toString();
-    window.history.replaceState(null, '', s ? `?${s}` : window.location.pathname);
+    const url = new URL(window.location.href);
+    const state = {
+      cluster: clusterSelect.value === 'family' ? '' : clusterSelect.value,
+      family: familySelect.value,
+      task: taskSelect.value,
+      year: yearSelect.value,
+      reviewed: reviewedOnly.checked ? '1' : '',
+      q: searchInput.value.trim(),
+      paper: selectedId,
+    };
+    for (const [name, value] of Object.entries(state)) {
+      if (value) url.searchParams.set(name, value);
+      else url.searchParams.delete(name);
+    }
+    if (url.href !== window.location.href) window.history.replaceState(window.history.state, '', url);
+  }
+
+  function restoreState() {
+    readParams();
+    applyFilters();
+    const node = nodes.find((paper) => paper.id === selectedId);
+    if (node) {
+      centerNode(node, false);
+      revealSelectedRow();
+    }
   }
 
   function onFilterChange() {
-    writeParams();
     applyFilters();
+    writeParams();
   }
 
   searchInput.addEventListener('input', () => { writeParams(); updateSearchHighlight(); });
@@ -601,7 +688,7 @@
   paperList.addEventListener('click', (event) => {
     const button = event.target.closest('button[data-paper-id]');
     if (!button) return;
-    selectNode(button.dataset.paperId);
+    selectNode(button.dataset.paperId, { center: true });
     const heading = detail.querySelector('.graph-detail-title');
     if (heading) {
       heading.tabIndex = -1;
@@ -615,6 +702,7 @@
     clusterSelect.value = 'family';
     familySelect.value = ''; taskSelect.value = ''; yearSelect.value = '';
     reviewedOnly.checked = false; searchInput.value = '';
+    selectedId = null;
     onFilterChange();
   });
   document.getElementById('library-zoom-in').addEventListener('click', () => zoomAt(1.25));
@@ -627,12 +715,14 @@
   }, { passive: false });
 
   svg.addEventListener('pointerdown', (event) => {
-    if (draggedNode) return;
+    if (!event.isPrimary || event.button !== 0 || draggedNode) return;
+    cancelCenter();
     panState = { x: event.clientX, y: event.clientY, tx: transform.x, ty: transform.y };
     svg.setPointerCapture(event.pointerId);
   });
 
   svg.addEventListener('pointermove', (event) => {
+    if (!event.isPrimary) return;
     if (draggedNode) {
       // 터치에서는 탭에도 몇 px 흔들린다. 그만큼은 드래그로 보지 않는다.
       if (!dragMoved && dragStart
@@ -650,8 +740,9 @@
   });
 
   function endPointer(event, cancelled) {
+    if (!event.isPrimary) return;
     if (draggedNode) {
-      if (!cancelled && !dragMoved) selectNode(draggedNode.id);
+      if (!cancelled && !dragMoved) selectNode(draggedNode.id, { revealRow: true });
       draggedNode = null;
     }
     dragStart = null;
@@ -679,7 +770,7 @@
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  readParams();
-  applyFilters();
+  window.addEventListener('popstate', restoreState);
   paperList.closest('.library-list').hidden = false;
+  restoreState();
 })();

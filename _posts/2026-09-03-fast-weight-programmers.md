@@ -1,5 +1,5 @@
 ---
-title: "[논문 리뷰] Linear Transformers Are Secretly Fast Weight Programmers"
+title: "Linear Transformers Are Secretly Fast Weight Programmers"
 date: 2026-09-03 15:00:00 +0900
 permalink: /posts/fast-weight-programmers/
 categories:
@@ -16,15 +16,13 @@ paper:
   code: "https://github.com/ischlag/fast-weight-transformers"
 ---
 
-## 세 줄 요약
-
 선형화된 자기주의(linearised self-attention)는 과거의 키와 값을 모두 보관하는 대신, 두 벡터의 외적을 누적한 행렬을 매 시점 갱신하는 Fast Weight Programmer로 해석할 수 있다.
 
 $d_{dot}$차원 메모리가 서로 다른 키-값 연결(association)을 간섭 없이 저장하려면 변환된 키들이 직교해야 하므로, 완벽히 분리할 수 있는 association의 수는 최대 $d_{dot}$개로 제한된다.
 
 이 논문은 기존 값을 먼저 읽고 오차만 수정하는 델타 규칙(delta rule), 합 정규화(sum normalisation), 결정론적 차원 확장인 DPFP를 결합해 가산 갱신의 용량과 수정 한계를 완화한다.
 
-## 이 논문이 풀려는 문제
+## 더하기만 하는 고정 크기 상태
 
 표준 Transformer의 자기주의는 길이 $L$인 시퀀스에서 $O(L^2)$의 연산을 요구하고, 과거 키와 값을 저장하는 메모리도 $L$에 따라 선형으로 늘어난다. 컨텍스트 윈도우가 길어질수록 비용이 빠르게 커지므로 실제 모델에서는 처리할 문맥 길이를 제한하게 된다.
 
@@ -882,7 +880,7 @@ $$
 
 가 된다. $\nu$를 늘릴수록 저장 공간은 넓어지지만 빠른 가중치의 열 수도 함께 늘어난다. 따라서 DPFP는 용량을 무료로 늘리는 장치가 아니라, 무작위성 대신 결정론적 계산과 더 큰 상태를 지불하는 선택이다.
 
-## 구현 관점에서
+## DPFP와 델타 메모리의 순차 갱신 코드
 
 ### DPFP 특징 맵
 
@@ -995,7 +993,7 @@ for i in range(L):
 
 이 추론 루프는 빠른 가중치 메모리의 갱신을 나타낸다. 출력 분포에서 다음 토큰을 선택하는 샘플링 규칙은 별도로 정해야 한다.
 
-## 실험 설정
+## 합성 검색·WMT14·WikiText-103 실험
 
 ### 합성 검색 태스크
 
@@ -1127,7 +1125,7 @@ Transformer-XL의 평가 설정에서 memory/target segment length와 상태 크
 
 Transformer-XL은 학습 시 비교 모델과 같은 384단어 역전파 범위를 맞추기 위해 memory와 target segment length를 모두 384로 두었고, 평가에서는 위와 같이 segment length를 바꿨다.
 
-## 무엇이 성능을 만들었나
+## 델타 규칙·정규화·위치 인코딩 ablation
 
 ### 델타 규칙은 초과용량 밖에서도 유효했다
 
@@ -1157,7 +1155,7 @@ Sum normalisation을 사용한 상태에서 attention normalisation을 추가하
 
 Attention normalisation이 없는 조건에서 절대 위치 인코딩을 제거하면 검증 perplexity가 29.7에서 28.1로, 테스트 perplexity가 31.5에서 31.1로 개선됐다. 이 실험 범위에서는 fast-weight 상태 갱신 자체가 순서를 따라 진행되므로 별도의 절대 위치 인코딩이 이득을 주지 않았다.
 
-## 비용과 트레이드오프
+## d_dot에 비례하는 상태와 처리량
 
 표준 자기주의는 시퀀스 길이에 대해 $O(L^2)$ 계산을 사용하고, 과거 키와 값을 저장하는 상태가 $O(L)$로 증가한다. 선형 주의와 Delta Network는 매 시점 $d_{value}\times d_{dot}$ 행렬을 갱신하므로 전체 시간은 시퀀스 길이에 선형이고 순차 추론의 상태 크기는 길이와 무관하다.
 
@@ -1177,7 +1175,7 @@ Delta Network는 순수 가산 Linear Transformer보다 처리량이 66K에서 6
 
 경량화 관점에서 이 방법의 강점은 파라미터 수를 크게 줄이는 데 있지 않다. Table 2의 모델들은 게이트로 인한 16K 또는 33K 차이를 제외하면 파라미터 수가 거의 같다. 핵심은 긴 시퀀스에서 평가 상태가 문맥 길이에 따라 커지지 않는다는 점이다. 반대로 더 큰 $d_{dot}$이 필요해지면 고정 상태 자체가 커지므로 필요한 association 용량과 실제 배포 메모리 사이에서 $\nu$나 $m$을 선택해야 한다.
 
-## 한계와 생각해볼 점
+## 큰 상태 모델과의 격차와 NaN 사례
 
 저자가 제시한 첫 번째 한계는 큰 상태를 허용한 Transformer-XL의 절대 성능이다. Delta Network는 0.13M 상태로 테스트 perplexity 29.4를 기록했지만, 6.29M 상태의 Transformer-XL은 25.5를 기록했다. 고정된 작은 상태에서 효율적이라는 장점이 더 큰 메모리를 사용하는 모델의 최고 품질까지 보장하지는 않는다.
 

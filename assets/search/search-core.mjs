@@ -148,7 +148,7 @@ export async function searchPosts(query, { limit = 8, onStatus = () => {} } = {}
   return rankResults(index, result.data, query, { limit });
 }
 
-export function renderQuestionChips(container, choose, className) {
+export function renderQuestionChips(container, choose, className = "search-chip") {
   for (const question of EXAMPLE_QUESTIONS) {
     const button = document.createElement("button");
     button.type = "button";
@@ -198,13 +198,13 @@ export function renderSearchResults(container, results, query, { baseUrl = "", c
   const fragment = document.createDocumentFragment();
   for (const result of results) {
     const card = document.createElement("article");
-    card.className = compact ? "sq-hit" : "card mb-2";
+    card.className = compact ? "sq-hit" : "card ai-result";
     const body = document.createElement("div");
     if (!compact) body.className = "card-body py-2";
 
     const href = baseUrl + result.u;
     const title = document.createElement("a");
-    title.className = compact ? "sq-title" : "fw-bold";
+    title.className = compact ? "sq-title" : "ai-result-title";
     title.href = href;
     appendHighlighted(title, result.t, terms);
 

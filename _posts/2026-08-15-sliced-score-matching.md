@@ -1,5 +1,5 @@
 ---
-title: "[논문 리뷰] Sliced Score Matching: A Scalable Approach to Density and Score Estimation"
+title: "Sliced Score Matching: A Scalable Approach to Density and Score Estimation"
 date: 2026-08-15 08:00:00 +0900
 permalink: /posts/sliced-score-matching/
 categories:
@@ -16,11 +16,11 @@ paper:
 
 > Hessian trace 계산을 랜덤 투영으로 우회한다는 아이디어와 그 대가에 초점을 맞춘다.
 
-## 세 줄 요약
+## Hessian trace를 랜덤 투영으로 바꾼 SSM
 
 Sliced Score Matching(SSM)은 고차원 스코어(score) 전체를 직접 비교하는 대신 랜덤 방향에 투영한 값들을 맞춰, 표준 score matching의 Hessian trace 계산 비용을 줄인다. 목적함수를 부분적분하면 데이터 분포의 미지 스코어가 사라지고, Hessian 전체 대신 Hessian-vector product만으로 학습할 수 있다. 이 계산상의 변화는 일관성(consistency)과 점근적 정규성(asymptotic normality)을 유지하면서 깊은 비정규화 밀도 모델, 암묵적 분포의 score estimation, VAE와 WAE 학습까지 연결된다.
 
-## 이 논문이 풀려는 문제
+## 엔트로피 그래디언트와 Hessian trace 비용
 
 밀도 모델 $p_m(x;\theta)$의 스코어는 로그 밀도의 입력 그래디언트다.
 
@@ -227,7 +227,7 @@ $$
 
 가 된다. 병목은 통계적 정의가 아니라 이 trace를 계산하는 방법에 있다.
 
-## 핵심 아이디어 — 스코어를 랜덤 방향으로 잘라 보기
+## 스코어를 랜덤 방향으로 잘라 보기
 
 ### 투영된 오차도 원래 스코어를 식별할 수 있는가
 
@@ -289,7 +289,7 @@ $$
 
 두 번째 조건은 목적함수와 증명에서 사용하는 모멘트가 유한하도록 만든다. 논문이 제시한 예시는 다변량 표준정규분포 $\mathcal N(0,I_D)$, $\{\pm1\}^D$ 위의 다변량 Rademacher 분포, 초구 $S^{D-1}$ 위의 균등분포다.
 
-내가 보기에는 저자가 DSM처럼 입력에 노이즈를 넣는 대신 목적함수의 trace만 랜덤화한 선택이 핵심이다. DSM을 택하면 학습 대상이 noise-corrupted distribution의 스코어로 바뀌어 원래 $p_d$에 대한 Eq. 1과의 정확한 동치가 사라진다. SSM은 $p_d$를 바꾸지 않고 $E[vv^\top]$을 통해 오차를 관측하는 방식을 바꾸므로, 이후의 부분적분 등식과 식별가능성을 그대로 유지할 수 있다.
+저자가 DSM처럼 입력에 노이즈를 넣는 대신 목적함수의 trace만 랜덤화한 선택이 핵심이라고 볼 수 있다. DSM을 택하면 학습 대상이 noise-corrupted distribution의 스코어로 바뀌어 원래 $p_d$에 대한 Eq. 1과의 정확한 동치가 사라진다. SSM은 $p_d$를 바꾸지 않고 $E[vv^\top]$을 통해 오차를 관측하는 방식을 바꾸므로, 이후의 부분적분 등식과 식별가능성을 그대로 유지할 수 있다.
 
 ### 부분적분으로 데이터 스코어를 제거하기
 
@@ -579,7 +579,7 @@ $$
 > SSM과 SSM-VR은 기대 목적함수는 같지만 유한한 미니배치와 작은 $M$에서의 최적화 잡음이 다르다. 실험에서 variance reduction이 성능을 크게 개선했다는 결과는 이 차이가 실제 학습에서 중요하다는 근거다.
 {: .prompt-tip }
 
-내가 보기에는 Rademacher를 사용한 선택도 단순한 구현 취향 이상이다. 표준정규와 Rademacher는 모두 $E[vv^\top]=I$라서 같은 모집단 목적함수를 만들지만, Lemma 5의 점근 분산에서는 Gaussian에만 $\frac2M\sum_iV_{ii}$가 추가된다. 각 성분의 제곱이 항상 1인 Rademacher는 대각 성분의 무작위성을 없애므로, 동일한 covariance를 만족하는 두 후보 중 이론상 더 작은 추가 분산을 갖는다.
+Rademacher를 사용한 선택도 단순한 구현 취향 이상이라고 해석할 수 있다. 표준정규와 Rademacher는 모두 $E[vv^\top]=I$라서 같은 모집단 목적함수를 만들지만, Lemma 5의 점근 분산에서는 Gaussian에만 $\frac2M\sum_iV_{ii}$가 추가된다. 각 성분의 제곱이 항상 1인 Rademacher는 대각 성분의 무작위성을 없애므로, 동일한 covariance를 만족하는 두 후보 중 이론상 더 작은 추가 분산을 갖는다.
 
 ## 밀도가 아니라 스코어 함수 자체를 학습하기
 
@@ -707,11 +707,11 @@ $$
 
 대괄호 안이 한 방향에 대한 SSM 목적함수다. 여기서는 Eq. 13처럼 정확한 등식이 아니라 $\|v\|_2\to0$에서의 2차 근사다. 버린 것은 $o(\|v\|_2^2)$에 들어가는 고차항이며, $v$가 충분히 작지 않으면 SSM과 NCE 목적함수가 가깝다는 결론을 그대로 적용할 수 없다.
 
-## 관련 리뷰와 연결
+## NCSN, Score SDE와 다른 병목
 
 [NCSN](/posts/ncsn/)과 이 논문은 모두 관측할 수 없는 데이터 스코어를 신경망으로 학습한다는 출발점을 공유하지만, 없애려는 병목은 다르다. SSM은 원래 분포의 Fisher divergence를 유지한 채 Hessian trace를 랜덤 투영으로 추정한다. NCSN은 여러 노이즈 규모에서 DSM을 사용해 noise-perturbed distribution의 score를 학습하고, annealed Langevin dynamics로 표본을 생성한다. [Score SDE](/posts/score-sde/)는 이 노이즈 수준을 연속 시간으로 확장해 reverse-time SDE의 score를 학습한다. 따라서 SSM의 핵심은 “score objective의 공간 미분을 어떻게 싸게 계산할 것인가”이고, NCSN과 Score SDE의 핵심은 “노이즈에 따라 달라지는 score를 어떻게 학습해 생성 과정에 연결할 것인가”다. SSM 자체에는 시간 인덱스나 역방향 생성 dynamics가 없다.
 
-## 구현 관점에서
+## SSM-VR 학습 단계와 DKEF 내부 최적화
 
 ### SSM과 SSM-VR 학습 단계
 
@@ -863,9 +863,9 @@ $$
 
 를 얻는다. 구현에서는 역행렬을 명시적으로 만드는 대신 같은 선형시스템을 푸는 편이 수치적으로 적절하다.
 
-이 결과가 DKEF 실험의 2단계 최적화를 뒷받침한다. 구현에서는 미니배치 200개를 $\alpha$ 계산용 100개와 loss 계산용 100개로 분리한다. 내가 보기에는 이 내부 해석해는 SSM 자체의 기여라기보다 DKEF라는 선형-in-parameter 구조를 활용한 최적화 장치다. inducing point와 feature network까지 모두 확률적 경사하강으로 뒤섞는 대신, convex한 $\alpha$ 블록을 정확히 제거해 나머지 비선형 파라미터의 최적화 문제를 좁힌다.
+이 결과가 DKEF 실험의 2단계 최적화를 뒷받침한다. 구현에서는 미니배치 200개를 $\alpha$ 계산용 100개와 loss 계산용 100개로 분리한다. 이 내부 해석해는 SSM 자체의 기여라기보다 DKEF라는 선형-in-parameter 구조를 활용한 최적화 장치라고 볼 수 있다. inducing point와 feature network까지 모두 확률적 경사하강으로 뒤섞는 대신, convex한 $\alpha$ 블록을 정확히 제거해 나머지 비선형 파라미터의 최적화 문제를 좁힌다.
 
-## 왜 이 추정량을 믿을 수 있는가
+## 식별가능성에서 점근적 정규성까지
 
 ### 식별가능성: 투영만 보아도 충분한 조건
 
@@ -1238,7 +1238,7 @@ $$
 
 ### 이론이 실제 구현에서 깨지는 지점
 
-내가 보기에는 이론과 신경망 구현 사이에서 가장 조용히 깔린 가정은 경계 조건, smoothness, compactness다.
+이론과 신경망 구현 사이에서 가장 조용히 깔린 가정은 경계 조건, smoothness, compactness라고 해석할 수 있다.
 
 첫째, 부분적분 등식은 경계항이 0일 때만 성립한다. 무한 지지집합에서는 $p_d(x)s_m(x;\theta)$가 충분히 빠르게 감소해야 하고, bounded support라면 무한대 대신 실제 경계에서 flux가 사라져야 한다. 밀도가 경계에서 0이 아니거나 모델 스코어가 발산하면 Eq. 16에 경계항이 추가되어 학습 목적함수는 Fisher divergence와 더 이상 상수 차이가 아니다.
 
@@ -1246,7 +1246,7 @@ $$
 
 셋째, Lemma 3은 compact한 $\Theta$를 사용하지만 일반적인 신경망 학습은 가중치를 명시적인 compact 집합에 제한하지 않는다. 정규화나 bounded parameterization 없이 Adam으로 학습했다는 사실만으로 이 가정이 자동 충족되지는 않는다. 따라서 정리는 추정량의 통계적 타당성을 설명하지만, 실험의 모든 신경망 최적화 trajectory에 그대로 적용되는 무조건적 보장은 아니다.
 
-## 밀도 추정 실험
+## DKEF와 NICE의 밀도 추정 실험
 
 ### DKEF 설정
 
@@ -1295,7 +1295,7 @@ DSM의 $\sigma$는 0.01, 0.05, 0.10, 0.20, 0.28, 0.50, 1.00, 1.50과 heuristic �
 
 Table 1에서 읽어야 할 점은 test SM loss와 test log-likelihood의 순위가 일치하지 않는다는 것이다. SSM-VR은 SM loss가 -8054로 가장 낮지만 LL은 -3355이며, MLE의 LL은 -791이다. DSM도 $\sigma=0.10$과 1.74 사이에서 SM loss와 LL이 크게 변한다. 따라서 특정 score matching loss를 더 낮춘 결과를 곧바로 더 높은 likelihood와 동일시할 수 없다.
 
-내 판단으로 이 불일치는 SSM-VR의 실패라기보다 목적함수와 평가 지표의 차이를 드러낸다. score matching은 정규화 상수를 보지 않고 입력 미분의 국소적 일치를 측정하는 반면, log-likelihood는 정규화된 전역 확률질량을 평가한다. Eq. 1이 0이면 두 밀도를 식별할 수 있다는 이론과, 제한된 모델·유한표본·불완전한 최적화에서 두 지표의 순위가 같아야 한다는 주장은 서로 다르다.
+이 불일치는 SSM-VR의 실패라기보다 목적함수와 평가 지표의 차이를 드러내는 것으로 해석할 수 있다. score matching은 정규화 상수를 보지 않고 입력 미분의 국소적 일치를 측정하는 반면, log-likelihood는 정규화된 전역 확률질량을 평가한다. Eq. 1이 0이면 두 밀도를 식별할 수 있다는 이론과, 제한된 모델·유한표본·불완전한 최적화에서 두 지표의 순위가 같아야 한다는 주장은 서로 다르다.
 
 ## 암묵적 VAE와 WAE에 적용하기
 
@@ -1370,7 +1370,7 @@ Table 4부터 Table 7은 생성 표본 비교다. 정량 지표와 표본의 시
 - Table 6: MNIST의 WAE 표본을 latent dimension 8과 32에서 SSM, Stein, Spectral별로 비교한다.
 - Table 7: CelebA의 WAE 표본을 SSM, Stein, Spectral별로 비교한다.
 
-## 재현에 필요한 네트워크 구조
+## MNIST·CelebA 인코더와 score estimator 구조
 
 ### MNIST
 
@@ -1398,7 +1398,7 @@ CelebA에서도 $D_\epsilon=D_z$이며 $D_z$는 8 또는 32다. 표에서 $m$은
 
 SSM의 미분은 score estimator 출력의 입력 Jacobian에 작용한다. 따라서 score estimator가 어느 변수의 스코어를 근사하는지에 따라 미분 대상과 출력 차원을 일치시켜야 한다.
 
-## 무엇이 성능을 만들었나
+## SSM-VR과 M=100 투영의 효과
 
 이 논문에는 독립된 ablation table이 없다. 따라서 구성 요소별 수치적 인과관계는 직접 비교가 있는 범위에서만 분리해 읽어야 한다.
 
@@ -1408,9 +1408,9 @@ SSM의 미분은 score estimator 출력의 입력 Jacobian에 작용한다. 따�
 
 DSM의 여러 $\sigma$ 결과도 민감도를 보여주지만, 이는 SSM 내부 구성 요소의 ablation은 아니다. NICE에서 $\sigma=0.10$과 1.74는 test SM loss가 -3035와 -97, test LL이 -4363과 -8082로 크게 다르다. 노이즈 규모가 복원 대상과 최적화 결과를 바꾼다는 기존 방법의 한계를 수치로 확인하는 비교에 가깝다.
 
-내가 보기에는 논문의 기여는 세 층으로 나뉜다. 첫 번째이자 핵심은 Fisher divergence의 식별력을 유지하면서 trace를 랜덤 이차형식으로 바꾼 Eq. 5와, 이를 일반적인 reverse-mode autodiff로 계산하게 만든 것이다. 두 번째는 이 랜덤 추정량의 consistency와 asymptotic normality를 정리하고 $M$에 따른 계산·분산 교환을 식으로 드러낸 것이다. 세 번째는 SSM-VR이다. 수학적으로는 기대값을 아는 항을 control variate로 치환한 비교적 단순한 장치지만, DKEF 결과를 보면 실제 성능에는 핵심적이다. NCE 연결, DKEF의 $\alpha$ 해석해, VAE·WAE 적용은 앞의 두 기여가 다른 추정 문제와 모델에서 작동함을 보여주는 연결 및 검증으로 보는 편이 맞다.
+논문의 기여는 세 층으로 나눠 볼 수 있다. 첫 번째이자 핵심은 Fisher divergence의 식별력을 유지하면서 trace를 랜덤 이차형식으로 바꾼 Eq. 5와, 이를 일반적인 reverse-mode autodiff로 계산하게 만든 것이다. 두 번째는 이 랜덤 추정량의 consistency와 asymptotic normality를 정리하고 $M$에 따른 계산·분산 교환을 식으로 드러낸 것이다. 세 번째는 SSM-VR이다. 수학적으로는 기대값을 아는 항을 control variate로 치환한 비교적 단순한 장치지만, DKEF 결과를 보면 실제 성능에는 핵심적이다. NCE 연결, DKEF의 $\alpha$ 해석해, VAE·WAE 적용은 앞의 두 기여가 다른 추정 문제와 모델에서 작동함을 보여주는 연결 및 검증으로 보는 편이 맞다.
 
-## 비용과 트레이드오프
+## D+1 대 M+1, 그리고 보조 score network
 
 SSM의 계산상 핵심 비율은 $D+1$ 대 $M+1$이다. 입력 차원 $D$가 크고 작은 $M$으로 충분한 경우 표준 SM보다 Hessian 관련 gradient operation을 크게 줄인다. DKEF 차원 확장 실험에서 표준 SM이 12GB GPU로 400차원을 넘기지 못한 결과는 이 차이가 메모리 병목에도 연결됨을 보여준다.
 
@@ -1422,7 +1422,7 @@ SSM의 계산상 핵심 비율은 $D+1$ 대 $M+1$이다. 입력 차원 $D$가 �
 
 DKEF에서는 $M=1$이 기본값이지만 15 seeds, validation patience 200, AIS 1,000,000 samples를 사용했다. NICE는 표준 SM을 제외해 한 epoch 7시간의 비용을 피했지만 각 모델 학습에는 약 2시간이 들었다. 따라서 목적함수 한 스텝의 효율과 전체 실험 비용은 구분해야 한다. 특히 AIS 기반 likelihood 평가는 학습 목적함수의 효율화와 별개의 평가 비용이다.
 
-## 한계와 생각해볼 점
+## 분산 증가, 정리의 가정, curl-free 문제
 
 계산 비용과 통계적 효율 사이에는 두 가지 제약이 있다.
 
@@ -1432,7 +1432,7 @@ DKEF에서는 $M=1$이 기본값이지만 15 seeds, validation patience 200, AIS
 
 이론적 보증의 적용 조건도 별도로 보아야 한다. 기존 Hyvärinen의 local consistency와 구분되는 SSM의 consistency 결과는 compactness, 식별가능성, 경계 조건, smoothness와 유한 모멘트 조건을 포함한 Assumption 1부터 9의 틀 안에서 성립한다. 임의의 신경망과 학습 설정이 이 조건을 자동으로 만족하는 것은 아니다.
 
-내가 구현 관점에서 추가로 주의해서 읽은 부분은 목적함수의 불편성과 실제 학습 안정성이 같지 않다는 점이다. Eq. 7이 불편 추정량이라는 사실만으로 작은 $M$에서 최적화가 안정적이라고 결론 내릴 수는 없다. DKEF에서 SSM-VR이 기본 SSM보다 크게 개선된 결과가 그 차이를 보여준다. 새 데이터와 모델에서는 $M$, projection 분포, control-variate 계수가 별도의 최적화 설계 변수가 된다.
+구현 관점에서 추가로 주의할 부분은 목적함수의 불편성과 실제 학습 안정성이 같지 않다는 점이다. Eq. 7이 불편 추정량이라는 사실만으로 작은 $M$에서 최적화가 안정적이라고 결론 내릴 수는 없다. DKEF에서 SSM-VR이 기본 SSM보다 크게 개선된 결과가 그 차이를 보여준다. 새 데이터와 모델에서는 $M$, projection 분포, control-variate 계수가 별도의 최적화 설계 변수가 된다.
 
 또한 일반 신경망 score estimator가 curl-free가 아닐 수 있다는 각주는 중요하다. 추정된 벡터장이 downstream 엔트로피 그래디언트에 유용할 수는 있어도, 항상 어떤 정규화 가능한 밀도의 로그 gradient로 적분된다고 볼 수는 없다. 밀도 복원까지 요구하는 응용이라면 자유로운 $h$ 대신 energy parameterization이나 integrability 제약이 필요하고, 그 대가로 미분 깊이와 계산량이 늘어난다.
 

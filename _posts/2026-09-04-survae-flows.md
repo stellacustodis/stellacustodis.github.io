@@ -14,15 +14,13 @@ paper:
   code: "https://github.com/didriknielsen/survae_flows"
 ---
 
-## 세 줄 요약
-
 SurVAE Flows는 전단사(bijection)만 허용하던 정규화 흐름(normalizing flow)에 전사 변환(surjection)과 확률적 변환을 더해, VAE와 flow를 하나의 변환 프레임워크로 설명한다.
 
 핵심은 각 레이어를 forward 변환, inverse 변환, 가능도 기여도(likelihood contribution), bound gap으로 분해하는 것이다.
 
 이 구성을 이용하면 차원을 줄이는 slicing·max 연산이나 이산화를 위한 rounding, 대칭성과 순열 불변성을 다루는 abs·sort·stochastic permutation을 flow의 조합 가능한 레이어로 사용할 수 있다.
 
-## 이 논문이 풀려는 문제
+## 전단사 flow와 VAE 사이의 간극
 
 정규화 흐름의 장점은 가능도 계산이 명확하다는 데 있다. 데이터 $x$와 잠재변수 $z$를 전단사 함수로 연결하면 역변환과 야코비안(Jacobian) 행렬식만으로 $\log p(x)$를 계산할 수 있다. 하지만 전단사는 입력과 출력 사이의 일대일 대응을 요구한다. 그 결과 변환 도중 차원을 바꾸기 어렵고, 이산적인 값이나 서로 분리된 성분을 가진 분포를 표현하는 데 제약이 생긴다.
 
@@ -50,7 +48,7 @@ _논문 Figure 1. Bijective, generative surjection, inference surjection, stocha
 
 전사 함수는 여러 입력을 하나의 출력으로 보낼 수 있다. 따라서 역방향에서는 원래 입력을 하나로 정할 수 없고, 잃어버린 정보를 확률적으로 복원해야 한다. SurVAE Flows는 이 확률적 역관계를 숨기지 않고 $p(x\mid z)$ 또는 $q(z\mid x)$로 명시한다.
 
-## 핵심 아이디어: 변환을 가능도 장부로 바꾼다
+## 변환을 가능도 장부로 바꾸기
 
 이 논문의 핵심은 새로운 단일 변환을 제안했다는 데 있지 않다. 서로 다른 변환을 동일한 회계 방식으로 기록할 수 있게 했다는 데 있다. 각 레이어는 다음 네 항목으로 기술된다.
 
@@ -72,7 +70,7 @@ _논문 Figure 1. Bijective, generative surjection, inference surjection, stocha
 
 이 표는 “surjection이면 항상 exact likelihood인가?”라는 질문에도 답한다. Inference surjection은 inverse가 결정적이므로 표에서 $E=0$이다. 반면 generative surjection은 inverse에 $q(z\mid x)$가 필요하며 stochastic transformation과 같은 형태의 gap이 남는다. 따라서 프레임워크 전체가 언제나 exact한 것이 아니라, 어떤 레이어를 조합했는지에 따라 exact likelihood와 lower bound가 구분된다.
 
-## 방법 — 전단사와 VAE를 하나의 식으로 읽기
+## 전단사와 VAE를 하나의 식으로 읽기
 
 ### 전단사의 change of variables
 
@@ -323,7 +321,7 @@ Probabilistic PCA, VAE, Diffusion Models는 모두 stochastic transformation이�
 
 이렇게 보면 SurVAE Flows의 역할은 모델 이름을 하나 더 추가하는 것보다 설계 공간을 정리하는 데 가깝다. 어떤 정보를 보조 변수로 추가하고, 어떤 변환에서 섞고, 어디에서 제거하며, 제거한 정보의 확률을 어느 항이 담당하는지 비교할 수 있다.
 
-## 구현 관점에서
+## Abs·Max·Sort 레이어의 의사코드
 
 ### 공통 실행 인터페이스
 
@@ -475,7 +473,7 @@ def slicing_inverse(x, dropped_dim):
 
 Rounding에서도 이산 결과와 그 결과에 대응한 연속 잠재변수의 관계를 혼동하면 안 된다. forward의 rounding 자체는 결정적이지만 inverse는 여러 연속 값을 가질 수 있으므로 $q(z\mid x)$가 필요하다. 따라서 정수 변환만 구현하고 $-\log q(z\mid x)$를 누락하면 SurVAE likelihood가 아니다.
 
-## 실험에서 확인한 것
+## SpatialMNIST PPLL과 이미지 밀도 결과
 
 논문은 네 종류의 실험 범위를 사용한다.
 
@@ -535,7 +533,7 @@ MaxPoolFlow는 Baseline보다 Inception score가 5.08에서 5.18로 높고 FID�
 
 이 결과는 density estimation과 sample quality가 같은 순서로 움직이지 않을 수 있음을 보여준다. 다만 MaxPoolFlow의 5.18과 49.03은 표의 모든 모델 중 최고가 아니다. DCGAN과 WGAN-GP는 더 높은 Inception score와 더 낮은 FID를 기록했고, PixelIQN의 Inception score도 5.29다. 따라서 결론은 max pooling surjection이 모든 생성 모델을 앞섰다는 것이 아니라, 논문의 자체 Baseline과 비슷한 bits/dim을 유지하면서 샘플 지표를 개선했다는 범위에 두어야 한다.
 
-## 무엇이 성능을 만들었는가
+## PermuteFlow와 MaxPoolFlow 비교의 범위
 
 전체 성능을 Abs, Max, Sort의 독립적인 기여로 분해하려면 구성 요소별 비교가 필요하다. likelihood contribution의 각 항을 제거하는 경우도 최종 모델의 수치만으로 효과를 판단할 수 없다.
 
@@ -545,7 +543,7 @@ MaxPoolFlow는 Baseline보다 Inception score가 5.08에서 5.18로 높고 FID�
 
 둘째, 이미지 실험에서는 tensor slicing 기반 Baseline과 MaxPoolFlow를 비교할 수 있다. MaxPoolFlow는 세 데이터셋에서 Baseline과 비슷하지만 조금 높은 bits/dim을 기록했고, CIFAR-10에서는 더 높은 Inception score와 더 낮은 FID를 기록했다. 이 비교를 각 구성 요소의 독립 효과로 해석하려면 다른 학습 조건과 구성 요소가 통제되었는지까지 확인해야 한다.
 
-## 비용과 트레이드오프
+## 잃은 정보를 모델링하는 계산의 대가
 
 SurVAE layer는 전단사가 허용하지 않던 연산을 모델 내부에 넣는 대신, 사라진 정보를 위한 확률모형을 요구한다.
 
@@ -563,7 +561,7 @@ Tensor slicing의 계산 비용은 방향에 따라 다르다. 생성 방향 sli
 
 샘플링 비용도 생성 경로의 연산을 기준으로 봐야 한다. inference surjection의 생성 방향에서는 sign, max index, 나머지 값, permutation과 같은 변수를 표본화해야 한다. 따라서 bijective flow처럼 모든 레이어를 결정적 역함수로만 통과하는 구조와는 생성 경로가 다르다.
 
-## 구현할 때 확인할 체크리스트
+## 레이어별 V·E 계산 체크리스트
 
 SurVAE Flow를 수식에서 코드로 옮길 때 먼저 확인할 항목은 다음과 같다.
 
@@ -580,7 +578,7 @@ SurVAE Flow를 수식에서 코드로 옮길 때 먼저 확인할 항목은 다�
 
 특히 레이어가 실행된다는 사실만으로 구현이 맞다고 판단하기 어렵다. 예를 들어 max 연산 자체는 쉽게 구현되지만 $\log p(k\mid z)$ 또는 $\log p(x\_{-k}\mid z,k)$를 누락해도 텐서 shape은 정상일 수 있다. 이 경우 생성 샘플은 나오더라도 논문이 정의한 likelihood contribution과 다른 모델이 된다.
 
-## 한계와 생각해볼 점
+## bound gap, 구조적 가정, 비어 있는 효율 근거
 
 구조와 실험 결과를 해석할 때는 다음 조건을 살펴야 한다.
 

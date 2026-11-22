@@ -5,6 +5,7 @@ if (root) {
   const launcher = document.getElementById("code-lab-launcher");
   const dialog = $(".code-lab__dialog");
   const source = $("#code-lab-source");
+  const stdinToggle = $(".code-lab__stdin summary");
   const stdin = $("#code-lab-stdin");
   const lineNumbers = $("#code-lab-line-numbers");
   const position = $("#code-lab-position");
@@ -32,6 +33,7 @@ if (root) {
   const preset = $("#code-lab-preset");
   const status = $("#code-lab-status");
   const statusIcon = $("#code-lab-status-icon");
+  const dependencyNote = $("#code-lab-dependency-note");
   const runtimeDot = $("#code-lab-runtime-dot");
   const runtimeLabel = $("#code-lab-runtime-label");
   const tabs = [...root.querySelectorAll("[data-language]")];
@@ -45,6 +47,11 @@ if (root) {
   const MAX_TRACE_LINES = 1_000;
   const PYTHON_IDLE_TIMEOUT = 45_000;
   const INDENT = "    ";
+  const pythonExternalPackages = new Set([
+    "altair", "diffusers", "dotenv", "duckdb", "fastapi", "joblib", "langchain", "matplotlib",
+    "mlflow", "numpy", "pandas", "plotly", "polars", "pydantic", "pynvml", "schedule", "scipy",
+    "seaborn", "sklearn", "torch", "torchaudio", "torchvision", "transformers",
+  ]);
 
   const languageConfig = {
     python: {
@@ -401,10 +408,37 @@ public class Main {
     position.textContent = `Ln ${lines.length}, Col ${lines.at(-1).length + 1}`;
   }
 
+  function findExternalPackage(code, lang) {
+    if (lang === "java") {
+      return /^[ \t]*import[ \t]+(?:static[ \t]+)?(org\.springframework|com\.fasterxml\.jackson|org\.junit|jakarta|lombok)\./m.exec(code)?.[1];
+    }
+    if (lang !== "python") return;
+
+    const statements = code.replace(/\\\r?\n[ \t]*/g, " ").matchAll(
+      /^[ \t]*(?:from[ \t]+([\w.]+)[ \t]+import\b|import[ \t]+([^#;\r\n]+))/gm,
+    );
+    for (const [, fromModule, imports] of statements) {
+      const modules = fromModule ? [fromModule] : imports.split(",");
+      for (const module of modules) {
+        const name = module.trim().split(/[.\s]/, 1)[0];
+        if (pythonExternalPackages.has(name) || name.startsWith("langchain_")) return name;
+      }
+    }
+  }
+
+  function updateDependencyNote() {
+    const name = findExternalPackage(currentCode(), language);
+    const message = name
+      ? `외부 패키지(${name} 등)를 사용하는 코드는 브라우저나 기본 격리 런타임에서 바로 실행되지 않을 수 있습니다.`
+      : "";
+    if (dependencyNote.textContent !== message) dependencyNote.textContent = message;
+  }
+
   function syncSource() {
     storageSet(codeKey(language), source.value);
     updateLineNumbers();
     updatePosition();
+    updateDependencyNote();
     preset.selectedIndex = 0;
   }
 
@@ -569,6 +603,7 @@ public class Main {
     setRuntimeDisplay();
     updateLineNumbers();
     updatePosition();
+    updateDependencyNote();
     clearOutput();
     setStatus("준비됨");
   }
@@ -1062,6 +1097,7 @@ public class Main {
         stdin.value = "";
         updateLineNumbers();
         updatePosition();
+        updateDependencyNote();
         openLab(button);
       });
       actions.append(button);
@@ -1168,11 +1204,14 @@ public class Main {
 
     if (event.key === "Escape") {
       event.preventDefault();
-      if (document.activeElement === source) {
-        $(".code-lab__stdin summary").focus();
-      } else {
-        closeLab();
-      }
+      closeLab();
+      return;
+    }
+
+    if (document.activeElement === source && event.ctrlKey && !event.altKey && !event.metaKey &&
+        !event.shiftKey && event.key.toLowerCase() === "m") {
+      event.preventDefault();
+      stdinToggle.focus();
       return;
     }
 

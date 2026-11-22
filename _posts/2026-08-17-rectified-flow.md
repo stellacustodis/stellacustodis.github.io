@@ -1,5 +1,5 @@
 ---
-title: "[논문 리뷰] Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow"
+title: "Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow"
 date: 2026-08-17 21:20:00 +0900
 permalink: /posts/rectified-flow/
 categories:
@@ -17,13 +17,13 @@ paper:
 
 > 선형 보간의 속도를 회귀하고 reflow로 생성 궤적을 직선화하는 과정에 초점을 맞춘다.
 
-## 세 줄 요약
+## 선형 보간, reflow, 그리고 보장의 범위
 
 Rectified flow는 두 분포에서 뽑은 표본을 선형 보간하고, 보간점에서 끝점 변위의 조건부 평균을 예측하는 최소제곱 문제로 생성·변환 ODE를 학습한다. 학습된 ODE가 만든 새로운 coupling으로 같은 절차를 반복하는 reflow는 궤적을 점차 직선에 가깝게 만들어 적은 함수 평가 횟수(Number of Function Evaluations, NFE)에서도 품질을 유지하게 한다. 이 과정은 주변분포 보존과 convex transport cost의 비증가로 정당화되지만, 비선형 경로나 고차원 최적 전송으로 확장하면 보장의 범위가 좁아진다.
 
 이 글에서 다루는 논문은 Xingchao Liu, Chengyue Gong, Qiang Liu의 **FLOW STRAIGHT AND FAST: LEARNING TO GENERATE AND TRANSFER DATA WITH RECTIFIED FLOW**이며 ICLR 2023에 발표되었다. 저자들이 공개한 공식 코드는 [gnobitab/RectifiedFlow](https://github.com/gnobitab/RectifiedFlow)에서 확인할 수 있다.
 
-## 이 논문이 풀려는 문제
+## 반복 호출되는 solver와 분리된 생성·변환
 
 생성 모델에서는 품질뿐 아니라 표본 하나를 얻기 위해 모델을 몇 번 호출해야 하는지도 중요하다. GAN은 한 번의 순전파로 표본을 생성할 수 있지만 학습 불안정성, mode collapse, 구조나 데이터셋이 바뀔 때의 민감한 튜닝 문제가 있다. 반면 VAE, normalizing flow, autoregressive model 같은 maximum likelihood 계열은 복잡한 모델에서 likelihood 계산이 어려워 근사 추론을 도입하거나 모델 구조를 제한해야 한다. 이때 표현력과 계산량 사이의 trade-off가 커진다.
 
@@ -33,7 +33,7 @@ ODE·SDE 기반 diffusion 계열은 다른 학습 경로를 제공하지만, 생
 
 Rectified flow는 OT를 곧바로 풀지 않는다. 먼저 임의의 coupling에서 두 끝점을 잇는 선분을 만들고, 그 선분들을 평균적으로 따라가는 ODE를 최소제곱으로 학습한다. 이 ODE가 만드는 coupling은 원래 coupling과 끝점 주변분포가 같고, rectifiability 조건 아래에서 convex transport cost가 더 크지 않다. 이어서 이 coupling을 다음 학습 데이터로 사용하면 경로가 점차 펴진다. 생성과 변환은 시작분포와 도착분포만 다를 뿐 같은 학습·시뮬레이션 절차가 된다.
 
-## 핵심 아이디어 — 선분을 학습하고 coupling을 다시 연결한다
+## 선분을 학습하고 coupling을 다시 연결하기
 
 $X_0\sim\pi_0$, $X_1\sim\pi_1$인 표본 쌍을 생각하자. 두 표본의 선형 보간은
 
@@ -554,7 +554,7 @@ $$
 
 즉 feature Jacobian이 만드는 위치 의존 metric에서 속도 오차를 측정한다. 다만 $r$가 $\nabla h(X_t)^\top$의 null space에 있으면 손실은 그 오차를 보지 못한다. 분류기 특징이 보존해야 할 정체성을 표현하지 못하면 원하는 변환과 loss metric이 어긋날 수 있다. $h$는 사전학습된 ImageNet 모델을 fine-tuning하여 두 도메인을 구분하도록 만든 분류기의 잠재 표현이다.
 
-## 구현 — 학습과 샘플링의 비대칭
+## 학습과 샘플링의 비대칭
 
 이미지 shape을 `(B, C, H, W)`로 두면 Eq. 1의 기본 학습은 다음과 같다.
 
@@ -706,7 +706,7 @@ Domain adaptation은 AdamW, batch size 16, 50k iteration, learning rate $10^{-4}
 
 하드웨어, 총 GPU 시간, 모델 파라미터 수는 보고되지 않았다. 따라서 비용 비교는 NFE와 추가 학습 절차를 중심으로 해야 하며, wall-clock 속도나 메모리 감소율을 수치로 환산할 수 없다.
 
-## 실험 설정
+## CIFAR10, LSUN, AFHQ, DomainNet 설정
 
 CIFAR10은 $32\times32$ 비조건부 생성으로 FID, Inception Score(IS), Recall을 평가한다. Table 1(a)는 같은 DDPM++ 구조 안에서 Rectified Flow, VP·sub-VP ODE, VP·sub-VP SDE를 비교한다. Table 1(b)는 서로 다른 architecture와 학습 recipe의 문헌 결과를 모은 비교다.
 
@@ -798,7 +798,7 @@ Domain adaptation 결과는 다음과 같다.
 
 OfficeHome에서 Ours는 $69.2\pm0.5$로 표에서 가장 높다. DomainNet에서는 $41.4\pm0.1$로 CORAL의 $41.5\pm0.2$보다 0.1 낮다. 두 데이터셋에서 모두 최고라고 말할 수는 없지만, 같은 rectified-flow 원리가 feature-domain transfer에서도 경쟁 가능한 결과를 낸다.
 
-## 무엇이 성능을 만들었나
+## reflow와 distillation의 분리된 역할
 
 CIFAR10에서 reflow와 distillation의 역할이 분리되어 나타난다. 직접 one-step FID는 1-Rectified Flow의 378에서 2-Rectified Flow의 12.21로 낮아지고, distillation 후 4.85가 된다.
 
@@ -844,7 +844,7 @@ $$
 
 이 결과는 같은 양방향 ODE를 generation, inversion, reconstruction, interpolation, unpaired translation에 사용할 수 있음을 보여준다. 다만 편집 결과는 주로 시각적으로 제시되므로 생성 FID의 비교 우위를 편집 품질이나 정체성 보존의 정량적 우위로 확대해서는 안 된다.
 
-## 비용과 경량화 관점
+## 파라미터가 아니라 NFE를 줄이는 대가
 
 Rectified flow의 직접적인 경량화 대상은 파라미터 수가 아니라 NFE다. CIFAR10에서 SDE full simulation은 2,000 Euler step, ODE full simulation은 104~176 NFE를 사용하지만 reflow와 distillation을 결합하면 NFE 1에서 FID 4.85를 얻는다. 반복적인 U-Net 호출이 지연과 처리량의 병목인 환경에서는 한 번의 호출로 압축할 수 있다는 점이 중요하다.
 
@@ -856,7 +856,7 @@ Rectified flow의 직접적인 경량화 대상은 파라미터 수가 아니라
 
 후속 경량화 문제는 여기서 자연스럽게 나온다. Low-NFE 품질을 유지하면서 reflow용 endpoint 생성과 추가 학습을 줄이거나, 직선화된 flow를 더 안정적으로 one-step에 압축해야 한다.
 
-## 한계와 해석
+## 오차 누적, 비선형 경로, OT 보장의 공백
 
 첫째, reflow에는 추정 오차가 누적될 수 있다. 이론은 정확한 조건부 속도장 $v^X$를 전제로 하지만 실제 모델은 유한한 데이터와 네트워크로 이를 근사한다. 이전 근사 ODE의 출력을 다음 학습분포로 사용하므로 지나친 반복은 오차까지 coupling에 반영할 수 있다.
 

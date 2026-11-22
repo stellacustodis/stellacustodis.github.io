@@ -7,6 +7,7 @@ categories:
   - Programming
   - Python
 tags: [python, mutability, object-model, shallow-copy, deep-copy, 코딩테스트]
+description: "DFS의 방문 배열과 인접 리스트를 예로 Python 객체의 가변성과 참조 공유를 설명한다. 리스트 반복과 얕은 복사, 깊은 복사의 차이도 다룬다."
 ---
 
 

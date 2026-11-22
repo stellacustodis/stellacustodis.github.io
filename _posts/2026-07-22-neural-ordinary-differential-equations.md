@@ -1,5 +1,5 @@
 ---
-title: "[논문 리뷰] Neural Ordinary Differential Equations"
+title: "Neural Ordinary Differential Equations"
 date: 2026-07-22 00:00:00 +0900
 layout: post
 permalink: /posts/neural-ordinary-differential-equations/
@@ -7,6 +7,7 @@ categories:
   - AI
   - Paper Review
 tags: [paper-review, neural-ode, continuous-depth, normalizing-flow, differential-equation, generative-model]
+description: "Neural ODE에서 은닉 상태의 변화율을 학습하고 ODE solver로 최종 상태를 구하는 과정을 설명한다. Adjoint method로 기울기를 계산하는 방식과 Continuous Normalizing Flow와의 연결도 다룬다."
 math: true
 related: [self-flow, dl-foundational-roadmap]
 paper:

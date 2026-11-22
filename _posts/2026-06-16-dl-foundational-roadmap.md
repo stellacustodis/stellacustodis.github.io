@@ -7,6 +7,7 @@ categories:
   - AI
   - Learning
 tags: [deep-learning, computer-vision, learning-roadmap, generative-model, self-supervised-learning, transformer]
+description: "정규화와 CNN 백본부터 객체 탐지, 생성 모델, 자기지도학습, Transformer까지 분야별 대표 모델과 기법을 학습 흐름에 따라 정리한다."
 ---
 
 

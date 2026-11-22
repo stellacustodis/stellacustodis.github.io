@@ -7,8 +7,8 @@ const out = document.getElementById("ai-results");
 const chips = document.getElementById("ai-examples");
 let searchId = 0;
 
-function say(message, style = "text-muted") {
-  status.className = style;
+function say(message, error = false) {
+  status.classList.toggle("search-status--error", error);
   status.textContent = message;
 }
 
@@ -36,7 +36,7 @@ async function search(value) {
     renderSearchResults(out, results, query, { baseUrl: form.dataset.baseUrl });
     say(results.length ? `상위 ${results.length}편` : "검색 결과가 없습니다.");
   } catch (error) {
-    if (id === searchId) say("검색하지 못했습니다. " + error.message, "text-danger");
+    if (id === searchId) say("검색하지 못했습니다. " + error.message, true);
   } finally {
     if (id === searchId) out.setAttribute("aria-busy", "false");
   }
@@ -46,6 +46,6 @@ form.addEventListener("submit", (event) => {
   event.preventDefault();
   search(box.value);
 });
-renderQuestionChips(chips, search, "btn btn-sm btn-outline-secondary");
+renderQuestionChips(chips, search);
 const query = new URLSearchParams(window.location.search).get("q");
 if (query?.trim()) search(query);

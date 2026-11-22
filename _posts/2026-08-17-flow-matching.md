@@ -1,5 +1,5 @@
 ---
-title: "[논문 리뷰] Flow Matching for Generative Modeling"
+title: "Flow Matching for Generative Modeling"
 date: 2026-08-17 21:00:00 +0900
 permalink: /posts/flow-matching/
 categories:
@@ -16,7 +16,7 @@ paper:
 
 > ODE 시뮬레이션 없이 CNF를 학습하는 조건부 벡터장 회귀와, 조건부 OT 경로가 주는 이점에 초점을 맞춘다.
 
-## 세 줄 요약
+## 조건부 벡터장 회귀와 FM-OT 결과
 
 「Flow Matching for Generative Modeling」은 Yaron Lipman, Ricky T. Q. Chen, Heli Ben-Hamu, Maximilian Nickel, Matt Le가 발표한 ICLR 2023 논문이다. Meta AI(FAIR)와 Weizmann Institute of Science 소속 연구진은 연속 정규화 흐름(Continuous Normalizing Flow, CNF)을 수치 ODE 시뮬레이션 없이 학습하는 Flow Matching(FM)을 제안한다.
 
@@ -24,7 +24,7 @@ paper:
 
 특히 평균과 표준편차를 선형 보간하는 조건부 최적수송(Optimal Transport, OT) 경로는 조건부 궤적과 회귀 표적을 단순하게 만든다. 실험에서도 FM-OT는 확산 경로보다 더 좋은 NLL·FID와 더 적은 함수 평가 횟수(Number of Function Evaluations, NFE)를 함께 기록했다.
 
-## 이 논문이 풀려는 문제
+## 확산 경로의 제약과 비싼 CNF 최대우도
 
 생성모델을 단순한 사전분포 $p_0$에서 데이터분포로 이동하는 과정으로 보면 두 가지를 정해야 한다.
 
@@ -701,7 +701,7 @@ $$
 ![2D 체커보드 데이터에서 모델별 샘플링 궤적과 속도 효율 비교](/assets/img/posts/flow-matching/figure4.jpg){: w="700" }
 _그림 3. 조건부 경로의 단순한 기하가 학습할 속도장과 solver가 적분할 궤적의 난이도에 어떻게 연결되는지를 보여준다._
 
-## 구현 관점에서
+## OT 학습 루프와 dopri5 샘플링 루프
 
 ### OT 학습 루프
 
@@ -1167,7 +1167,7 @@ $$
 
 기존의 [DDPM](/posts/ddpm/)이 고정된 이산 diffusion path의 noise prediction을 학습하고 [Score-Based Generative Modeling through SDEs](/posts/score-sde/)이 이를 연속시간 SDE와 probability flow ODE로 확장했다면, FM은 확률 경로 자체를 교체 가능한 설계 변수로 끌어올린다.
 
-## 실험 설정
+## CIFAR-10·ImageNet 해상도별 학습 구성
 
 실험 데이터는 CIFAR-10과 ImageNet 32×32, 64×64, 128×128, 256×256이다. 지표는 BPD 단위 NLL, FID, NFE, Inception Score(IS), PSNR, SSIM이다. 조건부 초해상도 실험은 ImageNet 이미지를 64×64에서 256×256으로 upsampling하고 Saharia et al.의 평가 절차를 따른다.
 
@@ -1194,7 +1194,7 @@ CIFAR-10과 ImageNet-32는 32-bit precision, ImageNet-64·128·256은 16-bit mix
 
 평가는 CIFAR-10과 ImageNet-32·64에서 TensorFlow GAN library를, ImageNet-128에서 Dhariwal & Nichol의 평가 스크립트를 사용한다.
 
-## 실험에서 확인한 것
+## NLL·FID·NFE와 초해상도 결과
 
 ### 같은 architecture에서 objective와 경로 비교
 
@@ -1264,7 +1264,7 @@ score matching 모델은 학습 도중 샘플링에 필요한 NFE가 크게 변�
 
 모든 모델에서 $K$가 커질수록 보고된 BPD가 낮아진다. Table 1의 최종 NLL을 재현할 때 데이터셋마다 사용한 $K$가 다르다는 점을 함께 확인해야 한다. NLL의 소수점 차이를 모델 차이로 해석하기 전에 dequantization 평가 설정이 같은지 확인해야 하는 이유다.
 
-## 무엇이 성능을 만들었나
+## FM 회귀와 OT 경로의 효과 분리
 
 실험은 두 축을 분리한다.
 
@@ -1282,7 +1282,7 @@ U-Net, Adam, `dopri5`, Hutchinson estimator는 이 방법을 구현하고 평가
 
 ablation의 범위에도 경계가 있다. canonical affine 벡터장과 같은 밀도 경로를 생성하는 다른 벡터장을 직접 비교하지 않았고, $\sigma_{\min}$의 민감도도 따로 분리하지 않았다. 따라서 불필요한 순환 성분 제거가 NFE를 낮춘다는 설명은 수식에 근거한 설계 해석이며, 실험이 직접 검증한 것은 FM-Diffusion과 FM-OT의 차이다.
 
-## 비용과 경량화 관점
+## 학습 ODE를 없앤 뒤 남는 생성·우도 비용
 
 Flow Matching은 CNF 학습에서 비쌌던 수치 ODE 시뮬레이션을 제거한다. 한 학습 스텝은 데이터, 잡음, 시간을 샘플링하고 한 번의 벡터장 회귀를 수행하는 구조다. 이 변화가 큰 U-Net과 ImageNet 규모에서 CNF를 학습할 수 있게 한 직접적인 효율 이점이다.
 
@@ -1311,7 +1311,7 @@ Table 1의 NFE는 `dopri5`, `atol=rtol=1e-5` 조건에서 측정됐다. toleranc
 
 이 비용 구조는 이후 연구가 출발할 지점을 분명하게 만든다. 학습 ODE를 제거한 다음 남는 병목은 생성 시 수치 적분의 스텝 수와 우도 평가의 divergence 계산이다. 따라서 더 단순한 확률 경로, 더 적은 스텝의 적분, 우도 계산 효율화가 자연스러운 후속 최적화 대상이 된다.
 
-## 한계와 생각해볼 점
+## 전역 OT가 아닌 조건부 경로와 빠진 ablation
 
 논문에는 별도의 한계 섹션이 없다. 다음 내용은 저자가 직접 주의한 경계와 수식·실험에서 드러나는 해석을 구분해 읽어야 한다.
 

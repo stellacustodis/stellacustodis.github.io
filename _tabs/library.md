@@ -14,7 +14,7 @@ permalink: /library/
 <div class="knowledge-graph library-graph" id="library-graph">
   <header class="graph-intro">
     <p>
-      Zotero 논문을 모델 계열·주제·성격별로 볼 수 있습니다.
+      Zotero에 등록한 논문과 블로그에서 리뷰한 논문을 모델 계열·주제·성격별로 볼 수 있습니다.
       선은 제1저자가 같은 논문을 잇고, 테두리는 블로그에 리뷰가 있는 논문을 표시합니다.
     </p>
     <div class="graph-stats" aria-label="라이브러리 통계">
@@ -69,24 +69,27 @@ permalink: /library/
   </div>
 
   <div class="graph-layout">
-    <section class="graph-canvas-wrap" aria-label="논문 라이브러리 그래프">
-      <svg id="library-canvas" role="img" aria-labelledby="library-title library-desc">
-        <title id="library-title">논문 라이브러리 그래프</title>
-        <desc id="library-desc">제1저자가 같은 논문을 연결한 그래프</desc>
-        <g id="library-viewport">
-          <g id="library-hulls"></g>
-          <g id="library-edges"></g>
-          <g id="library-nodes"></g>
-        </g>
-      </svg>
+    <section class="graph-stage" aria-label="논문 라이브러리 그래프">
+      <div class="graph-canvas-wrap">
+        <svg id="library-canvas" role="group" aria-labelledby="library-title library-desc" aria-describedby="library-help">
+          <title id="library-title">논문 라이브러리 그래프</title>
+          <desc id="library-desc">제1저자가 같은 논문을 연결한 그래프</desc>
+          <g id="library-viewport">
+            <g id="library-hulls"></g>
+            <g id="library-edges"></g>
+            <g id="library-nodes"></g>
+          </g>
+        </svg>
 
-      <div class="graph-zoom" aria-label="확대 및 축소">
-        <button id="library-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus"></i></button>
-        <button id="library-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus"></i></button>
-        <button id="library-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand"></i></button>
+        <div class="graph-zoom" aria-label="확대 및 축소">
+          <button id="library-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus" aria-hidden="true"></i></button>
+          <button id="library-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus" aria-hidden="true"></i></button>
+          <button id="library-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand" aria-hidden="true"></i></button>
+        </div>
+
+        <p id="library-empty" class="graph-empty" hidden>조건에 맞는 논문이 없습니다.</p>
       </div>
-
-      <p id="library-empty" class="graph-empty" hidden>조건에 맞는 논문이 없습니다.</p>
+      <p id="library-help" class="graph-help">드래그로 이동 · 휠로 확대·축소 · 리뷰 노드는 더블클릭 시 글로 이동</p>
     </section>
 
     <aside class="graph-detail" id="library-detail" aria-live="polite">

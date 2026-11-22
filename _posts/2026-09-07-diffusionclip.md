@@ -12,11 +12,9 @@ paper:
   code: "https://github.com/gwang-kim/DiffusionCLIP.git"
 ---
 
-## 세 줄 요약
-
 DiffusionCLIP은 사전 학습된 확산 모델의 결정론적 DDIM 경로와 CLIP의 텍스트-이미지 방향 정보를 결합해 실제 이미지를 조작한다. 잠재변수를 직접 최적화하는 대신, 목표 속성에 맞게 확산 모델의 노이즈 예측 함수를 미세조정한다. 이를 통해 입력의 세부를 보존하면서 unseen-domain 변환, 다중 속성 결합, 조작 강도의 연속 제어를 하나의 틀에서 다룬다.
 
-## 이 논문이 풀려는 문제
+## GAN inversion이 놓치는 실제 이미지의 세부
 
 텍스트 기반 이미지 조작은 두 요구를 함께 만족해야 한다. 입력 이미지의 인물·구조·세부는 유지하면서, 텍스트가 지시한 속성은 충분히 바뀌어야 한다. 보존만 강조하면 편집 효과가 약해지고, 변화만 강조하면 입력과 무관한 이미지가 될 수 있다.
 
@@ -29,7 +27,7 @@ _그림 1. 얼굴과 교회 이미지 조작에서 DiffusionCLIP, StyleGAN-NADA,
 
 DiffusionCLIP은 생성 공간 안에서 잠재 코드를 찾는 대신, 확산 모델의 복원 과정 자체를 목표 텍스트에 맞게 조정한다. 입력 이미지 $x_0$를 latent $x_{t_0}$로 보낸 뒤, CLIP loss가 가리키는 방향으로 reverse process의 노이즈 예측 모델을 미세조정한다.
 
-## 핵심 아이디어
+## latent 대신 노이즈 예측 모델을 미세조정
 
 전체 과정은 다음과 같다.
 
@@ -56,7 +54,7 @@ _그림 2. 입력을 latent로 변환한 뒤 latent 자체가 아니라 확산 �
 
 다만 확률성이 항상 방해가 되는 것은 아니다. 입력과 목표가 모두 사전 학습 도메인 밖에 있는 unseen-domain translation에서는 보통 $t_0=500$까지 stochastic DDPM으로 이미지를 교란한다. 이 latent에서 원래 모델을 역방향으로 실행하면 사전 학습 도메인의 $x'_0$를, 미세조정된 모델을 실행하면 목표 도메인의 $\hat{x}_0$를 생성한다.
 
-## 방법 — 확산 모델의 출발점
+## forward diffusion, 노이즈 예측, score
 
 ### Forward diffusion과 노이즈 예측
 
@@ -96,7 +94,7 @@ $$
 
 $\nabla_{x_t}\log p_\theta(x_t)$는 현재 위치에서 확률 밀도가 증가하는 방향인 score다. 식 (4)는 예측 노이즈가 크기 계수를 제외하면 score의 반대 방향이라는 뜻이다. 따라서 노이즈 예측 함수를 미세조정하는 일은 각 noise level에서 모델이 따라갈 확률 밀도의 방향을 바꾸는 일로 해석할 수 있다.
 
-## 방법 — 결정론적 DDIM inversion
+## 결정론적 DDIM forward와 reverse
 
 현재 $x_t$와 예측 노이즈가 주어졌을 때, 깨끗한 이미지의 예측값은 다음과 같다.
 
@@ -152,7 +150,7 @@ $$
 
 두 식의 차이는 다음 상태가 $t+1$인지 $t-1$인지다. 구현에서는 forward time grid가 낮은 noise level에서 높은 쪽으로, reverse time grid는 정확히 반대 방향으로 순회해야 한다. 또한 $\alpha_t$는 단일 단계의 $1-\beta_t$가 아니라 누적곱이므로 두 값을 혼동하면 trajectory가 달라진다.
 
-## 방법 — CLIP으로 바꿀 방향 정하기
+## directional CLIP loss와 보존 손실
 
 가장 직접적인 목적함수는 생성 이미지와 목표 텍스트 사이의 CLIP 거리다.
 
@@ -213,7 +211,7 @@ $L_1$ 항은 픽셀 수준 차이를 억제하고, $L_{face}$는 얼굴 정체�
 ![모든 diffusion time step에서 공유되는 모델과 미세조정 gradient의 흐름](/assets/img/posts/diffusionclip/figure3.png){: w="700" }
 _그림 3. 서로 다른 시간 $t$에서 호출되지만 같은 노이즈 예측 모델의 파라미터를 공유하므로, 생성 결과의 CLIP loss가 전체 reverse trajectory를 거쳐 모델에 전달된다._
 
-## 방법 — 여러 속성을 한 번에 결합하기
+## 노이즈 예측 가중합으로 여러 속성 결합
 
 목표 속성 $i$마다 미세조정된 모델 $\epsilon_{\hat{\theta}_i}$가 있다고 하자. DiffusionCLIP은 모델을 순서대로 실행하지 않고, 같은 $x_t$에서 얻은 예측을 각 reverse step에서 결합한다.
 
@@ -249,7 +247,7 @@ $$
 
 $\gamma_i(t)$를 조절하면 속성별 기여도를 바꿀 수 있다. 논문은 한 번의 sampling으로 multi-attribute transfer를 수행하고, 가중치를 연속적으로 변화시켜 조작 강도의 continuous transition을 만든다. 다만 한 sampling trajectory를 사용하더라도 각 step에서 $M$개 모델의 예측을 계산해야 하므로 모델 평가 비용이 사라지는 것은 아니다.
 
-## 구현 관점에서
+## latent 사전 계산과 미세조정 루프
 
 다음은 식 (6), (12), (13)의 연산 순서를 옮긴 의사코드다.
 
@@ -315,7 +313,7 @@ Unseen-domain translation에서는 입력과 목표가 모두 사전 학습 도�
 
 Stroke-conditioned image synthesis도 같은 확산·미세조정 틀의 응용으로 제시된다. 이를 구현할 때는 stroke 조건의 tensor 표현과 주입 위치, 별도 loss 사용 여부를 함께 확인해야 한다.
 
-## 실험 설정
+## 다섯 데이터셋과 GAN inversion 비교군
 
 평가는 CelebA-HQ뿐 아니라 AFHQ-Dog, LSUN-Bedroom, LSUN-Church, ImageNet을 포함한다. 비교 대상은 pSp, e4e, ReStyle with pSp, ReStyle with e4e, HFGI with e4e, TediGAN, StyleCLIP, StyleGAN-NADA다.
 
@@ -326,7 +324,7 @@ Stroke-conditioned image synthesis도 같은 확산·미세조정 틀의 응용�
 ![기존 텍스트 기반 이미지 조작 방법과 DiffusionCLIP의 정성 비교](/assets/img/posts/diffusionclip/figure5.jpg){: w="800" }
 _그림 4. 얼굴과 교회 이미지에서 TediGAN, StyleCLIP, StyleGAN-NADA를 DiffusionCLIP과 비교한 결과다. 입력의 세부·정체성 보존과 목표 속성 반영을 함께 확인할 수 있다._
 
-## 실험에서 확인한 것
+## t0별 복원 품질과 텍스트 정렬 지표
 
 ### Reconstruction 품질과 $t_0$의 관계
 
@@ -379,7 +377,7 @@ CelebA-HQ에서 DiffusionCLIP의 $S_{dir}$은 $0.17$, SC는 $93.7\%$, ID는 $0.7
 ![강아지 얼굴, 침실, 일반 이미지에서의 텍스트 기반 조작 결과](/assets/img/posts/diffusionclip/figure6.jpg){: w="800" }
 _그림 5. AFHQ-Dog, LSUN-Bedroom, 일반 이미지에서 목표 속성을 반영한 조작 사례다. 입력의 형태를 유지하면서 종·화풍·색상·객체 속성을 바꾸는 결과를 보여준다._
 
-## 무엇이 성능을 만들었나
+## forward·생성 스텝 수, t0, identity loss
 
 논문의 본문 ablation은 $S_{for}$, $S_{gen}$, $t_0$ 의존성을 분석한다. 학습에 사용한 $(S_{for},S_{gen})=(40,6)$에서는 일부 고주파 세부가 손실되고, 테스트 설정인 $(200,40)$에서는 원본과 구분하기 어려운 reconstruction을 얻는다.
 
@@ -387,7 +385,7 @@ $t_0$는 보존과 편집 가능성의 균형을 바꾼다. 낮은 $t_0$에서�
 
 Identity loss도 모든 편집에 같은 방식으로 적용할 수 없다. 표정이나 머리 색상처럼 원래 얼굴의 픽셀 구조와 인물 정체성이 중요할 때는 $L_1$과 $L_{face}$가 필요하다. 화풍이나 종 변환처럼 큰 형태·색상 변화가 목표인 작업에서는 같은 보존 항이 목표 변화를 제한할 수 있다.
 
-## 비용과 트레이드오프
+## 속성마다 드는 미세조정과 다중 모델 평가
 
 테스트에서는 forward DDIM에 $S_{for}=200$, 생성에 $S_{gen}=40$ step을 사용하므로 한 번의 조작에도 반복적인 노이즈 예측이 필요하다. 학습에서는 $S_{for}=40$, $S_{gen}=6$으로 step을 줄이고 latent를 미리 계산해 계산량을 줄인다.
 
@@ -397,7 +395,7 @@ Fine-tuning은 NVIDIA Quadro RTX 6000에서 $1$~$7$분이 걸린다. 목표 속�
 
 논문이 직접 확인한 효율화는 학습용 step 축소와 latent 사전 계산이다. 모델 공유, 파라미터 효율적 미세조정, 모델 증류, sampling step의 추가 감소 효과는 별도로 평가해야 한다.
 
-## 한계와 생각해볼 점
+## 편집 강도와 복원의 충돌, 사회적 위험
 
 저자들은 DiffusionCLIP에 한계와 사회적 위험이 있으므로 올바른 목적을 위해 주의해 사용할 것을 권고한다. 구체적인 한계와 사회적 영향은 Supplementary Section에서 다룬다.
 

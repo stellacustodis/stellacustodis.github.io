@@ -79,7 +79,7 @@
         </div>
 
         <p id="code-lab-editor-hint" class="code-lab__editor-hint">
-          <kbd>Tab</kbd> 들여쓰기 · <kbd>Shift</kbd> + <kbd>Tab</kbd> 내어쓰기 · <kbd>Esc</kbd> 다음 컨트롤로 이동
+          <kbd>Tab</kbd> 들여쓰기 · <kbd>Shift</kbd> + <kbd>Tab</kbd> 내어쓰기 · <kbd>Ctrl</kbd> + <kbd>M</kbd> 표준 입력으로 이동 · <kbd>Esc</kbd> 닫기
         </p>
 
         <div class="code-lab__editor">
@@ -88,7 +88,8 @@
             id="code-lab-source"
             class="code-lab__source"
             aria-label="소스 코드 편집기"
-            aria-describedby="code-lab-editor-hint"
+            aria-describedby="code-lab-editor-hint code-lab-dependency-note"
+            aria-keyshortcuts="Control+M"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
@@ -170,6 +171,7 @@
       <div class="code-lab__status-wrap">
         <span id="code-lab-status-icon" class="code-lab__status-icon" aria-hidden="true"><i class="fas fa-circle-check"></i></span>
         <span id="code-lab-status" role="status" aria-live="polite">준비됨</span>
+        <span id="code-lab-dependency-note" class="code-lab__dependency-note" role="status"></span>
       </div>
 
       <div class="code-lab__actions">

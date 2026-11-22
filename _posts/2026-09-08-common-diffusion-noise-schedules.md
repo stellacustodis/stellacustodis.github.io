@@ -13,11 +13,9 @@ paper:
   venue: "WACV"
 ---
 
-## 세 줄 요약
-
 널리 쓰이는 확산 모델은 마지막 학습 타임스텝에도 원본 신호를 조금 남겨 두면서, 추론은 신호가 전혀 없는 Gaussian 노이즈에서 시작하는 학습-추론 불일치를 갖는다. 이 논문은 마지막 신호 대 잡음비(signal-to-noise ratio, SNR)를 정확히 0으로 만들고, 이에 맞춰 $v$ 예측·trailing 타임스텝·Classifier-Free Guidance 재스케일링을 함께 적용한다. Stable Diffusion 2.1-base를 파인튜닝한 실험에서 이 수정 조합은 극단적인 밝기의 이미지 생성 범위를 넓히면서 FID를 22.96에서 21.66으로 낮추고 IS를 34.11에서 36.16으로 높였다.
 
-## 이 논문이 풀려는 문제
+## 마지막 타임스텝에 남은 신호와 밝기 문제
 
 확산 모델의 순방향 과정은 데이터에 Gaussian 노이즈를 단계적으로 더해 정보를 파괴한다. 역방향 과정은 반대로 노이즈가 섞인 상태에서 시작해 데이터를 복원한다. 이 설명만 보면 학습의 마지막 상태 $x_T$와 추론의 초기 상태가 당연히 같은 분포일 것 같지만, 실제로 널리 쓰이는 노이즈 스케줄은 그렇지 않다.
 
@@ -645,7 +643,7 @@ Eq. 15는 $\sigma_{\mathrm{cfg}}$로 나누므로 구현에서는 분모가 어�
 
 Imagen의 dynamic thresholding은 image-space 모델을 위한 방식이다. 반면 이 재스케일은 출력의 표준편차를 기준으로 하므로 논문은 image-space 모델과 latent-space 모델 모두에 적용할 수 있다고 설명한다.
 
-## 전체 구현 흐름
+## 네 가지 수정을 잇는 DDIM 의사코드
 
 논문의 네 수정 사항은 다음 순서로 연결된다.
 
@@ -717,7 +715,7 @@ def sample_ddim(model, condition_pos, condition_neg,
 - Table 2의 오름차순 표기와 실제 역방향 실행 순서를 혼동하지 않는다.
 - 정량 평가와 정성 평가에서 negative prompt 조건이 다르다는 점을 구분한다.
 
-## 실험 설정
+## SD 2.1-base 파인튜닝과 세 비교 모델
 
 저자들은 Stable Diffusion 2.1-base를 파인튜닝했다. 학습 데이터는 원래 Stable Diffusion 학습 데이터와 유사하게 필터링한 LAION 데이터셋이다. 배치 크기는 2048, 학습률은 $10^{-4}$, EMA decay는 0.9999이며 50k iteration 동안 학습했다. GPU 기종과 수량, 총 학습 시간은 보고되지 않았다.
 
@@ -742,7 +740,7 @@ def sample_ddim(model, condition_pos, condition_neg,
 ![기존 Stable Diffusion과 네 가지 수정을 적용한 모델의 밝기 범위 비교](/assets/img/posts/common-diffusion-noise-schedules/figure3.jpg){: w="700" }
 _그림 1. 기존 참조 모델과 수정 모델을 비교하면 zero terminal SNR을 포함한 수정 조합이 매우 어둡거나 밝은 프롬프트를 표현하는 범위를 넓힌다. 정량 평가와 달리 이 정성 비교에는 서로 다른 negative prompt가 사용됐다._
 
-## 무엇이 동작을 바꾸었나
+## trailing 스텝, rescale 계수, offset noise 비교
 
 ### 적은 샘플 스텝에서는 trailing의 차이가 커진다
 
@@ -782,7 +780,7 @@ $$
 
 그러나 논문의 zero terminal SNR 접근과는 철학이 다르다. Offset noise는 학습과 추론의 확산 경계를 일치시키는 대신 평균 신호를 신뢰할 수 없게 만든다. 논문은 이 방법이 확산 과정의 수학적 정식화와 맞지 않고, 실제 데이터 분포보다 과도하게 밝거나 어두운 이미지를 만들 수 있다고 지적한다.
 
-## 비용과 트레이드오프
+## 50k iteration 파인튜닝과 φ의 절충
 
 이 방법의 장점은 모델 아키텍처를 새로 제안하거나 파라미터 수를 늘리는 데 있지 않다. 핵심 변경은 스케줄, 학습 타깃, 타임스텝 선택, guidance 후처리에 있다. 따라서 논문에서 확인되는 추가 계산은 CFG 출력의 표준편차 계산과 재스케일링 같은 텐서 연산이다. 다만 전체 학습·추론 비용이 얼마나 변했는지, GPU 시간이나 메모리가 얼마나 증가했는지는 보고되지 않았다.
 
@@ -796,7 +794,7 @@ $$
 
 일반화 범위에도 경계가 있다. guidance rescale은 image-space와 latent-space 모델 모두에 적용할 수 있다고 설명되지만, 스케줄 재조정은 variance-preserving 정식화에 한정된다. 다른 데이터셋이나 모달리티, 모델 규모에서 같은 정량 효과가 나타나는지는 제시된 실험만으로 확인할 수 없다.
 
-## 한계와 생각해볼 점
+## VP 정식화와 non-cosine 스케줄에 묶인 범위
 
 저자가 밝힌 첫 번째 한계는 정식화의 범위다. zero terminal SNR 재조정은 variance-preserving 과정에서 사용해야 한다. Variance-exploding 정식화는 수학적으로 terminal SNR 0에 진정으로 도달할 수 없으므로 Algorithm 1을 그대로 옮길 수 없다.
 

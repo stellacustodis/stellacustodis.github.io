@@ -5,6 +5,7 @@ categories:
   - AI
   - Engineering
 tags: [nvidia, gpu, monitoring, linux, nvidia-smi, nvtop]
+description: "nvidia-smi와 nvtop으로 NVIDIA GPU의 사용률, 온도, 메모리를 확인한다. NVML을 지원하는 GPU의 팬 속도를 pynvml로 제어하는 예제도 설명한다."
 ---
 
 _본 게시글은 과거 연구실 노션에 후배들을 위해 정리해놨던 내용을 가져온 게시글이다. nvidia-driver를 관리 및 제어하는 유용한 툴들을 중심으로 정리했다_

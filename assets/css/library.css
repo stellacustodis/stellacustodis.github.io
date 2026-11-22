@@ -31,6 +31,7 @@
 }
 
 .library-hull-label {
+  fill: var(--text-color, #1b1b1e);
   font-size: 1.7rem;
   font-weight: 700;
   text-anchor: middle;
@@ -78,7 +79,8 @@
 }
 
 /* 블로그에 리뷰가 있는 논문 */
-.library-ring {
+.library-node .library-ring {
+  stroke: var(--text-color, #1b1b1e);
   stroke-width: 1.4;
   stroke-opacity: 0.75;
 }
@@ -141,8 +143,8 @@
 
 .library-facet-name {
   flex: 0 0 2.6rem;
+  color: var(--graph-muted);
   font-size: 0.75rem;
-  opacity: 0.65;
 }
 
 .library-chip {
@@ -171,20 +173,18 @@
 }
 
 .library-cluster-pick > span {
+  color: var(--graph-muted);
   font-size: 0.8rem;
-  opacity: 0.7;
 }
 
-.library-legend-count,
 #library-legend small {
-  opacity: 0.55;
   margin-left: 0.15rem;
 }
 
 .library-note {
   margin-top: 1rem;
+  color: var(--graph-muted);
   font-size: 0.8rem;
-  opacity: 0.7;
 }
 
 .library-list {
@@ -213,6 +213,10 @@
 
 .library-list__header select {
   margin-inline-start: 0.25rem;
+  border: 1px solid var(--graph-border);
+  border-radius: 0.35rem;
+  background: var(--main-bg, #fff);
+  color: var(--text-color, #1b1b1e);
 }
 
 #library-paper-list {

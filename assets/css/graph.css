@@ -1,7 +1,7 @@
 .knowledge-graph {
   --graph-border: rgba(128, 128, 128, 0.25);
   --graph-surface: rgba(128, 128, 128, 0.06);
-  --graph-muted: var(--text-muted-color, #6c757d);
+  --graph-muted: color-mix(in srgb, var(--text-color) 78%, var(--main-bg));
   --graph-accent: var(--link-color, #2a7ae2);
   margin-top: 0.5rem;
 }

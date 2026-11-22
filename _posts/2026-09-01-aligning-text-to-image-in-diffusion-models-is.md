@@ -17,7 +17,7 @@ paper:
 
 > SoftREPA가 고정된 확산 모델의 오차를 어떻게 image--text 대조 점수로 바꾸는지, 그리고 정렬 향상과 이미지 품질 사이에 어떤 대가가 남는지를 중심으로 읽었다.
 
-## 세 줄 요약
+## frozen 생성기에 붙인 대조 soft token
 
 SoftREPA는 짝이 맞는 image--text pair만으로 학습하는 기존 denoising/flow-matching 목적에, 같은 batch의 틀린 caption을 negative로 사용하는 대조학습 압력을 더한다. 사전학습된 생성 모델은 고정하고 layer와 timestep에 따라 달라지는 soft text token만 학습하므로 추가 파라미터는 100만 개 미만이다. SD1.5ㆍSDXLㆍSD3에서 text alignment와 human-preference 지표는 대체로 좋아지지만, SDXL/SD3의 FIDㆍLPIPS와 SD3의 counting은 악화되어 “더 잘 맞는 그림”과 “더 좋은 그림”이 같은 목표가 아님을 함께 보여준다.
 
@@ -91,7 +91,7 @@ matched caption이 주어지면 velocity error가 작아 $l$이 커지고, misma
 
 여기에는 지수가 두 겹 등장해 읽을 때 주의가 필요했다. Eq. (3) 자체가 음의 오차를 exponential로 감싼 bounded similarity이고, Eq. (2)가 다시 `exp(l)`을 취해 softmax를 만든다. 저자들은 $-\|\epsilon_\theta-\epsilon\|^2$를 그대로 similarity로 사용하면 값이 아래로 unbounded여서 학습이 불안정했다고 보고한다. 바깥쪽 exponential은 작은 오차와 큰 오차의 차이를 유한 범위로 눌러 안정화하는 선택이다.
 
-내가 보기에 이 부분이 SoftREPA의 핵심이다. “soft prompt를 학습했다”만 보면 익숙한 parameter-efficient tuning처럼 보이지만, token을 움직이는 감독 신호는 text encoder의 embedding 거리가 아니다. 이미 image--text joint distribution을 배운 generator 자체를 판별기처럼 재사용하고, 올바른 조건과 틀린 조건에서의 생성 가능성을 비교한다.
+이 부분이 SoftREPA의 핵심이라고 볼 수 있다. “soft prompt를 학습했다”만 보면 익숙한 parameter-efficient tuning처럼 보이지만, token을 움직이는 감독 신호는 text encoder의 embedding 거리가 아니다. 이미 image--text joint distribution을 배운 generator 자체를 판별기처럼 재사용하고, 올바른 조건과 틀린 조건에서의 생성 가능성을 비교한다.
 
 ## 방법 2 — layer와 시간마다 다른 soft token
 
@@ -169,7 +169,7 @@ $$
 
 Eq. (7)의 분모를 여러 text condition으로 Monte Carlo 근사하고 $p_\theta(x\mid y)=\exp(\widehat l(x,y))$를 대입하면 positive condition과 negative conditions의 log-softmax가 나온다. MI가 PMI의 joint expectation이므로 dataset 평균은 Eq. (2)와 매우 가까운 꼴이 된다. 직관적으로는 맞는 문장이 해당 이미지의 확률을 주변 caption 평균보다 얼마나 더 높이는지를 학습하는 셈이다.
 
-다만 이를 “SoftREPA가 MI를 정확히 최대화한다고 증명했다”로 옮기면 과하다. 이 유도는 optimal denoiser와 likelihood--denoising-error 관계를 가정하고, condition marginal도 Monte Carlo로 근사한다. 더구나 실제 optimizer가 보는 것은 시간 적분 $\widehat l$이 아니라 한 시점의 bounded surrogate $\widetilde l$이다. 나는 이 절을 유한 모델에 대한 보장보다는 **왜 in-batch negative와 생성 오차의 조합이 합리적인지 보여주는 해석**으로 읽었다.
+다만 이를 “SoftREPA가 MI를 정확히 최대화한다고 증명했다”로 옮기면 과하다. 이 유도는 optimal denoiser와 likelihood--denoising-error 관계를 가정하고, condition marginal도 Monte Carlo로 근사한다. 더구나 실제 optimizer가 보는 것은 시간 적분 $\widehat l$이 아니라 한 시점의 bounded surrogate $\widetilde l$이다. 이 절은 유한 모델에 대한 보장보다는 **왜 in-batch negative와 생성 오차의 조합이 합리적인지 보여주는 해석**으로 읽을 수 있다.
 
 ## 학습 설정 — 100만 개 미만이라는 말의 내용
 
@@ -240,13 +240,13 @@ token 8개를 고정하고 적용 layer를 2, 4, 6, 7개로 늘리면 CLIP은 `.
 
 이 결과는 REPA의 depth ablation과 흥미롭게 닮았다. 두 논문 모두 의미 정렬을 더 많은 layer에 적용하면 alignment probe는 좋아질 수 있지만 생성 품질은 나빠진다. 생성 모델의 후반부에는 prompt에 문자 그대로 맞추는 것 외에 질감, 구조, 다양성을 복원할 자유도가 필요하다는 신호로 읽힌다.
 
-## 계산 비용과 배포 관점
+## 1M 미만 token이 더하는 지연과 메모리
 
 Table 1에서 표시된 peak memory는 baseline과 SoftREPA가 같다. SD1.5 `2.621 GB`, SDXL `10.45 GB`, SD3 `18.77 GB`다. latency는 각각 `1.526 -> 1.547`, `4.059 -> 4.060`, `4.637 -> 4.695 sec/image`로 늘어난다. 부록에 따르면 fp16, A100 한 장에서 50회 평균했고 해상도는 SD1.5가 512x512, SDXL/SD3가 1024x1024다.
 
 표시 precision 안에서 memory 차이가 보이지 않고 latency 증가는 작다는 결론은 타당하다. 하지만 “inference-free”는 아니다. token을 매 timestep, 여러 layer의 text sequence에 실제로 붙이므로 sequence 연산이 늘고, token parameter도 배포해야 한다. 반대로 backbone checkpoint를 바꾸지 않고 1M 미만의 작은 모듈만 별도로 관리할 수 있다는 장점은 크다. 같은 기반 모델에 목적별 token set을 교체하는 운영도 생각할 수 있다.
 
-## 한계와 내가 남긴 질문
+## counting 실패, surrogate 간격, false negative
 
 첫째, alignment benchmark를 개선하는 것과 사용자의 의도를 보존하는 것은 동일하지 않다. 논문도 soft token이 text guidance를 과도하게 강조해 prompt intent를 오히려 충실히 보존하지 못할 수 있다고 적는다. Counting failure와 CFG sweep은 그 우려가 실제 metric conflict로 나타난 예다.
 
@@ -260,7 +260,7 @@ Table 1에서 표시된 peak memory는 baseline과 SoftREPA가 같다. SD1.5 `2.
 
 여섯째, 학습 데이터 오염과 adversarial token training은 다루지 않으며 backbone의 bias와 harmful generation capability를 그대로 상속한다. 작은 token 파일 하나가 모델의 조건 해석을 체계적으로 바꿀 수 있다는 점은 배포에는 편리하지만, provenance와 검증이 필요한 새로운 attack surface이기도 하다.
 
-## 정리
+## text adherence를 조절하는 adapter로 읽기
 
 SoftREPA를 읽고 가장 인상적이었던 점은 거대한 생성 모델을 직접 고치지 않고도, 그 모델의 denoising error를 self-supervision signal처럼 되돌려 쓸 수 있다는 발상이다. matched caption과 in-batch mismatch 사이의 오차 간격을 키우고, 그 gradient를 layer/time-specific soft token에만 모으면 1M 미만 파라미터로 조건 해석을 상당히 움직일 수 있다.
 

@@ -183,7 +183,6 @@ body.code-lab-is-open {
 .code-lab__brand,
 .code-lab__header-actions,
 .code-lab__actions,
-.code-lab__status-wrap,
 .code-lab__brand > div,
 .code-lab__pane-heading > div,
 .code-lab__trace-toolbar > div {
@@ -824,10 +823,23 @@ body.code-lab-is-open {
 }
 
 .code-lab__status-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   min-width: 0;
-  gap: 0.52rem;
+  align-items: baseline;
+  gap: 0.2rem 0.52rem;
   color: var(--lab-muted);
   font-size: 0.7rem;
+}
+
+.code-lab__dependency-note {
+  grid-column: 2;
+  color: var(--lab-yellow);
+  overflow-wrap: anywhere;
+}
+
+.code-lab__dependency-note:empty {
+  display: none;
 }
 
 .code-lab__status-icon {
@@ -999,9 +1011,7 @@ body.code-lab-is-open {
     display: none;
   }
 
-  .code-lab__pane-heading > .code-lab__editor-meta,
-  .code-lab__status-wrap,
-  .code-lab__button--ghost {
+  .code-lab__pane-heading > .code-lab__editor-meta {
     display: none;
   }
 
@@ -1023,13 +1033,21 @@ body.code-lab-is-open {
     border-bottom: 1px solid var(--lab-border);
   }
 
+  .code-lab__footer {
+    min-height: 0;
+    gap: 0.4rem;
+    padding-block: 0.45rem max(0.45rem, env(safe-area-inset-bottom));
+    padding-inline: 0.55rem;
+  }
+
   .code-lab__actions {
-    flex-wrap: nowrap;
+    gap: 0.35rem;
   }
 
   .code-lab__button {
     padding-inline: 0.55rem;
     font-size: 0.66rem;
+    white-space: nowrap;
   }
 
   .code-lab__shortcut {

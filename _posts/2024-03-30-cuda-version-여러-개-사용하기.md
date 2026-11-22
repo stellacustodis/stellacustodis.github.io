@@ -5,6 +5,7 @@ categories:
   - AI
   - Engineering
 tags: [cuda, gpu, nvidia, linux, deep-learning-environment]
+description: "Ubuntu에서 여러 CUDA Toolkit 버전을 runfile로 설치하고, 셸 환경 변수나 심볼릭 링크로 사용할 버전을 선택하는 방법을 정리한다."
 ---
 CUDA를 처음 다룰 때 가장 어려웠던 부분은 버전 관리였다. 이 글에서는 여러 CUDA 버전을 설치하고 선택하는 방법을 정리한다.
 
