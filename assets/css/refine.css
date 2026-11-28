@@ -451,7 +451,11 @@ article .content a:not(.img-link):not(.popup):hover {
 }
 
 /* Display math */
+/* MathJax writes an inline min-width on display math, which widens the whole
+   page on phones. Cap it so long equations scroll inside their own box. */
 .content mjx-container[display="true"] {
+  min-width: 0 !important;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.35rem 0;
@@ -837,4 +841,125 @@ article header h1 {
 #tags .tag:hover {
   background: var(--rf-accent-soft) !important;
   color: var(--rf-accent) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 11. Topbar, search results, footer                                  */
+/* ------------------------------------------------------------------ */
+
+:root,
+:root[data-bs-theme="light"] {
+  --topbar-bg: rgb(252 252 253 / 78%);
+}
+
+:root[data-bs-theme="dark"] {
+  --topbar-bg: rgb(20 21 24 / 78%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme]) {
+    --topbar-bg: rgb(20 21 24 / 78%);
+  }
+}
+
+#topbar-wrapper {
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+}
+
+#breadcrumb {
+  font-size: 0.88rem;
+}
+
+#breadcrumb a {
+  color: var(--text-muted-color);
+}
+
+#breadcrumb a:hover {
+  color: var(--rf-accent);
+  text-decoration: none;
+}
+
+#topbar-title {
+  font-family: var(--rf-font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+#search {
+  border: 1px solid var(--rf-divider) !important;
+  background: var(--rf-chip-bg);
+  transition: border-color 140ms var(--rf-ease), box-shadow 140ms var(--rf-ease);
+}
+
+#search.input-focus,
+#search:focus-within {
+  border-color: var(--rf-accent-line) !important;
+  box-shadow: 0 0 0 3px var(--rf-accent-soft);
+}
+
+#search-input::placeholder {
+  color: var(--text-muted-color);
+}
+
+#search-cancel {
+  color: var(--rf-accent) !important;
+}
+
+/* Search results */
+#search-results > article {
+  border-bottom: 1px solid var(--rf-divider);
+  padding-bottom: 1.1rem;
+}
+
+#search-results > article h2 {
+  font-size: 1.1rem !important;
+  line-height: 1.4 !important;
+  margin-bottom: 0.5rem;
+}
+
+#search-results > article h2 a {
+  color: var(--heading-color);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+#search-results > article h2 a:hover {
+  color: var(--rf-accent);
+  text-decoration: none;
+}
+
+#search-results mark,
+#search-results .text-muted mark {
+  background: var(--rf-accent-soft);
+  color: var(--rf-accent);
+  padding: 0 0.1em;
+  border-radius: 0.2rem;
+}
+
+#search-hints .post-tag,
+#search-hints .tag {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--rf-chip-bg) !important;
+  color: var(--rf-chip-text) !important;
+}
+
+/* Footer */
+#tail-wrapper footer[aria-label="Site Info"] {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rf-divider);
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+}
+
+#tail-wrapper footer[aria-label="Site Info"] a {
+  color: var(--text-muted-color);
+  font-weight: 600;
+}
+
+#tail-wrapper footer[aria-label="Site Info"] a:hover {
+  color: var(--rf-accent);
+  text-decoration: none;
 }
