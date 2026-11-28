@@ -15,11 +15,9 @@ permalink: /learn/
 
 관심 있는 트랙을 골라 순서대로 읽고, 읽은 글에 체크해 진행률을 기록할 수 있습니다.
 
-**논문 읽기** · [비전 표현학습](#learn-vision) · [Transformer와 SSM](#learn-sequence) · [생성 모델](#learn-generation) · [이미지 편집과 3D](#learn-editing) · [RAG와 벡터 DB](#learn-retrieval)
 
-**실습과 회고** · [데이터·머신러닝](#learn-data) · [프런트엔드·백엔드](#learn-web) · [LLM·Spring AI](#learn-ai-apps) · [컨테이너·Kubernetes](#learn-infra) · [개발·학습 기록](#learn-notes)
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="paper" data-short="비전 표현학습" markdown="1">
 
 ## 생성형 AI·딥러닝 기초와 비전 표현학습
 {: #learn-vision}
@@ -38,7 +36,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="paper" data-short="Transformer와 SSM" markdown="1">
 
 ## Transformer·Linear Attention·SSM
 {: #learn-sequence}
@@ -66,7 +64,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="paper" data-short="생성 모델" markdown="1">
 
 ## Diffusion·Flow Matching과 생성 모델 효율화
 {: #learn-generation}
@@ -133,7 +131,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="paper" data-short="이미지 편집과 3D" markdown="1">
 
 ## Image Editing·3D Generation
 {: #learn-editing}
@@ -165,7 +163,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="paper" data-short="RAG와 벡터 DB" markdown="1">
 
 ## RAG·Prompting·Vector Database
 {: #learn-retrieval}
@@ -195,7 +193,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="practice" data-short="데이터·머신러닝" markdown="1">
 
 ## SKALA 데이터·머신러닝
 {: #learn-data}
@@ -230,7 +228,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="practice" data-short="프런트엔드·백엔드" markdown="1">
 
 ## SKALA 프런트엔드·백엔드 설계
 {: #learn-web}
@@ -269,7 +267,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="practice" data-short="LLM·Spring AI" markdown="1">
 
 ## SKALA LLM·Spring AI·RAG 실습
 {: #learn-ai-apps}
@@ -310,7 +308,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="practice" data-short="컨테이너·Kubernetes" markdown="1">
 
 ## SKALA 컨테이너·Kubernetes
 {: #learn-infra}
@@ -351,7 +349,7 @@ permalink: /learn/
 
 </section>
 
-<section class="learn-track" markdown="1">
+<section class="learn-track" data-group="practice" data-short="개발·학습 기록" markdown="1">
 
 ## 개발 환경·코딩테스트·학습 기록
 {: #learn-notes}
