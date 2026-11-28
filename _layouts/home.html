@@ -121,8 +121,7 @@ layout: default
                   <i class="far fa-folder-open fa-fw me-1"></i>
                   <span class="categories">
                     {% for category in post.categories %}
-                      {{ category }}
-                      {%- unless forloop.last -%},{%- endunless -%}
+                      <span class="post-cat">{{ category }}</span>
                     {% endfor %}
                   </span>
                 {% endif %}

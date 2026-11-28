@@ -1,0 +1,515 @@
+/*
+ * Design refinement layer on top of Chirpy.
+ * Loaded last from _includes/metadata-hook.html; remove that one <link> to revert.
+ */
+
+/* ------------------------------------------------------------------ */
+/* 1. Tokens                                                           */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --rf-font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --rf-font-mono: "JetBrains Mono", D2Coding, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --rf-radius: 0.625rem;
+  --rf-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Light */
+:root,
+:root[data-bs-theme="light"] {
+  --rf-accent: #4f52c9;
+  --rf-accent-soft: rgb(79 82 201 / 9%);
+  --rf-accent-line: rgb(79 82 201 / 28%);
+  --rf-divider: rgb(0 0 0 / 7%);
+  --rf-chip-bg: rgb(0 0 0 / 4%);
+  --rf-chip-text: #5c5f6a;
+
+  --main-bg: #fcfcfd;
+  --text-color: #2f3138;
+  --heading-color: #16171c;
+  --text-muted-color: #6e717c;
+  --link-color: var(--rf-accent);
+  --link-underline-color: var(--rf-accent-line);
+  --toc-highlight: var(--rf-accent);
+  --checkbox-checked-color: var(--rf-accent);
+  --btn-share-hover-color: var(--rf-accent);
+  --sidebar-bg: #f5f6f8;
+  --sidebar-border-color: rgb(0 0 0 / 6%);
+  --sidebar-hover-bg: rgb(0 0 0 / 4%);
+  --site-title-color: #23242a;
+  --blockquote-border-color: var(--rf-accent-line);
+}
+
+/* Dark */
+:root[data-bs-theme="dark"] {
+  --rf-accent: #a7adff;
+  --rf-accent-soft: rgb(167 173 255 / 10%);
+  --rf-accent-line: rgb(167 173 255 / 32%);
+  --rf-divider: rgb(255 255 255 / 7%);
+  --rf-chip-bg: rgb(255 255 255 / 6%);
+  --rf-chip-text: #a3a6b0;
+
+  --main-bg: #141518;
+  --text-color: #c4c6cc;
+  --heading-color: #ececf0;
+  --text-muted-color: #8b8e98;
+  --link-color: var(--rf-accent);
+  --link-underline-color: var(--rf-accent-line);
+  --toc-highlight: var(--rf-accent);
+  --checkbox-checked-color: var(--rf-accent);
+  --btn-share-hover-color: var(--rf-accent);
+  --sidebar-bg: #18191d;
+  --sidebar-border-color: rgb(255 255 255 / 5%);
+  --sidebar-hover-bg: rgb(255 255 255 / 5%);
+  --sidebar-active-color: #f2f2f5;
+  --site-title-color: #e6e6ea;
+  --card-bg: #1b1c20;
+  --blockquote-border-color: var(--rf-accent-line);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-bs-theme]) {
+    --rf-accent: #a7adff;
+    --rf-accent-soft: rgb(167 173 255 / 10%);
+    --rf-accent-line: rgb(167 173 255 / 32%);
+    --rf-divider: rgb(255 255 255 / 7%);
+    --rf-chip-bg: rgb(255 255 255 / 6%);
+    --rf-chip-text: #a3a6b0;
+    --main-bg: #141518;
+    --text-color: #c4c6cc;
+    --heading-color: #ececf0;
+    --text-muted-color: #8b8e98;
+    --sidebar-bg: #18191d;
+    --sidebar-active-color: #f2f2f5;
+    --site-title-color: #e6e6ea;
+    --card-bg: #1b1c20;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Typography                                                       */
+/* ------------------------------------------------------------------ */
+
+body,
+.pagination,
+#sidebar .site-title,
+#topbar,
+#search-input {
+  font-family: var(--rf-font-sans);
+  font-feature-settings: "ss06", "tnum" 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.card-title {
+  font-family: var(--rf-font-sans);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  word-break: keep-all;
+}
+
+code,
+kbd,
+pre,
+.highlight,
+.code-header {
+  font-family: var(--rf-font-mono) !important;
+  font-variant-ligatures: none;
+}
+
+::selection {
+  background: var(--rf-accent-line);
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Home post list: cards -> editorial list                          */
+/* ------------------------------------------------------------------ */
+
+#post-list {
+  margin-top: 1.5rem;
+}
+
+#post-list .card-wrapper.card {
+  position: relative;
+  border-radius: 0;
+  box-shadow: none !important;
+  background: none !important;
+  border-bottom: 1px solid var(--rf-divider) !important;
+  transition: none;
+}
+
+#post-list .card-wrapper .post-preview {
+  background: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+#post-list .card-wrapper:not(:last-child) {
+  margin-bottom: 0;
+}
+
+#post-list .card .card-body {
+  padding: 1.6rem 0.25rem 1.7rem;
+}
+
+#post-list .card .post-meta {
+  order: -1;
+  flex-grow: 0 !important;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+#post-list .card .post-meta > div:first-child {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+}
+
+#post-list .card .post-meta i {
+  display: none;
+}
+
+#post-list .post-meta .categories {
+  margin: 0 !important;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+#post-list .post-cat {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--rf-chip-bg);
+  color: var(--rf-chip-text);
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+#post-list .post-cat:first-of-type {
+  background: var(--rf-accent-soft);
+  color: var(--rf-accent);
+}
+
+#post-list .card .card-title {
+  margin: 0.35rem 0 0.4rem !important;
+  font-size: 1.32rem;
+  line-height: 1.38;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 160ms var(--rf-ease);
+}
+
+#post-list .card .card-text.content {
+  margin-bottom: 0 !important;
+}
+
+#post-list .card .card-text.content p {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  -webkit-line-clamp: 2;
+}
+
+#post-list .card-wrapper:hover .card-title {
+  color: var(--rf-accent) !important;
+}
+
+#post-list .card .pin {
+  color: var(--rf-accent);
+  font-size: 0.72rem;
+}
+
+#post-list .card .pin i {
+  display: inline-block;
+}
+
+#post-list .card img {
+  border-radius: var(--rf-radius);
+}
+
+/* Pagination */
+.pagination .page-item .page-link {
+  border-radius: 999px;
+  min-width: 2.2rem;
+  text-align: center;
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--rf-accent-soft);
+  color: var(--rf-accent);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Sidebar                                                          */
+/* ------------------------------------------------------------------ */
+
+#sidebar {
+  border-right: 1px solid var(--sidebar-border-color);
+}
+
+#sidebar #avatar {
+  width: 5.25rem;
+  height: 5.25rem;
+  box-shadow: 0 0 0 3px var(--sidebar-bg), 0 0 0 4px var(--rf-divider);
+}
+
+#sidebar .profile-wrapper {
+  margin-top: 2.75rem;
+  margin-bottom: 1.75rem;
+}
+
+#sidebar .site-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-top: 1.1rem;
+  text-shadow: none;
+}
+
+#sidebar .site-subtitle {
+  font-style: normal !important;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+
+#sidebar ul li.nav-item {
+  opacity: 1;
+}
+
+#sidebar ul li.nav-item a.nav-link,
+#sidebar ul li.nav-item button.nav-link {
+  font-family: var(--rf-font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  border-radius: 0.5rem;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+  transition: background-color 140ms var(--rf-ease), color 140ms var(--rf-ease);
+}
+
+#sidebar ul li.nav-item a.nav-link i,
+#sidebar ul li.nav-item button.nav-link i {
+  opacity: 0.75;
+}
+
+#sidebar ul li.nav-item.active a.nav-link {
+  background: var(--rf-accent-soft);
+  color: var(--rf-accent);
+}
+
+#sidebar ul li.nav-item.active a.nav-link i {
+  opacity: 1;
+}
+
+#sidebar ul li.nav-item.nav-group-start {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--rf-divider);
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Topbar                                                           */
+/* ------------------------------------------------------------------ */
+
+#topbar-wrapper {
+  border-bottom: 1px solid transparent;
+}
+
+#search {
+  border-radius: 999px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Post reading                                                     */
+/* ------------------------------------------------------------------ */
+
+article .content,
+.post-content {
+  font-size: 1.03rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.content p {
+  margin-bottom: 1.25rem;
+}
+
+.content h2 {
+  margin-top: 3.25rem;
+  margin-bottom: 1.1rem;
+  font-size: 1.55rem;
+  border-bottom: 0 !important;
+}
+
+.content h3 {
+  margin-top: 2.25rem;
+  margin-bottom: 0.85rem;
+  font-size: 1.25rem;
+}
+
+.content h4 {
+  margin-top: 1.75rem;
+  font-size: 1.08rem;
+}
+
+.content a:not(.img-link):not(.popup) {
+  text-decoration: underline;
+  text-decoration-color: var(--rf-accent-line);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  border-bottom: 0;
+}
+
+.content a:not(.img-link):not(.popup):hover {
+  text-decoration-color: currentColor;
+}
+
+/* Figures and captions */
+.content img {
+  border-radius: var(--rf-radius);
+}
+
+.content img + em,
+.content a.popup + em,
+.content .img-link + em {
+  display: block;
+  max-width: 34rem;
+  margin: 0.6rem auto 0;
+  font-style: normal;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--text-muted-color);
+}
+
+:root[data-bs-theme="dark"] .content img {
+  filter: brightness(0.9);
+}
+
+/* Blockquote */
+.content blockquote:not(.prompt-tip):not(.prompt-info):not(.prompt-warning):not(.prompt-danger) {
+  border-left: 3px solid var(--rf-accent-line);
+  padding: 0.2rem 0 0.2rem 1.1rem;
+  color: var(--text-muted-color);
+}
+
+/* Callouts */
+.content blockquote[class^="prompt-"],
+.content blockquote[class*=" prompt-"] {
+  border-radius: var(--rf-radius);
+  border: 1px solid var(--rf-divider);
+}
+
+/* Inline code */
+.content :not(pre):not(.highlight) > code {
+  font-size: 0.86em;
+  padding: 0.12em 0.4em;
+  border-radius: 0.35rem;
+}
+
+/* Code blocks */
+.content div[class^="language-"],
+.content div[class*=" language-"] {
+  border-radius: var(--rf-radius);
+  box-shadow: 0 0 0 1px var(--rf-divider);
+  overflow: hidden;
+}
+
+/* Code Lab adds a third header item, which breaks Chirpy's centered-label
+   offset and pushes the label onto the window dots. Left-align it after them. */
+@media (min-width: 576px) {
+  div[class^="language-"] .code-header > span[data-label-text] {
+    margin-left: 3.1rem;
+    margin-right: auto;
+  }
+}
+
+.content .highlight pre,
+.content .highlight code {
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+/* Tables */
+.content .table-wrapper > table {
+  font-size: 0.92rem;
+  border-radius: var(--rf-radius);
+}
+
+.content .table-wrapper > table thead th {
+  font-weight: 600;
+  border-bottom-width: 1px;
+}
+
+/* Display math */
+.content mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+  margin: 1.25rem 0 !important;
+}
+
+/* Post header */
+header h1[data-toc-skip],
+article header h1 {
+  font-size: 2.1rem;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+}
+
+/* TOC */
+#toc-wrapper {
+  font-size: 0.85rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. Floating search button: quieter                                  */
+/* ------------------------------------------------------------------ */
+
+#sq-fab {
+  --sq-fab-size: 2.85rem;
+  width: var(--sq-fab-size) !important;
+  height: var(--sq-fab-size) !important;
+  font-size: 1.1rem !important;
+  background: var(--card-bg, #fff) !important;
+  color: var(--rf-accent) !important;
+  box-shadow: 0 0 0 1px var(--rf-divider), 0 6px 18px rgb(0 0 0 / 14%) !important;
+  transition: transform 160ms var(--rf-ease), box-shadow 160ms var(--rf-ease);
+}
+
+#sq-fab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--rf-accent-line), 0 8px 22px rgb(0 0 0 / 18%) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #post-list .card .card-title,
+  #sidebar ul li.nav-item a.nav-link,
+  #sq-fab {
+    transition: none;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #post-list .card .card-body {
+    padding: 1.3rem 0.1rem 1.4rem;
+  }
+
+  #post-list .card .card-title {
+    font-size: 1.15rem;
+  }
+
+  header h1[data-toc-skip],
+  article header h1 {
+    font-size: 1.65rem;
+  }
+}
