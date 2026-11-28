@@ -11,7 +11,8 @@ permalink: /graph/
 <div class="knowledge-graph" id="knowledge-graph">
   <header class="graph-intro">
     <p>
-      점선은 직접 연결, 실선은 공통 태그, 색상은 상위 카테고리입니다.
+      글 사이의 연결을 한눈에 봅니다. 점선은 본문 참조·관련 글 지정 같은 직접 연결,
+      실선은 공통 태그, 색은 상위 카테고리입니다.
     </p>
     <div class="graph-stats" aria-label="그래프 통계">
       <span><strong id="graph-post-count">{{ site.posts | size }}</strong> posts</span>
@@ -45,44 +46,37 @@ permalink: /graph/
       </select>
     </label>
 
-    <button id="graph-reset" type="button" class="graph-button">
+    <button id="graph-reset" type="button" class="graph-button graph-reset" aria-label="필터 초기화" title="필터 초기화">
       <i class="fas fa-rotate-left" aria-hidden="true"></i>
-      초기화
     </button>
   </div>
 
-  <div class="graph-layout">
-    <section class="graph-stage" aria-label="게시글 관계 그래프">
-      <div class="graph-canvas-wrap">
-        <svg id="graph-canvas" role="group" aria-labelledby="graph-title graph-description">
-          <title id="graph-title">게시글 관계 그래프</title>
-          <desc id="graph-description">본문 참조, 관련 글 연결, 공통 태그로 게시글을 연결한 그래프</desc>
-          <g id="graph-viewport">
-            <g id="graph-edges"></g>
-            <g id="graph-nodes"></g>
-          </g>
-        </svg>
+  <div id="graph-category-chips" class="graph-chips" role="group" aria-label="카테고리 빠른 선택"></div>
 
-        <div class="graph-zoom" aria-label="그래프 확대 및 축소">
-          <button id="graph-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus"></i></button>
-          <button id="graph-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus"></i></button>
-          <button id="graph-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand"></i></button>
-        </div>
+  <section class="graph-stage" aria-label="게시글 관계 그래프">
+    <div class="graph-canvas-wrap">
+      <svg id="graph-canvas" role="group" aria-labelledby="graph-title graph-description">
+        <title id="graph-title">게시글 관계 그래프</title>
+        <desc id="graph-description">본문 참조, 관련 글 연결, 공통 태그로 게시글을 연결한 그래프</desc>
+        <g id="graph-viewport">
+          <g id="graph-edges"></g>
+          <g id="graph-nodes"></g>
+        </g>
+      </svg>
 
-        <p id="graph-empty" class="graph-empty" hidden>조건에 맞는 글이 없습니다.</p>
+      <div class="graph-zoom" aria-label="그래프 확대 및 축소">
+        <button id="graph-zoom-in" type="button" aria-label="확대"><i class="fas fa-plus" aria-hidden="true"></i></button>
+        <button id="graph-zoom-out" type="button" aria-label="축소"><i class="fas fa-minus" aria-hidden="true"></i></button>
+        <button id="graph-fit" type="button" aria-label="화면에 맞추기"><i class="fas fa-expand" aria-hidden="true"></i></button>
       </div>
-      <p class="graph-help">드래그로 이동 · 휠로 확대·축소</p>
-    </section>
 
-    <aside class="graph-detail" id="graph-detail" aria-live="polite">
-      <div class="graph-detail-placeholder">
-        <i class="fas fa-circle-nodes" aria-hidden="true"></i>
-        <p>노드를 선택하면 글과 연결 정보를 볼 수 있습니다.</p>
-      </div>
-    </aside>
-  </div>
+      <aside class="graph-detail" id="graph-detail" aria-live="polite" hidden></aside>
 
-  <div id="graph-legend" class="graph-legend" aria-label="카테고리 색상 범례"></div>
+      <p id="graph-empty" class="graph-empty" hidden>조건에 맞는 글이 없습니다.</p>
+    </div>
+    <p class="graph-help">드래그로 이동 · 휠로 확대·축소 · 노드를 누르면 연결 정보 · 더블클릭하면 글로 이동</p>
+    <div id="graph-legend" class="graph-legend" aria-label="카테고리 색상 범례"></div>
+  </section>
 
   <noscript>
     <p class="prompt-warning">그래프를 보려면 브라우저에서 JavaScript를 활성화해야 합니다.</p>

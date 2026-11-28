@@ -33,6 +33,8 @@
   const postCount = document.getElementById('graph-post-count');
   const edgeCount = document.getElementById('graph-edge-count');
   const legend = document.getElementById('graph-legend');
+  const categoryChips = document.getElementById('graph-category-chips');
+  const zoomControls = root.querySelector('.graph-zoom');
   const ns = 'http://www.w3.org/2000/svg';
 
   const palette = ['#4c78a8', '#f58518', '#54a24b', '#e45756', '#72b7b2', '#b279a2', '#ff9da6'];
@@ -61,6 +63,8 @@
   let hoveredNode = null;
   let focusedNode = null;
   let graphSize = { width: 0, height: 0 };
+  // 사용자가 직접 옮기거나 확대하면 시뮬레이션 중 자동 맞춤을 멈춘다.
+  let userMovedView = false;
 
   categories.forEach((category) => categorySelect.add(new Option(category, category)));
   tags.forEach((tag) => tagSelect.add(new Option(`#${tag}`, tag)));
@@ -100,6 +104,7 @@
   }
 
   function applyFilters() {
+    userMovedView = false;
     const category = categorySelect.value;
     const tag = tagSelect.value;
 
@@ -139,7 +144,7 @@
       degrees.set(edge.target.id, (degrees.get(edge.target.id) ?? 0) + 1);
       edge.element = createSvgElement('line', {
         class: `graph-edge${edge.explicit ? ' is-related' : ''}`,
-        'stroke-width': edge.explicit ? 3.5 : Math.min(0.65 + edge.weight * 0.55, 3.2),
+        'stroke-width': edge.explicit ? 2 : Math.min(0.4 + edge.weight * 0.3, 1.6),
       });
       const description = createSvgElement('title');
       description.textContent = edge.explicit
@@ -158,12 +163,13 @@
       });
       const degree = degrees.get(node.id) ?? 0;
       node.degree = degree;
-      node.radius = Math.min(10 + degree * 1.1, 18);
+      // 태그 연결이 많아 차수 편차가 크다. 제곱근으로 눌러야 큰 노드가 화면을 덮지 않는다.
+      node.radius = Math.min(3.5 + Math.sqrt(degree) * 0.4, 8);
       const circle = createSvgElement('circle', {
         r: node.radius,
         fill: categoryColors.get(node.categories[0] || 'Uncategorized'),
       });
-      const label = createSvgElement('text', { class: 'graph-node-label', y: node.radius + 15, 'aria-hidden': 'true' });
+      const label = createSvgElement('text', { class: 'graph-node-label', y: node.radius + 12, 'aria-hidden': 'true' });
       label.textContent = truncate(node.title, 22);
       const title = createSvgElement('title');
       title.textContent = node.title;
@@ -221,11 +227,12 @@
         iterations += 1;
       }
       updatePositions();
+      if (!userMovedView && iterations % 45 === 0) fitGraph();
       if (iterations < 420) {
         animationFrame = requestAnimationFrame(tick);
       } else {
         animationFrame = null;
-        fitGraph();
+        if (!userMovedView) fitGraph();
       }
     };
     animationFrame = requestAnimationFrame(tick);
@@ -378,7 +385,9 @@
     const direct = neighbors.filter((neighbor) => neighbor.explicit);
     const byTags = neighbors.filter((neighbor) => !neighbor.explicit);
 
+    detail.hidden = false;
     detail.innerHTML = `
+      <button type="button" class="graph-detail__close" aria-label="상세 닫기"><i class="fas fa-xmark" aria-hidden="true"></i></button>
       <h2><a href="${escapeHtml(node.url)}">${escapeHtml(node.title)}</a></h2>
       <p class="graph-detail-meta">${escapeHtml(node.categories.join(' / '))} · ${escapeHtml(node.date)}</p>
       <p class="graph-detail-excerpt">${escapeHtml(node.excerpt)}</p>
@@ -387,6 +396,7 @@
       ${edgeModeSelect.value === 'tags' ? '' : renderNeighborList('직접 연결된 글', direct)}
       ${edgeModeSelect.value === 'explicit' ? '' : renderNeighborList('공통 태그로 연결된 글', byTags)}`;
 
+    detail.querySelector('.graph-detail__close').addEventListener('click', clearSelection);
     detail.querySelectorAll('[data-tag]').forEach((button) => {
       button.addEventListener('click', () => {
         tagSelect.value = button.dataset.tag;
@@ -413,11 +423,16 @@
   }
 
   function showPlaceholder() {
-    detail.innerHTML = `
-      <div class="graph-detail-placeholder">
-        <i class="fas fa-circle-nodes" aria-hidden="true"></i>
-        <p>노드를 선택하면 글과 연결 정보를 볼 수 있습니다.</p>
-      </div>`;
+    detail.hidden = true;
+    detail.replaceChildren();
+  }
+
+  function clearSelection() {
+    const node = postsById.get(selectedId);
+    selectedId = null;
+    renderSelection();
+    writeParams();
+    nodes.find((n) => n.id === node?.id)?.element.focus({ preventScroll: true });
   }
 
   function updateSearchHighlight(connectedEdges = selectedEdges()) {
@@ -482,9 +497,14 @@
 
     const bounds = nodeLayer.getBBox();
     const pad = Math.min(36, rect.width / 8, rect.height / 8);
-    const scale = Math.min(1.6, (rect.width - 2 * pad) / bounds.width, (rect.height - 2 * pad) / bounds.height);
+    // 왼쪽 위 확대 버튼과, 떠 있는 상세 패널을 피한 영역에 맞춘다.
+    const leftEdge = zoomControls.getBoundingClientRect().right - rect.left;
+    const overlay = !detail.hidden && getComputedStyle(detail).position === 'absolute'
+      ? detail.offsetWidth + 24 : 0;
+    const width = Math.max(1, rect.width - leftEdge - overlay - 2 * pad);
+    const scale = Math.min(1.6, width / bounds.width, (rect.height - 2 * pad) / bounds.height);
     transform = {
-      x: centerX - (bounds.x + bounds.width / 2) * scale,
+      x: leftEdge + pad + width / 2 - (bounds.x + bounds.width / 2) * scale,
       y: centerY - (bounds.y + bounds.height / 2) * scale,
       scale,
     };
@@ -492,6 +512,7 @@
   }
 
   function zoomAt(factor, clientX, clientY) {
+    userMovedView = true;
     const rect = svg.getBoundingClientRect();
     const px = clientX == null ? rect.width / 2 : clientX - rect.left;
     const py = clientY == null ? rect.height / 2 : clientY - rect.top;
@@ -506,6 +527,46 @@
   function renderLegend() {
     legend.innerHTML = categories.map((category) => `
       <span><i style="background:${categoryColors.get(category)}"></i>${escapeHtml(category)}</span>`).join('');
+  }
+
+  function renderCategoryChips() {
+    const counts = new Map();
+    for (const post of allPosts) {
+      const key = post.categories[0] || 'Uncategorized';
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const entries = [{ id: '', label: '전체', count: allPosts.length }]
+      .concat(categories.map((category) => ({ id: category, label: category, count: counts.get(category) ?? 0 }))
+        .sort((a, b) => b.count - a.count));
+    categoryChips.replaceChildren(...entries.map((entry) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'graph-quick';
+      button.dataset.value = entry.id;
+      if (entry.id) {
+        const dot = document.createElement('i');
+        dot.className = 'graph-quick__dot';
+        dot.style.background = categoryColors.get(entry.id);
+        dot.setAttribute('aria-hidden', 'true');
+        button.append(dot);
+      }
+      button.append(document.createTextNode(entry.label));
+      const count = document.createElement('small');
+      count.textContent = entry.count;
+      button.append(count);
+      button.addEventListener('click', () => {
+        categorySelect.value = entry.id;
+        onFilterChange();
+      });
+      return button;
+    }));
+    syncCategoryChips();
+  }
+
+  function syncCategoryChips() {
+    for (const button of categoryChips.children) {
+      button.setAttribute('aria-pressed', String(button.dataset.value === categorySelect.value));
+    }
   }
 
   function truncate(text, maxLength) {
@@ -553,8 +614,15 @@
 
   function onFilterChange() {
     applyFilters();
+    syncCategoryChips();
     writeParams();
   }
+
+  // Esc로 상세 패널을 닫는다.
+  root.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || detail.hidden) return;
+    clearSelection();
+  });
 
   searchInput.addEventListener('input', () => {
     updateSearchHighlight();
@@ -602,6 +670,7 @@
       return;
     }
     if (panState) {
+      userMovedView = true;
       transform.x = panState.tx + event.clientX - panState.x;
       transform.y = panState.ty + event.clientY - panState.y;
       setTransform();
@@ -634,8 +703,10 @@
   window.addEventListener('popstate', () => {
     readParams();
     applyFilters();
+    syncCategoryChips();
   });
   new ResizeObserver(fitGraph).observe(svg);
   readParams();
   applyFilters();
+  renderCategoryChips();
 })();
