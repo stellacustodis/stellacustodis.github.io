@@ -718,3 +718,123 @@ article header h1 {
 #panel-wrapper .popular-posts-list a:hover {
   color: var(--rf-accent);
 }
+
+/* ------------------------------------------------------------------ */
+/* 10. Listing pages: archives, categories, tags                       */
+/* ------------------------------------------------------------------ */
+
+#archives a,
+.categories a,
+#tags a,
+.content .post-tag {
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+}
+
+/* Archives */
+#archives .year {
+  font-family: var(--rf-font-sans);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  color: var(--heading-color);
+}
+
+#archives ul li {
+  border-radius: 0.5rem;
+}
+
+#archives ul li:nth-child(odd) {
+  background-color: transparent !important;
+}
+
+#archives ul li > a {
+  color: var(--text-color);
+  font-size: 0.97rem;
+  transition: color 140ms var(--rf-ease);
+}
+
+#archives ul li > a:hover {
+  color: var(--rf-accent);
+}
+
+#archives .date {
+  color: var(--text-muted-color);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+#archives .year::after,
+#archives ul li > a::before {
+  background-color: var(--rf-accent-line) !important;
+  box-shadow: none !important;
+}
+
+/* Categories */
+.categories.card {
+  border: 1px solid var(--rf-divider) !important;
+  border-radius: var(--rf-radius) !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+.categories .card-header {
+  background: var(--rf-chip-bg) !important;
+  border-bottom: 1px solid var(--rf-divider) !important;
+}
+
+.categories .card-header a,
+.categories .list-group-item a {
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+.categories .list-group-item a {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.categories .card-header a:hover,
+.categories .list-group-item a:hover {
+  color: var(--rf-accent);
+}
+
+.categories .list-group-item {
+  background: transparent !important;
+  border-color: var(--rf-divider) !important;
+}
+
+.categories .text-muted,
+.categories small {
+  font-size: 0.78rem;
+}
+
+/* Tags page */
+#tags {
+  gap: 0.15rem;
+}
+
+#tags .tag {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--rf-chip-bg) !important;
+  color: var(--rf-chip-text) !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.25rem 0.8rem !important;
+  box-shadow: none !important;
+  transition: background-color 140ms var(--rf-ease), color 140ms var(--rf-ease);
+}
+
+#tags .tag span {
+  color: var(--text-muted-color);
+  opacity: 0.75;
+  font-size: 0.72rem;
+  margin-left: 0.3rem;
+}
+
+#tags .tag:hover {
+  background: var(--rf-accent-soft) !important;
+  color: var(--rf-accent) !important;
+}
