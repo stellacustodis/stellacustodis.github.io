@@ -1,28 +1,604 @@
-/* Library 그래프 — graph.css 를 깔고 그 위에 라이브러리 전용만 얹는다. */
+/* Library — graph.css 를 깔고 그 위에 라이브러리 전용만 얹는다.
+   graph.css 는 /graph/ 페이지와 같이 쓰므로 여기서는 .library-graph 범위에서만 덮어쓴다. */
+
+.library-graph {
+  --lib-accent: var(--rf-accent, var(--link-color));
+  --lib-accent-soft: var(--rf-accent-soft, rgb(79 82 201 / 9%));
+  --lib-accent-line: var(--rf-accent-line, rgb(79 82 201 / 28%));
+  --lib-divider: var(--rf-divider, var(--main-border-color));
+  --lib-chip: var(--rf-chip-bg, rgb(0 0 0 / 4%));
+  --lib-chip-text: var(--rf-chip-text, var(--text-muted-color));
+  --lib-radius: var(--rf-radius, 0.625rem);
+  --lib-ease: var(--rf-ease, ease);
+  --graph-border: var(--lib-divider);
+  --graph-accent: var(--lib-accent);
+}
+
+/* 넓은 화면에서는 오른쪽 사이트 패널을 숨기고 본문을 넓힌다. */
+@media (min-width: 1200px) {
+  .row:has(#library-graph) > #panel-wrapper {
+    display: none !important;
+  }
+
+  .row:has(#library-graph) > main {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .row:has(#library-graph) > main > article {
+    max-width: 72rem;
+  }
+}
+
+/* 보기별로만 보이는 요소 */
+.library-graph[data-view="list"] .library-graph-only,
+.library-graph[data-view="graph"] .library-list-only {
+  display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 머리와 통계                                                          */
+/* ------------------------------------------------------------------ */
+
+.library-intro p {
+  color: var(--text-muted-color);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
 
 .library-graph .graph-stats {
   flex-wrap: wrap;
 }
 
+.library-graph .graph-stats span {
+  background: var(--lib-chip);
+  border: 0;
+  color: var(--text-muted-color);
+}
+
+.library-graph .graph-stats strong {
+  color: var(--heading-color);
+}
+
+/* ------------------------------------------------------------------ */
+/* 도구막대                                                             */
+/* ------------------------------------------------------------------ */
+
+.library-toolbar {
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.library-graph .library-toolbar > label {
+  flex: 1 1 8rem;
+  min-width: 0;
+  margin: 0;
+}
+
+.library-graph .library-toolbar > .graph-search {
+  flex: 3 1 14rem;
+}
+
+.library-graph .graph-toolbar input[type='search'],
+.library-graph .graph-toolbar select,
+.library-graph .graph-button,
+.library-viewbar select {
+  background: var(--card-bg, var(--main-bg));
+  border: 1px solid var(--lib-divider);
+  border-radius: 0.6rem;
+  transition: border-color 140ms var(--lib-ease), box-shadow 140ms var(--lib-ease);
+}
+
+.library-graph .graph-toolbar input[type='search']:focus,
+.library-graph .graph-toolbar select:focus,
+.library-graph .graph-button:focus-visible,
+.library-viewbar select:focus {
+  border-color: var(--lib-accent-line);
+  box-shadow: 0 0 0 3px var(--lib-accent-soft);
+}
+
+.library-graph .library-toolbar > .library-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.45rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--lib-divider);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 140ms var(--lib-ease), border-color 140ms var(--lib-ease), color 140ms;
+}
+
+.library-graph .library-toolbar > .library-toggle:has(input:checked) {
+  background: var(--lib-accent-soft);
+  border-color: var(--lib-accent-line);
+  color: var(--lib-accent);
+  font-weight: 600;
+}
+
+/* 테마의 폼 규칙이 입력 요소를 툴바 폭에 맞춰 늘린다. 체크박스는 고정 크기로 둔다. */
+.library-toggle input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--lib-accent);
+}
+
+.library-graph .library-reset {
+  flex: 0 0 auto;
+  width: 2.45rem !important;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* 계열 빠른 칩                                                          */
+/* ------------------------------------------------------------------ */
+
+.library-chips {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.library-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.library-quick {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--lib-chip);
+  color: var(--lib-chip-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 140ms var(--lib-ease), color 140ms var(--lib-ease), border-color 140ms;
+}
+
+.library-quick small {
+  opacity: 0.7;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.library-quick__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.library-quick:hover {
+  color: var(--heading-color);
+}
+
+.library-quick[aria-pressed="true"] {
+  background: var(--lib-accent-soft);
+  border-color: var(--lib-accent-line);
+  color: var(--lib-accent);
+  font-weight: 600;
+}
+
+.library-quick:focus-visible {
+  outline: 2px solid var(--lib-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 보기 전환 막대                                                        */
+/* ------------------------------------------------------------------ */
+
+.library-viewbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.library-tabs {
+  display: inline-flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: var(--lib-chip);
+}
+
+.library-tabs [role="tab"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted-color);
+  font-size: 0.87rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms var(--lib-ease), color 160ms var(--lib-ease), box-shadow 160ms;
+}
+
+.library-tabs [role="tab"] i {
+  font-size: 0.8rem;
+}
+
+.library-tabs [role="tab"][aria-selected="true"] {
+  background: var(--card-bg, var(--main-bg));
+  color: var(--heading-color);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%), 0 0 0 1px var(--lib-divider);
+}
+
+.library-tabs [role="tab"]:focus-visible {
+  outline: 2px solid var(--lib-accent);
+  outline-offset: 2px;
+}
+
+.library-tabs__count {
+  color: var(--lib-accent);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.library-viewbar__control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--text-muted-color);
+  font-size: 0.82rem;
+}
+
+.library-viewbar select {
+  height: 2.1rem;
+  padding: 0 0.6rem;
+  color: var(--text-color);
+  font-size: 0.84rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* 목록                                                                 */
+/* ------------------------------------------------------------------ */
+
+.library-list {
+  margin-top: 0;
+}
+
+#library-paper-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--lib-divider);
+}
+
+#library-paper-list > li {
+  margin: 0;
+}
+
+.library-paper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.25rem 1rem;
+  padding: 0.95rem 0.75rem 0.95rem 1.15rem;
+  border-bottom: 1px solid var(--lib-divider);
+  border-radius: 0;
+  transition: background-color 140ms var(--lib-ease);
+}
+
+.library-paper:hover {
+  background: var(--lib-chip);
+}
+
+.library-paper.is-reviewed::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 1.38rem;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: var(--lib-accent);
+}
+
+.library-paper[aria-current="true"] {
+  background: var(--lib-accent-soft);
+}
+
+.library-paper__year {
+  padding-top: 0.12rem;
+  color: var(--text-muted-color);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.library-paper__main {
+  min-width: 0;
+}
+
+.library-paper__title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--heading-color);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+a.library-paper__title {
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+}
+
+a.library-paper__title:hover {
+  color: var(--lib-accent);
+}
+
+.library-paper__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.library-paper__author {
+  margin-right: 0.25rem;
+  color: var(--text-muted-color);
+  font-size: 0.8rem;
+}
+
+.library-chip {
+  padding: 0.05rem 0.55rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--lib-chip);
+  color: var(--lib-chip-text);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: background-color 140ms var(--lib-ease), color 140ms var(--lib-ease);
+}
+
+button.library-chip:hover {
+  background: var(--lib-accent-soft);
+  color: var(--lib-accent);
+}
+
+.library-chip--static {
+  cursor: default;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--lib-divider);
+}
+
+.library-paper__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-top: 0.05rem;
+}
+
+.library-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 1.85rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--lib-divider);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-color) !important;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: border-color 140ms var(--lib-ease), color 140ms var(--lib-ease), background-color 140ms;
+}
+
+.library-action:hover {
+  border-color: var(--lib-accent-line);
+  color: var(--lib-accent) !important;
+}
+
+.library-action--review {
+  border-color: transparent;
+  background: var(--lib-accent-soft);
+  color: var(--lib-accent) !important;
+  font-weight: 600;
+}
+
+.library-action--review:hover {
+  background: var(--lib-accent);
+  color: var(--card-bg, #fff) !important;
+}
+
+.library-action--icon {
+  width: 1.85rem;
+  padding: 0;
+  justify-content: center;
+  color: var(--text-muted-color) !important;
+}
+
+.library-action:focus-visible {
+  outline: 2px solid var(--lib-accent);
+  outline-offset: 2px;
+}
+
+.library-empty {
+  padding: 3rem 0;
+  color: var(--text-muted-color);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* 그래프                                                               */
+/* ------------------------------------------------------------------ */
+
 .library-graph .graph-canvas-wrap {
   height: auto;
   min-height: 0;
+  border-color: var(--lib-divider);
+  border-radius: calc(var(--lib-radius) + 0.25rem);
+  background:
+    radial-gradient(circle at 1px 1px, var(--lib-divider) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--card-bg, transparent);
 }
 
 /* graph.css 는 #graph-canvas 를 아이디로 잡는다. 이쪽 캔버스는 별도로 크기를 준다. */
 #library-canvas {
   cursor: grab;
   display: block;
-  height: 38rem;
+  height: min(72vh, 44rem);
   touch-action: none;
   user-select: none;
   width: 100%;
 }
 
-@media (max-width: 850px) {
-  #library-canvas {
-    height: 30rem;
-  }
+.library-graph .graph-zoom {
+  left: 0.75rem;
+  right: auto;
+}
+
+.library-graph .graph-zoom button {
+  background: var(--card-bg, var(--main-bg));
+  border-color: var(--lib-divider);
+}
+
+.library-graph .graph-zoom button:hover {
+  color: var(--lib-accent);
+  border-color: var(--lib-accent-line);
+}
+
+.library-graph .graph-help {
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+}
+
+/* 떠 있는 상세 패널 */
+.library-graph .library-detail {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  bottom: auto;
+  width: min(21rem, calc(100% - 5rem));
+  min-height: 0;
+  max-height: calc(100% - 1.5rem);
+  padding: 1.1rem 1.15rem 1rem;
+  border: 1px solid var(--lib-divider);
+  border-radius: var(--lib-radius);
+  background: color-mix(in srgb, var(--card-bg, var(--main-bg)) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 28%);
+}
+
+.library-graph .library-detail[hidden] {
+  display: none;
+}
+
+.library-detail__close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted-color);
+  cursor: pointer;
+}
+
+.library-detail__close:hover {
+  background: var(--lib-chip);
+  color: var(--heading-color);
+}
+
+.library-detail__close:focus-visible {
+  outline: 2px solid var(--lib-accent);
+}
+
+.library-graph .library-detail .graph-detail-title {
+  margin: 0 1.75rem 0.35rem 0;
+  color: var(--heading-color);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.library-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.85rem 0 0.25rem;
+}
+
+/* 상세창의 축별 라벨. 누르면 그 라벨로 걸러진다. */
+.library-facet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.library-facet-name {
+  flex: 0 0 2.6rem;
+  color: var(--graph-muted);
+  font-size: 0.75rem;
+}
+
+.library-graph .graph-detail .graph-tag {
+  border: 0;
+  border-radius: 999px;
+  background: var(--lib-chip);
+  color: var(--lib-chip-text);
+  font-size: 0.72rem;
+}
+
+.library-graph .graph-detail button.graph-tag:hover {
+  background: var(--lib-accent-soft);
+  color: var(--lib-accent);
+}
+
+#library-legend {
+  margin-top: 0.6rem;
+}
+
+#library-legend small {
+  margin-left: 0.15rem;
+}
+
+.library-note {
+  margin-top: 1.5rem;
+  color: var(--graph-muted);
+  font-size: 0.78rem;
 }
 
 /* 주제 군집을 감싸는 원과 이름표 */
@@ -31,12 +607,12 @@
 }
 
 .library-hull-label {
-  fill: var(--text-color, #1b1b1e);
+  fill: var(--heading-color, #1b1b1e);
   font-size: 1.7rem;
   font-weight: 700;
   text-anchor: middle;
   pointer-events: none;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
 }
 
 .library-node circle {
@@ -80,9 +656,9 @@
 
 /* 블로그에 리뷰가 있는 논문 */
 .library-node .library-ring {
-  stroke: var(--text-color, #1b1b1e);
-  stroke-width: 1.4;
-  stroke-opacity: 0.75;
+  stroke: var(--lib-accent, #1b1b1e);
+  stroke-width: 1.6;
+  stroke-opacity: 0.85;
 }
 
 .library-node.is-reviewed circle:first-of-type {
@@ -95,198 +671,81 @@
 }
 
 .library-edge.is-active {
+  stroke: var(--lib-accent);
   stroke-opacity: 0.9;
   stroke-width: 2;
 }
 
-.library-graph .graph-toolbar > label {
-  flex: 1 1 8rem;
-  min-width: 0;
+/* ------------------------------------------------------------------ */
+/* 좁은 화면                                                            */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 850px) {
+  #library-canvas {
+    height: 30rem;
+  }
+
+  /* 좁으면 상세 패널이 그래프를 가리지 않게 아래로 내린다. */
+  .library-graph .library-detail {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0.75rem;
+    background: var(--card-bg, var(--main-bg));
+    box-shadow: none;
+  }
 }
 
-.library-graph .graph-toolbar > .graph-search {
-  flex: 2 1 12rem;
-}
+@media (max-width: 767px) {
+  /* 검색 옆에 초기화, 그 아래 필터 2열 */
+  .library-graph .library-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 2.45rem;
+    grid-template-areas:
+      "search search reset"
+      "family task   task"
+      "year   toggle toggle";
+  }
 
-.library-graph .graph-toolbar > .library-toggle {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2.45rem;
-  width: auto;
-  font-size: 0.86rem;
-  white-space: nowrap;
-}
+  .library-graph .library-toolbar > .graph-search { grid-area: search; }
+  .library-graph .library-toolbar > label:has(#library-family) { grid-area: family; }
+  .library-graph .library-toolbar > label:has(#library-task) { grid-area: task; }
+  .library-graph .library-toolbar > label:has(#library-year) { grid-area: year; }
+  .library-graph .library-toolbar > .library-toggle { grid-area: toggle; justify-content: center; }
+  .library-graph .library-toolbar > .library-reset { grid-area: reset; }
 
-/* 테마의 폼 규칙이 입력 요소를 툴바 폭에 맞춰 늘린다. 체크박스는 고정 크기로 둔다. */
-.library-toggle input[type='checkbox'] {
-  flex: 0 0 auto;
-  width: 1rem;
-  height: 1rem;
-  min-width: 0;
-  margin: 0;
-}
+  .library-paper {
+    grid-template-columns: 2.6rem minmax(0, 1fr);
+    padding-inline: 1rem 0.25rem;
+  }
 
-.library-external {
-  font-size: 0.86rem;
-}
-
-/* 상세창의 축별 라벨. 누르면 그 라벨로 걸러진다. */
-.library-facet {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.3rem;
-  margin-bottom: 0.4rem;
-}
-
-.library-facet-name {
-  flex: 0 0 2.6rem;
-  color: var(--graph-muted);
-  font-size: 0.75rem;
-}
-
-.library-chip {
-  border: 0;
-  cursor: pointer;
-  font: inherit;
-}
-
-.library-chip:hover {
-  filter: brightness(0.94);
-  text-decoration: underline;
-}
-
-.library-graph .graph-toolbar > .library-cluster-pick {
-  display: inline-flex;
-  flex: 1 1 9rem;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-
-.library-graph .library-cluster-pick > select {
-  flex: 1 1 auto;
-  min-width: 0;
-  width: auto;
-}
-
-.library-cluster-pick > span {
-  color: var(--graph-muted);
-  font-size: 0.8rem;
-}
-
-#library-legend small {
-  margin-left: 0.15rem;
-}
-
-.library-note {
-  margin-top: 1rem;
-  color: var(--graph-muted);
-  font-size: 0.8rem;
-}
-
-.library-list {
-  margin-top: 1.5rem;
-}
-
-.library-list__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.library-list__header h2,
-.library-list__header p {
-  margin: 0;
-}
-
-.library-list__header p,
-.library-list__header label {
-  color: var(--text-muted-color);
-  font-size: 0.875rem;
-}
-
-.library-list__header select {
-  margin-inline-start: 0.25rem;
-  border: 1px solid var(--graph-border);
-  border-radius: 0.35rem;
-  background: var(--main-bg, #fff);
-  color: var(--text-color, #1b1b1e);
-}
-
-#library-paper-list {
-  max-height: 26rem;
-  margin: 0;
-  padding: 0;
-  overflow: auto;
-  list-style: none;
-}
-
-#library-paper-list > li {
-  margin: 0;
-  border-top: 1px solid var(--main-border-color);
-}
-
-.library-list__paper {
-  display: grid;
-  grid-template-columns: 3.25rem minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.5rem;
-  border: 0;
-  background: transparent;
-  color: var(--text-color);
-  text-align: start;
-}
-
-.library-list__paper:hover .library-list__title {
-  text-decoration: underline;
-}
-
-.library-list__paper:focus-visible,
-.library-list__paper[aria-current='true'] {
-  outline: 2px solid var(--link-color);
-  outline-offset: -2px;
-}
-
-.library-list__year,
-.library-list__title small,
-.library-list__review {
-  color: var(--text-muted-color);
-  font-size: 0.8125rem;
-}
-
-.library-list__title {
-  overflow-wrap: anywhere;
-}
-
-.library-list__title small {
-  display: block;
-}
-
-.library-list__review {
-  color: var(--link-color);
-  white-space: nowrap;
+  .library-paper__actions {
+    grid-column: 2;
+    margin-top: 0.35rem;
+  }
 }
 
 @media (max-width: 420px) {
-  .library-list__paper {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
+  .library-viewbar {
+    gap: 0.5rem;
   }
 
-  .library-list__review {
-    grid-column: 2;
+  .library-tabs {
+    flex: 1 1 100%;
+  }
+
+  .library-tabs [role="tab"] {
+    flex: 1 1 0;
+    justify-content: center;
   }
 }
 
-.graph-detail-title {
-  font-size: 1rem;
-  line-height: 1.4;
-  margin-bottom: 0.35rem;
+@media (prefers-reduced-motion: reduce) {
+  .library-quick,
+  .library-tabs [role="tab"],
+  .library-paper,
+  .library-action,
+  .library-chip {
+    transition: none;
+  }
 }

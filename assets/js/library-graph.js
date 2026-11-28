@@ -37,6 +37,14 @@
   const listCount = document.getElementById('library-list-count');
   const listEmpty = document.getElementById('library-list-empty');
   const listSort = document.getElementById('library-list-sort');
+  const familyChips = document.getElementById('library-family-chips');
+  const tabs = [...root.querySelectorAll('.library-tabs [role="tab"]')];
+  const panels = {
+    list: document.getElementById('library-panel-list'),
+    graph: document.getElementById('library-panel-graph'),
+  };
+  const viewKey = 'stellacustodis-library-view:v1';
+  let view = 'list';
   const ns = 'http://www.w3.org/2000/svg';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -338,7 +346,10 @@
 
   function renderDetail(node, linked) {
     const others = linked.map((e) => (e.source === node ? e.target : e.source));
-    const out = [`<h3 class="graph-detail-title">${escapeHtml(node.title)}</h3>`];
+    const out = [
+      '<button type="button" class="library-detail__close" aria-label="상세 닫기"><i class="fas fa-xmark" aria-hidden="true"></i></button>',
+      `<h3 class="graph-detail-title">${escapeHtml(node.title)}</h3>`,
+    ];
     out.push(`<p class="graph-detail-meta">${escapeHtml([node.year, node.author].filter(Boolean).join(' · '))}</p>`);
 
     const rows = [];
@@ -349,8 +360,10 @@
       out.push(`<p class="library-facet"><span class="library-facet-name">${name}</span>${html}</p>`);
     });
 
-    if (node.post) out.push(`<p><a class="graph-button" href="${escapeHtml(node.post)}">이 논문 리뷰 읽기</a></p>`);
-    if (node.url) out.push(`<p><a class="library-external" href="${escapeHtml(node.url)}" target="_blank" rel="noopener">원문 링크</a></p>`);
+    const links = [];
+    if (node.post) links.push(`<a class="library-action library-action--review" href="${escapeHtml(node.post)}">리뷰 읽기</a>`);
+    if (node.url) links.push(`<a class="library-action" href="${escapeHtml(node.url)}" target="_blank" rel="noopener">원문 <span aria-hidden="true">↗</span></a>`);
+    if (links.length) out.push(`<p class="library-detail__actions">${links.join('')}</p>`);
 
     if (others.length) {
       out.push('<p class="graph-detail-meta">같은 제1저자</p><ul class="graph-neighbor-list">');
@@ -360,22 +373,32 @@
       out.push('</ul>');
     }
     detail.innerHTML = out.join('');
+    detail.hidden = false;
+    detail.querySelector('.library-detail__close').addEventListener('click', clearSelection);
     detail.querySelectorAll('button[data-node-id]').forEach((b) => {
       b.addEventListener('click', () => selectNode(b.dataset.nodeId, { center: true, revealRow: true }));
     });
     // 라벨을 누르면 그 라벨로 걸러진다 — 여러 특성을 타고 넘어가는 통로다.
     detail.querySelectorAll('button[data-facet]').forEach((b) => {
-      b.addEventListener('click', () => {
-        (b.dataset.facet === 'family' ? familySelect : taskSelect).value = b.dataset.value;
-        onFilterChange();
-      });
+      b.addEventListener('click', () => applyFacet(b.dataset.facet, b.dataset.value));
     });
   }
 
+  function applyFacet(facet, value) {
+    (facet === 'family' ? familySelect : taskSelect).value = value;
+    onFilterChange();
+  }
+
+  function clearSelection() {
+    selectedId = null;
+    showPlaceholder();
+    updateListSelection();
+    writeParams();
+  }
+
   function showPlaceholder() {
-    detail.innerHTML = `<div class="graph-detail-placeholder">
-      <i class="fas fa-book" aria-hidden="true"></i>
-      <p>논문을 선택하세요.</p></div>`;
+    detail.hidden = true;
+    detail.replaceChildren();
     nodes.forEach((n) => n.element.classList.remove('is-dimmed', 'is-selected'));
     edges.forEach((e) => e.element.classList.remove('is-active'));
   }
@@ -452,12 +475,9 @@
   }
 
   function revealSelectedRow() {
-    if (!selectedRow) return;
-    // 목록만 이동해야 그래프가 화면에 남아 리뷰 노드를 더블클릭할 수 있다.
-    const row = selectedRow.getBoundingClientRect();
-    const list = paperList.getBoundingClientRect();
-    if (row.top < list.top) paperList.scrollTop += row.top - list.top;
-    else if (row.bottom > list.bottom) paperList.scrollTop += row.bottom - list.bottom;
+    // 목록 화면일 때만 행으로 스크롤한다. 그래프 화면에서는 목록이 숨어 있다.
+    if (!selectedRow || view !== 'list') return;
+    selectedRow.scrollIntoView({ block: 'nearest' });
   }
 
   function renderPaperList() {
@@ -471,38 +491,154 @@
     const rows = document.createDocumentFragment();
     for (const paper of sorted) {
       const item = document.createElement('li');
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'library-list__paper';
-      button.id = `library-row-${paper.id}`;
-      button.dataset.paperId = paper.id;
+      item.className = `library-paper${paper.post ? ' is-reviewed' : ''}`;
+      item.id = `library-row-${paper.id}`;
 
       const year = document.createElement('span');
-      year.className = 'library-list__year';
+      year.className = 'library-paper__year';
       year.textContent = paper.year || '미상';
-      const title = document.createElement('span');
-      title.className = 'library-list__title';
+
+      const main = document.createElement('div');
+      main.className = 'library-paper__main';
+      const title = document.createElement(paper.post ? 'a' : 'span');
+      title.className = 'library-paper__title';
       title.textContent = paper.title;
+      if (paper.post) title.href = paper.post;
+      const meta = document.createElement('div');
+      meta.className = 'library-paper__meta';
       if (paper.author) {
-        const author = document.createElement('small');
+        const author = document.createElement('span');
+        author.className = 'library-paper__author';
         author.textContent = paper.author;
-        title.append(author);
+        meta.append(author);
       }
-      button.append(year, title);
+      for (const id of paper.family) meta.append(facetChip(id, 'family'));
+      for (const id of paper.task) meta.append(facetChip(id, 'task'));
+      if (paper.kind && paper.kind !== 'method') {
+        const kind = document.createElement('span');
+        kind.className = 'library-chip library-chip--static';
+        kind.textContent = label.get(paper.kind) || paper.kind;
+        meta.append(kind);
+      }
+      main.append(title, meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'library-paper__actions';
       if (paper.post) {
-        const review = document.createElement('span');
-        review.className = 'library-list__review';
-        review.textContent = '리뷰 있음';
-        button.append(review);
+        const review = document.createElement('a');
+        review.className = 'library-action library-action--review';
+        review.href = paper.post;
+        review.textContent = '리뷰 읽기';
+        actions.append(review);
       }
-      item.append(button);
+      if (paper.url) {
+        const source = document.createElement('a');
+        source.className = 'library-action';
+        source.href = paper.url;
+        source.target = '_blank';
+        source.rel = 'noopener';
+        source.innerHTML = '원문 <span aria-hidden="true">↗</span>';
+        source.setAttribute('aria-label', `${paper.title} 원문 (새 탭)`);
+        actions.append(source);
+      }
+      const locate = document.createElement('button');
+      locate.type = 'button';
+      locate.className = 'library-action library-action--icon';
+      locate.dataset.action = 'graph';
+      locate.dataset.paperId = paper.id;
+      locate.setAttribute('aria-label', `${paper.title} 그래프에서 보기`);
+      locate.title = '그래프에서 보기';
+      locate.innerHTML = '<i class="fas fa-circle-nodes" aria-hidden="true"></i>';
+      actions.append(locate);
+
+      item.append(year, main, actions);
       rows.append(item);
     }
     paperList.replaceChildren(rows);
-    paperList.scrollTop = 0;
-    listCount.textContent = `${sorted.length}편`;
+    listCount.textContent = String(sorted.length);
     listEmpty.hidden = sorted.length > 0;
     updateListSelection();
+  }
+
+  function facetChip(id, facet) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'library-chip';
+    button.dataset.facet = facet;
+    button.dataset.value = id;
+    button.textContent = label.get(id) || id;
+    return button;
+  }
+
+  // ── 계열 빠른 칩 ───────────────────────────────────────
+  function renderFamilyChips() {
+    const counts = new Map();
+    for (const paper of papers) {
+      const keys = paper.family.length ? paper.family : ['none'];
+      for (const key of keys) counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    const entries = [{ id: '', label: '전체', count: papers.length }]
+      .concat((facets.family || []).map((f) => ({ ...f, count: counts.get(f.id) || 0 }))
+        .filter((f) => f.count > 0)
+        .sort((a, b) => (a.id === 'none') - (b.id === 'none') || b.count - a.count));
+    familyChips.replaceChildren(...entries.map((f) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'library-quick';
+      button.dataset.value = f.id;
+      if (f.id) {
+        const dot = document.createElement('i');
+        dot.className = 'library-quick__dot';
+        dot.style.background = colorOf(f.id);
+        dot.setAttribute('aria-hidden', 'true');
+        button.append(dot);
+      }
+      button.append(document.createTextNode(f.label));
+      const count = document.createElement('small');
+      count.textContent = f.count;
+      button.append(count);
+      button.addEventListener('click', () => {
+        familySelect.value = f.id;
+        onFilterChange();
+      });
+      return button;
+    }));
+    syncFamilyChips();
+  }
+
+  function syncFamilyChips() {
+    for (const button of familyChips.children) {
+      button.setAttribute('aria-pressed', String(button.dataset.value === familySelect.value));
+    }
+  }
+
+  // ── 목록 · 그래프 전환 ─────────────────────────────────
+  function setView(next, { focus = false, persist = true } = {}) {
+    view = next === 'graph' ? 'graph' : 'list';
+    root.dataset.view = view;
+    for (const tab of tabs) {
+      const active = tab.dataset.view === view;
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+      if (active && focus) tab.focus();
+    }
+    panels.list.hidden = view !== 'list';
+    panels.graph.hidden = view !== 'graph';
+    if (persist) {
+      try { localStorage.setItem(viewKey, view); } catch { /* 편의 기능 */ }
+    }
+    writeParams();
+    if (view === 'graph') {
+      requestAnimationFrame(() => {
+        fitGraph();
+        const node = nodes.find((n) => n.id === selectedId);
+        if (node) centerNode(node, false);
+      });
+    }
+  }
+
+  function storedView() {
+    try { return localStorage.getItem(viewKey); } catch { return null; }
   }
 
   function renderLegend(clusters) {
@@ -557,13 +693,17 @@
     const margin = 24;
     const x = transform.x + node.x * transform.scale;
     const y = transform.y + node.y * transform.scale;
+    // 확대 버튼은 그래프 왼쪽 위에 있다.
     const controls = zoomControls.getBoundingClientRect();
-    const overlapsControls = x > controls.left - left - margin && y < controls.bottom - top + margin;
+    const overlapsControls = x < controls.right - left + margin && y < controls.bottom - top + margin;
     if (transform.scale >= minScale && !overlapsControls
         && x >= margin && x <= width - margin && y >= margin && y <= height - margin) return;
 
     const scale = Math.max(transform.scale, minScale);
-    const target = { x: width / 2 - node.x * scale, y: height / 2 - node.y * scale, scale };
+    // 상세 패널이 그래프 오른쪽 위에 떠 있으면 그 폭을 빼고 가운데를 잡는다.
+    const overlay = !detail.hidden && getComputedStyle(detail).position === 'absolute'
+      ? detail.offsetWidth + 24 : 0;
+    const target = { x: (width - overlay) / 2 - node.x * scale, y: height / 2 - node.y * scale, scale };
     if (!animate || reducedMotion.matches) {
       transform = target;
       setTransform();
@@ -612,11 +752,14 @@
     const maxX = Math.max(...bounds.map((bound) => bound[2]));
     const maxY = Math.max(...bounds.map((bound) => bound[3]));
     const pad = 12;
-    const right = zoomControls.getBoundingClientRect().left - rect.left;
-    const width = Math.max(1, right - pad * 2);
+    // 왼쪽은 확대 버튼, 오른쪽은 떠 있는 상세 패널을 피해서 맞춘다.
+    const leftEdge = zoomControls.getBoundingClientRect().right - rect.left;
+    const overlay = !detail.hidden && getComputedStyle(detail).position === 'absolute'
+      ? detail.offsetWidth + 24 : 0;
+    const width = Math.max(1, rect.width - leftEdge - overlay - pad * 2);
     const height = Math.max(1, rect.height - pad * 2);
     transform.scale = Math.min(width / (maxX - minX), height / (maxY - minY), 1.6);
-    transform.x = pad + width / 2 - ((minX + maxX) / 2) * transform.scale;
+    transform.x = leftEdge + pad + width / 2 - ((minX + maxX) / 2) * transform.scale;
     transform.y = pad + height / 2 - ((minY + maxY) / 2) * transform.scale;
     setTransform();
   }
@@ -648,6 +791,7 @@
     reviewedOnly.checked = params.get('reviewed') === '1';
     searchInput.value = params.get('q') ?? '';
     selectedId = params.get('paper');
+    view = params.get('view') || storedView() || 'list';
   }
 
   function writeParams() {
@@ -660,6 +804,7 @@
       reviewed: reviewedOnly.checked ? '1' : '',
       q: searchInput.value.trim(),
       paper: selectedId,
+      view: view === 'graph' ? 'graph' : '',
     };
     for (const [name, value] of Object.entries(state)) {
       if (value) url.searchParams.set(name, value);
@@ -671,30 +816,56 @@
   function restoreState() {
     readParams();
     applyFilters();
-    const node = nodes.find((paper) => paper.id === selectedId);
-    if (node) {
-      centerNode(node, false);
-      revealSelectedRow();
-    }
+    syncFamilyChips();
+    setView(view, { persist: false });
+    revealSelectedRow();
   }
 
   function onFilterChange() {
     applyFilters();
+    syncFamilyChips();
     writeParams();
   }
 
   searchInput.addEventListener('input', () => { writeParams(); updateSearchHighlight(); });
   listSort.addEventListener('change', renderPaperList);
   paperList.addEventListener('click', (event) => {
-    const button = event.target.closest('button[data-paper-id]');
-    if (!button) return;
-    selectNode(button.dataset.paperId, { center: true });
-    const heading = detail.querySelector('.graph-detail-title');
-    if (heading) {
-      heading.tabIndex = -1;
-      heading.focus({ preventScroll: true });
-      detail.scrollIntoView({ block: 'nearest' });
+    const chipButton = event.target.closest('button[data-facet]');
+    if (chipButton) {
+      applyFacet(chipButton.dataset.facet, chipButton.dataset.value);
+      return;
     }
+    const locate = event.target.closest('button[data-action="graph"]');
+    if (!locate) return;
+    selectedId = locate.dataset.paperId;
+    setView('graph');
+    requestAnimationFrame(() => {
+      selectNode(locate.dataset.paperId, { center: true });
+      const heading = detail.querySelector('.graph-detail-title');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
+      panels.graph.scrollIntoView({ block: 'nearest' });
+    });
+  });
+
+  // 그래프 화면에서 Esc로 상세 패널을 닫는다.
+  root.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || view !== 'graph' || detail.hidden) return;
+    const node = nodes.find((n) => n.id === selectedId);
+    clearSelection();
+    node?.element.focus({ preventScroll: true });
+  });
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => setView(tab.dataset.view));
+    tab.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+      event.preventDefault();
+      const next = tabs[(index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      setView(next.dataset.view, { focus: true });
+    });
   });
   [clusterSelect, familySelect, taskSelect, yearSelect, reviewedOnly]
     .forEach((el) => el.addEventListener('change', onFilterChange));
@@ -771,6 +942,6 @@
   }
 
   window.addEventListener('popstate', restoreState);
-  paperList.closest('.library-list').hidden = false;
   restoreState();
+  renderFamilyChips();
 })();
