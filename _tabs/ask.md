@@ -14,7 +14,7 @@ permalink: /ask/
 
 <div id="ai-examples" role="group" aria-label="예시 검색어"></div>
 
-<p class="text-muted small">키워드와 문맥으로 블로그 문단을 검색합니다. 첫 검색 시 브라우저에서 모델을 불러옵니다.</p>
+<p class="text-muted small">키워드 결과를 먼저 보여 주고, 브라우저에서 의미 검색 모델이 준비되면 문맥으로 다시 정렬합니다.</p>
 
 <p id="ai-status" role="status"></p>
 <div id="ai-results"></div>

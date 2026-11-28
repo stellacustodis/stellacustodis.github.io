@@ -1,4 +1,4 @@
-import { renderQuestionChips, renderSearchResults, searchPosts } from "./search-core.mjs";
+import { renderQuestionChips, renderSearchResults, searchPosts, warmup } from "./search-core.mjs";
 
 const form = document.getElementById("ai-form");
 const status = document.getElementById("ai-status");
@@ -31,10 +31,14 @@ async function search(value) {
   try {
     const results = await searchPosts(query, {
       onStatus: (message) => { if (id === searchId) say(message); },
+      onPartial: (partial) => {
+        if (id === searchId) renderSearchResults(out, partial, query, { baseUrl: form.dataset.baseUrl });
+      },
     });
     if (id !== searchId) return;
     renderSearchResults(out, results, query, { baseUrl: form.dataset.baseUrl });
-    say(results.length ? `상위 ${results.length}편` : "검색 결과가 없습니다.");
+    if (results.lexicalOnly) say("의미 검색 모델을 불러오지 못해 키워드 결과만 보여 줍니다.", true);
+    else say(results.length ? `상위 ${results.length}편` : "검색 결과가 없습니다.");
   } catch (error) {
     if (id === searchId) say("검색하지 못했습니다. " + error.message, true);
   } finally {
@@ -47,5 +51,8 @@ form.addEventListener("submit", (event) => {
   search(box.value);
 });
 renderQuestionChips(chips, search);
+// 검색 전용 페이지라 들어오자마자 모델을 미리 불러 둔다.
+if ("requestIdleCallback" in window) requestIdleCallback(warmup, { timeout: 1500 });
+else setTimeout(warmup, 300);
 const query = new URLSearchParams(window.location.search).get("q");
 if (query?.trim()) search(query);

@@ -1,4 +1,4 @@
-import { renderQuestionChips, renderSearchResults, searchPosts } from "./search-core.mjs";
+import { renderQuestionChips, renderSearchResults, searchPosts, warmup } from "./search-core.mjs";
 
 const baseUrl = document.querySelector('meta[name="code-lab-baseurl"]')?.content ?? "";
 const css = `
@@ -111,8 +111,10 @@ function toggle(open) {
   panel.hidden = !open;
   fab.setAttribute("aria-expanded", String(open));
   fab.textContent = open ? "×" : "💬";
-  if (open) input.focus();
-  else fab.focus();
+  if (open) {
+    input.focus();
+    warmup();
+  } else fab.focus();
 }
 
 function say(message, error = false) {
@@ -137,10 +139,14 @@ async function search(value) {
     const results = await searchPosts(query, {
       limit: 6,
       onStatus: (message) => { if (id === searchId) say(message); },
+      onPartial: (partial) => {
+        if (id === searchId) renderSearchResults(out, partial, query, { baseUrl, compact: true });
+      },
     });
     if (id !== searchId) return;
     renderSearchResults(out, results, query, { baseUrl, compact: true });
-    say(results.length ? `상위 ${results.length}편` : "검색 결과가 없습니다.");
+    if (results.lexicalOnly) say("의미 검색 모델을 불러오지 못해 키워드 결과만 보여 줍니다.", true);
+    else say(results.length ? `상위 ${results.length}편` : "검색 결과가 없습니다.");
     full.href = `${baseUrl}/ask/?${new URLSearchParams({ q: query })}`;
     full.hidden = false;
   } catch (error) {
@@ -154,6 +160,10 @@ async function search(value) {
 }
 
 fab.addEventListener("click", () => toggle(panel.hidden));
+// 버튼에 마우스를 올리거나 포커스하면 가벼운 색인만 미리 받아 둔다. 모델은 패널을 열 때 받는다.
+const warmIndex = () => warmup({ model: false });
+fab.addEventListener("pointerenter", warmIndex, { once: true });
+fab.addEventListener("focus", warmIndex, { once: true });
 get("sq-close").addEventListener("click", () => toggle(false));
 panel.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !event.isComposing) toggle(false);
